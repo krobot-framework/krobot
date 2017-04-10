@@ -41,23 +41,6 @@ public class Krobot extends AbstractModule
         bot.init();
     }
 
-    public static User resolve(String user)
-    {
-        List<User> users = jda.getUsersByName(user, true);
-
-        if (users.size() == 0 && user.startsWith("@"))
-        {
-            users = jda.getUsersByName(user.substring(1), true);
-        }
-
-        if (users.size() == 0)
-        {
-            return jda.getUserById(user);
-        }
-
-        return users.get(0);
-    }
-
     @Override
     protected void configure()
     {

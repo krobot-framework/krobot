@@ -1,6 +1,6 @@
 package fr.litarvan.krobot.command;
 
-import fr.litarvan.krobot.Krobot;
+import fr.litarvan.krobot.util.UserUtils;
 import java.util.List;
 import net.dv8tion.jda.core.entities.User;
 
@@ -74,9 +74,9 @@ public class SuppliedArgument
             case USER:
                 return this.user;
             case STRING:
-                return Krobot.resolve(this.stringValue);
+                return UserUtils.resolve(this.stringValue);
             case NUMBER:
-                return Krobot.resolve(String.valueOf(this.numberValue));
+                throw new IllegalStateException("Cannot convert Number argument to User argument");
         }
 
         return null;

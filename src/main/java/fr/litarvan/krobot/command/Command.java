@@ -1,6 +1,7 @@
 package fr.litarvan.krobot.command;
 
 import fr.litarvan.krobot.Krobot;
+import fr.litarvan.krobot.util.UserUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +68,7 @@ public class Command
                 {
                     ex = new BadSyntaxException();
                 }
-                else if (type == ArgumentType.USER && Krobot.resolve(arg) == null)
+                else if (type == ArgumentType.USER && UserUtils.resolve(arg) == null)
                 {
                     ex = new UserNotFoundException(arg);
                 }
@@ -121,7 +122,7 @@ public class Command
                         switch (type)
                         {
                             case USER:
-                                User user = Krobot.resolve(value);
+                                User user = UserUtils.resolve(value);
                                 if (user == null)
                                 {
                                     throw new UserNotFoundException(value);
@@ -152,7 +153,7 @@ public class Command
                     switch (arguments[i].getType())
                     {
                         case USER:
-                            argument = new SuppliedArgument(Krobot.resolve(value));
+                            argument = new SuppliedArgument(UserUtils.resolve(value));
                             break;
                         case NUMBER:
                             argument = new SuppliedArgument(Integer.parseInt(value));

@@ -5,5 +5,4 @@ build/
 *.iws
 *.ipr
 src/test
-config/
 logs/

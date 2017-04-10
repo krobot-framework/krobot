@@ -18,15 +18,37 @@
  */
 package fr.litarvan.krobot.command;
 
+import fr.litarvan.krobot.ExceptionHandler;
+
+/**
+ * The User Not Found Exception
+ *
+ *
+ * An exception thrown when the user called a command and
+ * provided a {@link ArgumentType#USER} argument but of
+ * a user that cannot be resolved.
+ *
+ * Supposed to be caught by the {@link ExceptionHandler}.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public class UserNotFoundException extends Exception
 {
     private String user;
 
+    /**
+     * @param user The user that the command caller given
+     */
     public UserNotFoundException(String user)
     {
         super("Can't find user '" + user + "'");
     }
 
+    /**
+     * @return The user that the command caller given
+     */
     public String getUser()
     {
         return user;

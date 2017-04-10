@@ -20,8 +20,25 @@ package fr.litarvan.krobot.command;
 
 import java.util.Map;
 
+/**
+ * The Command Handler
+ *
+ *
+ * Called by the {@link CommandManager} to handle the call
+ * of a command.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 @FunctionalInterface
 public interface CommandHandler
 {
+    /**
+     * Handle a command calling
+     *
+     * @param context The context of the command call
+     * @param args The supplied arguments
+     */
     void handle(CommandContext context, Map<String, SuppliedArgument> args);
 }

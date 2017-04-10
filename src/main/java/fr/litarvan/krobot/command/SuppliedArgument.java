@@ -22,6 +22,17 @@ import fr.litarvan.krobot.util.UserUtils;
 import java.util.List;
 import net.dv8tion.jda.core.entities.User;
 
+/**
+ * A Supplied Argument
+ *
+ *
+ * An argument that was given to a command.
+ * Like an instance of a {@link CommandArgument}.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public class SuppliedArgument
 {
     private ArgumentType type;
@@ -31,30 +42,57 @@ public class SuppliedArgument
     private int numberValue;
     private List listValue;
 
+    /**
+     * A User argument
+     *
+     * @param user The given user
+     */
     public SuppliedArgument(User user)
     {
         this.type = ArgumentType.USER;
         this.user = user;
     }
 
+    /**
+     * A String argument
+     *
+     * @param stringValue The value of the argument
+     */
     public SuppliedArgument(String stringValue)
     {
         this.type = ArgumentType.STRING;
         this.stringValue = stringValue;
     }
 
+    /**
+     * A number argument
+     *
+     * @param numberValue The value of the argument
+     */
     public SuppliedArgument(int numberValue)
     {
         this.type = ArgumentType.NUMBER;
         this.numberValue = numberValue;
     }
 
+    /**
+     * A list argument
+     *
+     * @param list The given list
+     * @param type The type of the list
+     */
     public SuppliedArgument(List list, ArgumentType type)
     {
         this.type = type;
         this.listValue = list;
     }
 
+    /**
+     * @return The string value of the argument.
+     *
+     * If it is a {@link ArgumentType#USER}, returns its Username.
+     * If it is a number, returns its String value.
+     */
     public String getAsString()
     {
         switch (this.type)
@@ -70,6 +108,13 @@ public class SuppliedArgument
         return null;
     }
 
+    /**
+     * @throws IllegalStateException If it is a {@link ArgumentType#USER}
+     *
+     * @return The int value of the argument.
+     *
+     * If it is a {@link ArgumentType#STRING}, it tries to parse it.
+     */
     public int getAsNumber()
     {
         switch (this.type)
@@ -85,6 +130,13 @@ public class SuppliedArgument
         return 0;
     }
 
+    /**
+     * @throws IllegalStateException If it is a {@link ArgumentType#NUMBER}
+     *
+     * @return The argument as a User.
+     *
+     * If it is a {@link ArgumentType#STRING}, tries to resolve it.
+     */
     public User getAsUser()
     {
         switch (this.type)
@@ -100,6 +152,11 @@ public class SuppliedArgument
         return null;
     }
 
+    /**
+     * @throws IllegalStateException If it isn't a list of user
+     *
+     * @return The argument as a User list.
+     */
     public List<User> getAsUserList()
     {
         if (this.listValue == null)
@@ -115,6 +172,11 @@ public class SuppliedArgument
         return listValue;
     }
 
+    /**
+     * @throws IllegalStateException If it isn't a list of string
+     *
+     * @return The argument as a string list.
+     */
     public List<String> getAsStringList()
     {
         if (this.listValue == null)
@@ -130,6 +192,11 @@ public class SuppliedArgument
         return listValue;
     }
 
+    /**
+     * @throws IllegalStateException If it isn't a list of number
+     *
+     * @return The argument as a number list.
+     */
     public List<Integer> getAsNumberList()
     {
         if (this.listValue == null)

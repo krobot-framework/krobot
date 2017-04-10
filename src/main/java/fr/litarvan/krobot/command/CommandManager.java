@@ -34,6 +34,43 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * The CommandManager
+ *
+ *
+ * It's the starting point of a bot, and the main part of Krobot.
+ *
+ * It has a command registry, and handle the command call to its
+ * registered command.
+ *
+ * It uses the builders to make commands.
+ *
+ * To use it, use the {@link #make} methods.
+ *
+ * Examples :
+ *
+ * <pre>
+ *     manager.make("/mycommand", MyHandler.class).middlewares(MyMiddleware.class).register();
+ *     manager.make("/version", (context, args) -> {
+ *         context.getChannel().sendMessage("v1.0.0").queue();
+ *     }).register();
+ * </pre>
+ *
+ * <pre>
+ *     manager.group().prefix("!").middleware((command, args, context) -> {
+ *         context.getChannel().sendMessage("A command was called").queue();
+ *     }).apply(() -> {
+ *         manager.make("mycommand", MyHandler.class).register();
+ *         manager.make("myothercommand", MyOtherHandler.class).register();
+ *     });
+ * </pre>
+ *
+ * Don't forget to call the register function.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 @Singleton
 public class CommandManager
 {
@@ -55,16 +92,57 @@ public class CommandManager
         this.jda.addEventListener(this);
     }
 
+    /**
+     * Create a group builder.
+     *
+     * A command group is some properties that will be applied
+     * to some commands at the same time.
+     *
+     * Example :
+     *
+     * <pre>
+     *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -> {
+     *         manager.make("mycommand", MyHandler.class).register();
+     *         manager.make("myothercommand", MyOtherHandler.class).register();
+     *     });
+     * </pre>
+     *
+     * In this case, the label of mycommand and myothercommand will be
+     * !mycommand and !myothercommand, and they will have the MyMiddleware
+     * middleware triggered before their call.
+     *
+     * @return A new group builder linked to this
+     */
     public GroupBuilder group()
     {
         return new GroupBuilder(this);
     }
 
+    /**
+     * Generate a CommandBuilder linked to this, with pre-defined
+     * path and command handler
+     *
+     * @param path The path of the command (see {@link CommandBuilder#path(String)}
+     *             for the syntax
+     * @param commandCl The command handler (will be created by the injector)
+     *
+     * @return A new CommandBuilder
+     */
     public CommandBuilder make(String path, Class<? extends CommandHandler> commandCl)
     {
         return make(path, Krobot.injector().getInstance(commandCl));
     }
 
+    /**
+     * Generate a CommandBuilder linked to this, with pre-defined
+     * path and command handler
+     *
+     * @param path The path of the command (see {@link CommandBuilder#path(String)}
+     *             for the syntax
+     * @param handler The command handler
+     *
+     * @return A new CommandBuilder
+     */
     public CommandBuilder make(String path, CommandHandler handler)
     {
         CommandBuilder builder = make(handler);
@@ -88,22 +166,45 @@ public class CommandManager
         return builder.path(prefix.toString() + path);
     }
 
+    /**
+     * Generate a CommandBuilder linked to this, with a pre-defined
+     * command handler
+     *
+     * @param handler The command handler
+     *
+     * @return A new CommandBuilder
+     */
     public CommandBuilder make(CommandHandler handler)
     {
         return new CommandBuilder(this).handler(handler);
     }
 
+    /**
+     * Register a command
+     *
+     * @param command The command to register
+     */
     public void register(Command command)
     {
         LOGGER.info("Registered command -> " + command.toString("", true));
         this.commands.add(command);
     }
 
+    /**
+     * Push a command group to the stack
+     * The next command registered will have the group properties
+     * applied.
+     *
+     * @param group The group to push
+     */
     public void push(CommandGroup group)
     {
         stack.add(group);
     }
 
+    /**
+     * Pop the last group of the stack
+     */
     public void pop()
     {
         stack.remove(stack.size() - 1);
@@ -140,6 +241,21 @@ public class CommandManager
         }
     }
 
+    /**
+     * Split a message from whitespaces, ignoring the one in quotes.
+     *
+     * Example :
+     *
+     * <pre>
+     *     I am a "discord bot"
+     * </pre>
+     *
+     * Will return ["I", "am", "a", "discord bot"].
+     *
+     * @param line The line to split
+     *
+     * @return The line split
+     */
     public static String[] splitWithQuotes(String line)
     {
         ArrayList<String> matchList = new ArrayList<>();
@@ -165,6 +281,9 @@ public class CommandManager
         return matchList.toArray(new String[matchList.size()]);
     }
 
+    /**
+     * @return The registered commands
+     */
     public List<Command> getCommands()
     {
         return commands;

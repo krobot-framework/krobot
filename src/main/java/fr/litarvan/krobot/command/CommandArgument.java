@@ -18,6 +18,17 @@
  */
 package fr.litarvan.krobot.command;
 
+/**
+ * A Command Argument
+ *
+ *
+ * Represents a definition of an argument that can be given
+ * to a command.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public class CommandArgument
 {
     private String key;
@@ -26,6 +37,14 @@ public class CommandArgument
     private String[] choices;
     private ArgumentType type;
 
+    /**
+     * An argument
+     *
+     * @param key The key of the argument (to retrieve it then)
+     * @param optional If it is optional or required
+     * @param list If it is a list
+     * @param type The type of the argument
+     */
     public CommandArgument(String key, boolean optional, boolean list, ArgumentType type)
     {
         this.key = key;
@@ -34,6 +53,13 @@ public class CommandArgument
         this.type = type;
     }
 
+    /**
+     * An fixed "choices" argument
+     *
+     * @param key The key of the argument (to retrieve it then)
+     * @param optional If it is optional or required
+     * @param choices The choices that the user can type
+     */
     public CommandArgument(String key, boolean optional, String[] choices)
     {
         this.key = key;
@@ -43,26 +69,42 @@ public class CommandArgument
         this.type = ArgumentType.STRING;
     }
 
+    /**
+     * @return The key of the argument (to retrieve it then)
+     */
     public String getKey()
     {
         return key;
     }
 
+    /**
+     * @return If it is optional or required
+     */
     public boolean isOptional()
     {
         return optional;
     }
 
+    /**
+     * @return If it is a list
+     */
     public boolean isList()
     {
         return list;
     }
 
+    /**
+     * @return (In case of a fixed choices argument) The choices
+     * that the user can type
+     */
     public String[] getChoices()
     {
         return choices;
     }
 
+    /**
+     * @return The type of the argument
+     */
     public ArgumentType getType()
     {
         return type;

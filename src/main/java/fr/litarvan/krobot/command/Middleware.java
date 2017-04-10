@@ -18,8 +18,32 @@
  */
 package fr.litarvan.krobot.command;
 
+import java.util.Map;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * A Middleware
+ *
+ *
+ * A Middleware is something that is called before that a/some
+ * commands are called. It can cancel its handling.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 @FunctionalInterface
 public interface Middleware
 {
-    boolean handle(Command command, CommandContext context);
+    /**
+     * Handle a command call
+     *
+     * @param command The command that was called
+     * @param args The arguments given to the command => Null if it
+     *             is called before a sub command handling
+     * @param context The context of the command call
+     *
+     * @return If the handling should continue
+     */
+    boolean handle(Command command, @Nullable Map<String, SuppliedArgument> args, CommandContext context);
 }

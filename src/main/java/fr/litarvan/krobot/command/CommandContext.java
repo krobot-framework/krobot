@@ -22,12 +22,31 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
+/**
+ * The Command Context
+ *
+ *
+ * The context where the command was called.
+ * It contains the user that called the command, the message
+ * of the command, and the channel where it was called.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public class CommandContext
 {
     private User user;
     private Message message;
     private TextChannel channel;
 
+    /**
+     * The command Context
+     *
+     * @param user The user that called the command
+     * @param message The command message
+     * @param channel The channel where the command was called
+     */
     public CommandContext(User user, Message message, TextChannel channel)
     {
         this.user = user;
@@ -35,16 +54,25 @@ public class CommandContext
         this.channel = channel;
     }
 
+    /**
+     * @return The user that called the command
+     */
     public User getUser()
     {
         return user;
     }
 
+    /**
+     * @return The command message
+     */
     public Message getMessage()
     {
         return message;
     }
 
+    /**
+     * @return The channel where the command was called
+     */
     public TextChannel getChannel()
     {
         return channel;

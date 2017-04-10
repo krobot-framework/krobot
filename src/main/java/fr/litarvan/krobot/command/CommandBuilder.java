@@ -24,13 +24,46 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
+/**
+ * The Command Builder
+ *
+ *
+ * Used to build commands, supposed to be used from the
+ * {@link CommandManager} but can be used manually (the
+ * group won't apply).
+ *
+ * Example :
+ *
+ * <pre>
+ *     manager.make("command <arg1> [arg2...]", MyHandler.class).register();
+ *     // Or
+ *     Command command = new CommandBuiler().path("command <arg1> [arg2...]").handler(MyHandler.class).build();
+ * </pre>
+ *
+ * See {@link #path(String)} for the make path expression
+ * syntax.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public class CommandBuilder
 {
-    // [^\s]+
-    // \B(\[|\()\w*(\.\.\.)?(\]|\))
-
     private CommandManager commandManager;
 
+    /**
+     * CommandBuidler for manual use
+     */
+    public CommandBuilder()
+    {
+        this(null);
+    }
+
+    /**
+     * CommandBuilder with a manager
+     *
+     * @param commandManager The manager where to register the command
+     */
     public CommandBuilder(CommandManager commandManager)
     {
         this.commandManager = commandManager;
@@ -46,6 +79,55 @@ public class CommandBuilder
 
     // \B(\[|\()\w+(:\w+)?(\.\.\.)?(\]|\))
 
+    /**
+     * Generate a command label and arguments from an expression.
+     *
+     * Syntax :
+     *
+     * The first word, is the command label.
+     * Then, each argument are separated by space.
+     *
+     * Argument syntax :
+     *
+     * If an argument is required, it is surrounded by < >
+     * If it is optional, it is surrounded by [ ]
+     *
+     * In this, there is the name of the argument.
+     *
+     * Then, you can precise the type, for this just after
+     * the argument name add a : and either
+     *
+     * <ul>
+     *     <li>user</li>
+     *     <li>string</li>
+     *     <li>number</li>
+     * </ul>
+     *
+     * (string is used by default when no type is given).
+     *
+     * Example : [arg:number]
+     *
+     * You can use vararg-like list, for this, just after
+     * the type, put ...
+     * Example: [arg...] [arg:user...]
+     *
+     * (It must to be the last argument)
+     *
+     * Instead of one of these, you can precise some fixed choices.
+     * For this, replace the type (always use the : ) by the possible
+     * choices separated by a |
+     * Example : [arg:choice1|choice2|choice3]
+     *
+     * Here is an example of a command path :
+     *
+     * <pre>
+     *     command <arg1> <arg2:user> [arg3:choice1|choice2] [arg4...]
+     * </pre>
+     *
+     * @param path The path of the command
+     *
+     * @return This
+     */
     public CommandBuilder path(String path)
     {
         String[] split = path.split(" ");
@@ -68,14 +150,6 @@ public class CommandBuilder
 
             arg = arg.substring(1, arg.length() - 1);
 
-            if (arg.contains("|"))
-            {
-                String[] choices = arg.split("\\|");
-                this.arguments.add(new CommandArgument(arg, optional, choices));
-
-                continue;
-            }
-
             String type = "string";
 
             if (arg.contains(":"))
@@ -84,6 +158,14 @@ public class CommandBuilder
 
                 arg = spl[0];
                 type = spl[1];
+
+                if (type.contains("|"))
+                {
+                    String[] choices = type.split("\\|");
+                    this.arguments.add(new CommandArgument(arg, optional, choices));
+
+                    continue;
+                }
             }
 
             if (type.endsWith("..."))
@@ -99,42 +181,93 @@ public class CommandBuilder
         return this;
     }
 
+    /**
+     * Set the label of the command
+     *
+     * @param label The command label
+     *
+     * @return This
+     */
     public CommandBuilder label(String label)
     {
         this.label = label;
         return this;
     }
 
+    /**
+     * Add an argument to the command
+     *
+     * @param arg The argument to add
+     *
+     * @return This
+     */
     public CommandBuilder arg(CommandArgument arg)
     {
         this.arguments.add(arg);
         return this;
     }
 
+    /**
+     * Define the parent of the command (so the command is a
+     * sub of it)
+     *
+     * @param parent The command parent
+     *
+     * @return This
+     */
     public CommandBuilder parent(Command parent)
     {
         this.parent = parent;
         return this;
     }
 
+    /**
+     * Set the command handler
+     *
+     * @param handler The command handler
+     *
+     * @return This
+     */
     public CommandBuilder handler(CommandHandler handler)
     {
         this.handler = handler;
         return this;
     }
 
+    /**
+     * Register a middleware to the command
+     *
+     * @param middleware The middleware to register
+     *
+     * @return This
+     */
     public CommandBuilder middleware(Middleware middleware) // Needed for lambda
     {
         this.middlewares.add(middleware);
         return this;
     }
 
+    /**
+     * Register middlewares to the command
+     *
+     * @param middlewares The middlewares to register
+     *
+     * @return This
+     */
     public CommandBuilder middlewares(Middleware... middlewares) // 's' needed for lambda
     {
         this.middlewares.addAll(Arrays.asList(middlewares));
         return this;
     }
 
+    /**
+     * Register middlewares to the command
+     *
+     * @param middlewares The middlewares to register (will be created
+     *                    by the injector)
+     *
+     * @return This
+     */
     public CommandBuilder middlewares(Class<? extends Middleware>... middlewares)
     {
         Middleware[] mwares = new Middleware[middlewares.length];
@@ -149,6 +282,11 @@ public class CommandBuilder
         return this;
     }
 
+    /**
+     * Build the command
+     *
+     * @return The generated command
+     */
     public Command build()
     {
         return new Command(this.label,
@@ -157,6 +295,14 @@ public class CommandBuilder
                            this.handler);
     }
 
+    /**
+     * Build and register the command to the manager or to the
+     * parent if given.
+     *
+     * Drop an exception if there is no command manager
+     *
+     * @return The generated command
+     */
     public Command register()
     {
         Command command = build();
@@ -167,6 +313,11 @@ public class CommandBuilder
         }
         else
         {
+            if (commandManager == null)
+            {
+                throw new IllegalStateException("Can't register the command if no command manager was given");
+            }
+
             commandManager.register(command);
         }
 

@@ -61,7 +61,7 @@ public class Command
             {
                 if (sub.getLabel().equals(args.get(0)))
                 {
-                    if (executeMiddlewares(context))
+                    if (executeMiddlewares(context, null))
                     {
                         LOGGER.debug("Sub command detected -> " + sub.getLabel());
                         sub.call(context, args.subList(1, args.size()));
@@ -198,16 +198,18 @@ public class Command
         }
 
         LOGGER.debug("Handling call of -> " + this.getLabel() + " | with args -> " + map);
+
+        executeMiddlewares(context, map);
         handler.handle(context, map);
 
         context.getMessage().delete().queue();
     }
 
-    private boolean executeMiddlewares(CommandContext context)
+    private boolean executeMiddlewares(CommandContext context, Map<String, SuppliedArgument> args)
     {
         for (Middleware middleware : middlewares)
         {
-            if (!middleware.handle(this, context))
+            if (!middleware.handle(this, args, context))
             {
                 return false;
             }

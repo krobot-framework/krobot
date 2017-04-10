@@ -20,14 +20,38 @@ package fr.litarvan.krobot.util;
 
 import fr.litarvan.krobot.Krobot;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.User;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * User Utils
+ *
+ *
+ * A class containing user-related util functions.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public final class UserUtils
 {
     private static JDA jda = Krobot.jda();
 
-    public static User resolve(String user)
+    /**
+     * Resolve a user from a String.
+     *
+     * Example : "@Litarvan", "Litarvan", or "87279950075293696"
+     * returns the JDA User object of Litarvan.
+     *
+     * @param user A string (mention/username/id) of the user
+     *             to resolve
+     *
+     * @return The resolved user
+     */
+    public static User resolve(@NotNull String user)
     {
         List<User> users = jda.getUsersByName(user, true);
 
@@ -42,5 +66,28 @@ public final class UserUtils
         }
 
         return users.get(0);
+    }
+
+    /**
+     * Get the private channel of the given user. Opens it if needed.
+     *
+     * @param user The user private channel
+     *
+     * @return The private channel
+     */
+    public static PrivateChannel privateChannel(@NotNull User user)
+    {
+        if (!user.hasPrivateChannel())
+        {
+            try
+            {
+                return user.openPrivateChannel().submit().get();
+            }
+            catch (InterruptedException | ExecutionException ignored)
+            {
+            }
+        }
+
+        return user.getPrivateChannel();
     }
 }

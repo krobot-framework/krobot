@@ -18,6 +18,22 @@
  */
 package fr.litarvan.krobot.util;
 
+/**
+ * Markdown util
+ *
+ *
+ * Functions to use Discord-markdown in messages.
+ *
+ * Example :
+ *
+ * <pre>
+ *     channel.sendMessage("I am a " + Markdown.bold("bot")).queue();
+ * </pre>
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public final class Markdown
 {
     public static final String BOLD_MODIFIER = "**";

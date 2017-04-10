@@ -22,32 +22,108 @@ import java.awt.Color;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
+/**
+ * Dialog maker
+ *
+ *
+ * Contains functions to make kind of "dialogs" using embeds.
+ * It has three types of dialog : info, warning, error.
+ * You can always create your own.
+ *
+ * Examples :
+ *
+ * <pre>
+ *     channel.sendMessage(Dialog.info("Some info", "Here is an information")).queue();
+ * </pre>
+ *
+ * <pre>
+ *     channel.sendMessage(Dialog.dialog(Color.GREEN, "Status", "Everything is good !")).queue();
+ * </pre>
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public final class Dialog
 {
+    /**
+     * Icon used in info dialogs
+     */
     public static final String INFO_ICON = "http://litarvan.github.com/krobot_icons/info.png";
+
+    /**
+     * Icon used in warn dialogs
+     */
     public static final String WARN_ICON = "http://litarvan.github.com/krobot_icons/warn.png";
+
+    /**
+     * Icon used in error dialogs
+     */
     public static final String ERROR_ICON = "http://litarvan.github.com/krobot_icons/error.png";
 
+    /**
+     * Displays an info dialog
+     *
+     * @param title The title of the dialog
+     * @param description The description of the dialog
+     *
+     * @return The created dialog
+     */
     public static MessageEmbed info(String title, String description)
     {
         return dialog(Color.decode("0x0094FF"), title, description, INFO_ICON);
     }
 
+    /**
+     * Display a warning dialog
+     *
+     * @param title The title of the dialog
+     * @param description The description of the dialog
+     *
+     * @return The created dialog
+     */
     public static MessageEmbed warn(String title, String description)
     {
         return dialog(Color.decode("0xFFBD00"), title, description, WARN_ICON);
     }
 
+    /**
+     * Displays an error dialog
+     *
+     * @param title The title of the dialog
+     * @param description The description of the dialog
+     *
+     * @return The created dialog
+     */
     public static MessageEmbed error(String title, String description)
     {
         return dialog(Color.decode("0xED1B2E"), title, description, ERROR_ICON);
     }
 
+    /**
+     * Displays a dialog
+     *
+     * @param color The color of the bar on the dialog' left side
+     * @param title The title of the dialog
+     * @param description The description of the dialog
+     *
+     * @return The created dialog
+     */
     public static MessageEmbed dialog(Color color, String title, String description)
     {
         return dialog(color, title, description, null);
     }
 
+    /**
+     * Displays a dialog
+     *
+     * @param color The color of the bar on the dialog' left side
+     * @param title The title of the dialog
+     * @param description The description of the dialog
+     * @param url The URL of the dialog icon
+     *
+     * @return The created dialog
+     */
     public static MessageEmbed dialog(Color color, String title, String description, String icon)
     {
         EmbedBuilder builder = new EmbedBuilder();

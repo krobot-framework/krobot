@@ -24,7 +24,47 @@ import java.util.Map;
 import javax.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * The Config Provider
+ *
+ *
+ * Manage the configs of a bot.
+ *
+ * <b>Registering a config :</b>
+ *
+ * <pre>
+ *     provider.json("config/myconfig.json");
+ *     // Or
+ *     provider.properties("config/myconfig.properties");
+ *     // Or
+ *     provider.json("myconfig").in("config/myconfig.json");
+ *     // Etc...
+ * </pre>
+ *
+ * <b>Getting a value :</b>
+ *
+ * <pre>
+ *     String value = (String) provider.get("myconfig").get("myValue");
+ *     // or
+ *     String value = (String) provider.at("myconfig.subobject.subsubobject.value");
+ *     // etc...
+ * </pre>
+ *
+ * <b>Setting a value :</b>
+ *
+ * <pre>
+ *     provider.get("myconfig").set("myValue", "value");
+ *     // or
+ *     provider.get("myconfig").set("myValue.subobject.subsubobject.value", "value");
+ *     // etc...
+ * </pre>
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 @Singleton
 public class ConfigProvider
 {
@@ -32,53 +72,172 @@ public class ConfigProvider
 
     private Map<String, Config> configs = new HashMap<>();
 
+    /**
+     * Create a config from a file path.
+     * It names will be the file name without the extension.
+     *
+     * @param file The path of the config file
+     *
+     * @return A {@link JSONConfig} of this file.
+     */
     public FileConfig from(String file)
     {
         return from(new File(file));
     }
 
+    /**
+     * Create a config from a file
+     * It names will be the file name without the extension.
+     *
+     * @param file The path of the config file
+     *
+     * @return A {@link JSONConfig} of this file.
+     */
     public FileConfig from(File file)
     {
         return json(file);
     }
 
+    /**
+     * Create a JSON config with the given name.
+     *
+     * @param name The name of the config
+     *
+     * @return A new {@link JSONConfig}
+     */
+    public JSONConfig json(String name)
+    {
+        return register(new JSONConfig(), name);
+    }
+
+    /**
+     * Create a JSON config from a file
+     * It names will be the file name without the extension.
+     *
+     * @param file The path of the config file
+     *
+     * @return A {@link JSONConfig} of this file.
+     */
     public JSONConfig json(File file)
     {
         return json(file, file.getName().substring(0, file.getName().lastIndexOf(".")));
     }
 
+    /**
+     * Create a JSON config from a file with the given name
+     *
+     * @param file The path of the config file
+     * @param name The name of the config
+     *
+     * @return A new {@link JSONConfig}
+     */
     public JSONConfig json(File file, String name)
     {
         return register(new JSONConfig(file), name);
     }
 
+    /**
+     * Create a Java Properties config with the given name.
+     *
+     * @param name The name of the config
+     *
+     * @return A new {@link PropertiesConfig}
+     */
+    public PropertiesConfig properties(String name)
+    {
+        return register(new PropertiesConfig(), name);
+    }
+
+    /**
+     * Create a Java Properties config from a file
+     * It names will be the file name without the extension.
+     *
+     * @param file The path of the config file
+     *
+     * @return A {@link PropertiesConfig} of this file.
+     */
     public PropertiesConfig properties(File file)
     {
         return properties(file, file.getName().substring(0, file.getName().lastIndexOf(".")));
     }
 
+    /**
+     * Create a Java Properties config from a file with the given name
+     *
+     * @param file The path of the config file
+     * @param name The name of the config
+     *
+     * @return A new {@link JSONConfig}
+     */
     public PropertiesConfig properties(File file, String name)
     {
         return register(new PropertiesConfig(file), name);
     }
 
+    /**
+     * Register a file config
+     *
+     * @param config The config to register
+     * @param name The name of the config
+     * @param <T> The config type
+     *
+     * @return The given config
+     */
     public <T extends FileConfig> T register(T config, String name)
     {
         LOGGER.info("Loaded config -> " + name + " (" + config.getFile().getAbsolutePath() + ")");
         return (T) register((Config) config, name);
     }
 
+    /**
+     * Register a config
+     *
+     * @param config The config to register
+     * @param name The name of the config
+     * @param <T> The config type
+     *
+     * @return The given config
+     */
     public <T extends Config> T register(T config, String name)
     {
         configs.put(name, config);
         return config;
     }
 
+    /**
+     * Get a registered config
+     *
+     * @param name The config name
+     *
+     * @return The config, or null if not found
+     */
+    @Nullable
     public Config get(String name)
     {
         return configs.get(name);
     }
 
+    /**
+     * Finds a value with the given path.
+     *
+     * Example :
+     *
+     * myconfig.json =>
+     * <pre>
+     * {
+     *     "object": {
+     *         "key": "value"
+     *     }
+     * }
+     * </pre>
+     * Registered with provider.json("myconfig.json");
+     *
+     * provider.at("myconfig.object.key") returns "value"
+     *
+     * @param path The path of the value to get (example config.object.key)
+     *
+     * @return The value at the given path
+     */
     public Object at(String path)
     {
         int index = path.indexOf(".");

@@ -32,8 +32,24 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Main Krobot Class
+ *
+ *
+ * Contains the framework base like JDA, the bot, and the Injector.
+ * Used to start a bot, and as Guice module.
+ *
+ * Use {@link #start(String, Class, Module...)} to start a bot.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public class Krobot extends AbstractModule
 {
+    /**
+     * The Krobot version
+     */
     public static final String VERSION = "2.0.0";
 
     private static final Logger LOGGER = LogManager.getLogger("Krobot");
@@ -43,6 +59,17 @@ public class Krobot extends AbstractModule
     private static Injector injector;
     private static JDA jda;
 
+    /**
+     * Start the bot
+     *
+     * @param token The Discord bot token
+     * @param botCl The class of the bot to start
+     * @param modules The Guice modules to use
+     *
+     * @throws LoginException If JDA dropped one because of a bad bot token
+     * @throws InterruptedException If JDA dropped one
+     * @throws RateLimitedException If JDA dropped one
+     */
     public static void start(String token, Class<? extends IBot> botCl, Module... modules) throws LoginException, InterruptedException, RateLimitedException
     {
         System.out.println();

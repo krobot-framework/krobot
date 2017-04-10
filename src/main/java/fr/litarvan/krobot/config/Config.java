@@ -18,25 +18,113 @@
  */
 package fr.litarvan.krobot.config;
 
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * A Config
+ *
+ *
+ * An object that contains objects/strings that can be
+ * retrieved or set.
+ *
+ * @author Litarvan
+ * @verison 2.0.0
+ * @since 2.0.0
+ */
 public interface Config
 {
+    /**
+     * Get a value of the config
+     *
+     * @param key The key of the value
+     * @param def The default value if not found
+     *
+     * @return The found value or the default one if not found
+     */
     Object get(String key, Object def);
+
+    /**
+     * Set a value of the config
+     *
+     * @param key The key of the value to set
+     * @param value The value to set
+     */
     void set(String key, Object value);
 
+    /**
+     * Get a value of the config
+     *
+     * @param key The key of the value
+     *
+     * @return The found value or null
+     */
+    @Nullable
     default Object get(String key)
     {
         return get(key, null);
     }
 
+    /**
+     * Finds a value with the given path.
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link #get(String, Object)}</b>
+     *
+     * Example :
+     *
+     * <pre>
+     * {
+     *     "object": {
+     *         "key": "value"
+     *     }
+     * }
+     * </pre>
+     *
+     * config.at("object.key") returns "value"
+     *
+     * @param path The path of the value to get (example config.object.key)
+     * @param def The default value if not found
+     *
+     * @return The value at the given path or the default if not found
+     */
     default Object at(String path, Object def)
     {
         return get(path, def);
     }
 
+    /**
+     * Finds a value with the given path.
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link #get(String, Object)}</b>
+     *
+     * Example :
+     *
+     * <pre>
+     * {
+     *     "object": {
+     *         "key": "value"
+     *     }
+     * }
+     * </pre>
+     *
+     * config.at("object.key") returns "value"
+     *
+     * @param path The path of the value to get (example config.object.key)
+     *
+     * @return The value at the given path or null if not found
+     */
+    @Nullable
     default Object at(String path)
     {
         return at(path, null);
     }
 
+    /**
+     * @return If the config supports containing objects
+     */
     boolean areObjectsSupported();
+
+    /**
+     * @return If the config supports saving
+     */
+    boolean isSavingSupported();
 }

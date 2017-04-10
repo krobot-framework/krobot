@@ -19,36 +19,45 @@
 package fr.litarvan.krobot.util;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import net.dv8tion.jda.core.entities.PrivateChannel;
-import net.dv8tion.jda.core.entities.User;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * Message Utils
+ *
+ *
+ * Message-related util functions.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public final class MessageUtils
 {
+    /**
+     * Number of maximum character in a Discord message
+     */
     public static final int MAX_MESSAGE_CHARS = 1999;
 
-    public static PrivateChannel privateChannel(User user)
-    {
-        if (!user.hasPrivateChannel())
-        {
-            try
-            {
-                return user.openPrivateChannel().submit().get();
-            }
-            catch (InterruptedException | ExecutionException ignored)
-            {
-            }
-        }
-
-        return user.getPrivateChannel();
-    }
-
-    public static String[] splitMessage(String message)
+    /**
+     * Split a message in messages of at most {@link #MAX_MESSAGE_CHARS} characters
+     *
+     * @param message The message to split
+     *
+     * @return The splitted message
+     */
+    public static String[] splitMessage(@NotNull String message)
     {
         return splitMessage(message, MAX_MESSAGE_CHARS);
     }
 
-    public static String[] splitMessage(String message, int limit)
+    /**
+     * Split a message in messages of at most a given amount of characters
+     *
+     * @param message The message to split
+     *
+     * @return The splitted message
+     */
+    public static String[] splitMessage(@NotNull String message, int limit)
     {
         ArrayList<String> messages = new ArrayList<>();
 

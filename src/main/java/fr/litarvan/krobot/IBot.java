@@ -18,7 +18,25 @@
  */
 package fr.litarvan.krobot;
 
+import com.google.inject.Module;
+
+/**
+ * A Krobot Discord bot
+ *
+ *
+ * A Discord bot that uses Krobot, just contains an initialization
+ * method.
+ *
+ * To start it, use {@link Krobot#start(String, Class, Module...)}
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public interface IBot
 {
+    /**
+     * Initializes the bot, called just after setting up JDA
+     */
     void init();
 }

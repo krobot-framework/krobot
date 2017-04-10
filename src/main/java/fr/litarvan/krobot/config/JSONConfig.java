@@ -28,6 +28,18 @@ import net.dv8tion.jda.core.utils.IOUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * The JSON Config
+ *
+ *
+ * A config made using JSON.
+ * To create one, consider using the {@link ConfigProvider#json}
+ * methods.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public class JSONConfig extends FileConfig
 {
     private JSONObject config;
@@ -71,7 +83,7 @@ public class JSONConfig extends FileConfig
         }
         catch (IOException e)
         {
-            Krobot.injector().getInstance(ExceptionHandler.class).handle(e, null, null, null);
+            throw new RuntimeException("Can't save the config", e);
         }
 
         return this;
@@ -108,6 +120,11 @@ public class JSONConfig extends FileConfig
         }
 
         config.put(key, value);
+
+        if (autoSave)
+        {
+            save();
+        }
     }
 
     @Override

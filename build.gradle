@@ -22,6 +22,7 @@ dependencies {
     compile 'com.google.inject:guice:4.1.0'
     compile 'org.apache.logging.log4j:log4j-api:2.8'
     compile 'org.apache.logging.log4j:log4j-core:2.8'
+    compile 'org.jetbrains:annotations:15.0'
 }
 
 jar {

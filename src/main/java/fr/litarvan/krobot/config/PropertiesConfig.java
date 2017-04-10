@@ -26,6 +26,18 @@ import java.io.IOException;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * The Properties Config
+ *
+ *
+ * A Config made using Java Properties.
+ * To create one, consider using the {@link ConfigProvider#properties}
+ * methods.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public class PropertiesConfig extends FileConfig
 {
     private Properties properties = new Properties();
@@ -49,6 +61,11 @@ public class PropertiesConfig extends FileConfig
     public void set(String key, Object value)
     {
         properties.setProperty(key, (String) value);
+
+        if (autoSave)
+        {
+            save();
+        }
     }
 
     @Override

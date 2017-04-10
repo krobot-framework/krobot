@@ -53,7 +53,7 @@ public class JSONConfig extends FileConfig
         }
         catch (IOException e)
         {
-            Krobot.injector().getInstance(ExceptionHandler.class).handle(e, null, null);
+            Krobot.injector().getInstance(ExceptionHandler.class).handle(e, null, null, null);
         }
 
         return this;

@@ -77,7 +77,7 @@ public class CommandManager
 
     public void register(Command command)
     {
-        LOGGER.info("Registered command -> " + command.toString(""));
+        LOGGER.info("Registered command -> " + command.toString("", true));
         this.commands.add(command);
     }
 
@@ -106,14 +106,15 @@ public class CommandManager
             if (command.getLabel().equalsIgnoreCase(line[0]))
             {
                 CommandContext context = new CommandContext(event.getAuthor(), event.getMessage(), event.getTextChannel());
+                List<String> args = Arrays.asList(ArrayUtils.subarray(line, 1, line.length));
 
                 try
                 {
-                    command.call(context, Arrays.asList(ArrayUtils.subarray(line, 1, line.length)));
+                    command.call(context, args);
                 }
                 catch (Throwable t)
                 {
-                    exHandler.handle(t, command, context);
+                    exHandler.handle(t, command, args, context);
                 }
 
                 return;

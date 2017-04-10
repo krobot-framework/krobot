@@ -246,10 +246,10 @@ public class Command
     @Override
     public String toString()
     {
-        return toString("");
+        return toString("", true);
     }
 
-    public String toString(String prefix)
+    public String toString(String prefix, boolean subs)
     {
         StringBuilder string = new StringBuilder(prefix + this.label + " ");
 
@@ -258,12 +258,12 @@ public class Command
             string.append(argument).append(" ");
         }
 
-        if (subs != null && !subs.isEmpty())
+        if (subs && this.subs != null && !this.subs.isEmpty())
         {
-            for (Command sub : subs)
+            for (Command sub : this.subs)
             {
                 string.append("\n");
-                string.append(prefix).append(sub.toString(prefix + this.getLabel() + " "));
+                string.append(prefix).append(sub.toString(prefix + this.getLabel() + " ", true));
             }
         }
 

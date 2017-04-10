@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Krobot extends AbstractModule
 {
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "2.0.0";
 
     private static final Logger LOGGER = LogManager.getLogger("Krobot");
 
@@ -30,7 +30,6 @@ public class Krobot extends AbstractModule
         System.out.println();
 
         LOGGER.info("                                     ");
-        LOGGER.info("         .:::::.         -::::::-    ");
         LOGGER.info("         hMMMMM:      -dMMMMMMs`     ");
         LOGGER.info("        +MMMMMs     oNMMMMMd-        ");
         LOGGER.info("       .MMMMMm   -dMMMMMN+           ");

@@ -35,9 +35,9 @@ import org.apache.commons.lang3.ArrayUtils;
  * Example :
  *
  * <pre>
- *     manager.make("command <arg1> [arg2...]", MyHandler.class).register();
+ *     manager.make("command &lt;arg1&gt; [arg2...]", MyHandler.class).register();
  *     // Or
- *     Command command = new CommandBuiler().path("command <arg1> [arg2...]").handler(MyHandler.class).build();
+ *     Command command = new CommandBuiler().path("command &lt;arg1&gt; [arg2...]").handler(MyHandler.class).build();
  * </pre>
  *
  * See {@link #path(String)} for the make path expression
@@ -89,7 +89,7 @@ public class CommandBuilder
      *
      * Argument syntax :
      *
-     * If an argument is required, it is surrounded by < >
+     * If an argument is required, it is surrounded by &lt; &gt;
      * If it is optional, it is surrounded by [ ]
      *
      * In this, there is the name of the argument.
@@ -121,7 +121,7 @@ public class CommandBuilder
      * Here is an example of a command path :
      *
      * <pre>
-     *     command <arg1> <arg2:user> [arg3:choice1|choice2] [arg4...]
+     *     command &lt;arg1&gt; &lt;arg2:user&gt; [arg3:choice1|choice2] [arg4...]
      * </pre>
      *
      * @param path The path of the command

@@ -35,7 +35,7 @@ import java.util.List;
  * Example :
  *
  * <pre>
- *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -> {
+ *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -&gt; {
  *         manager.make("mycommand", MyHandler.class).register();
  *         manager.make("myothercommand", MyOtherHandler.class).register();
  *     });
@@ -149,7 +149,7 @@ public class GroupBuilder
      * Example of use :
      *
      * <pre>
-     *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -> {
+     *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -&gt; {
      *         manager.make("mycommand", MyHandler.class).register();
      *         manager.make("myothercommand", MyOtherHandler.class).register();
      *     });

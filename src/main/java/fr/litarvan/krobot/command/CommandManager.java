@@ -51,15 +51,15 @@ import org.apache.logging.log4j.Logger;
  *
  * <pre>
  *     manager.make("/mycommand", MyHandler.class).middlewares(MyMiddleware.class).register();
- *     manager.make("/version", (context, args) -> {
+ *     manager.make("/version", (context, args) -&gt; {
  *         context.getChannel().sendMessage("v1.0.0").queue();
  *     }).register();
  * </pre>
  *
  * <pre>
- *     manager.group().prefix("!").middleware((command, args, context) -> {
+ *     manager.group().prefix("!").middleware((command, args, context) -&gt; {
  *         context.getChannel().sendMessage("A command was called").queue();
- *     }).apply(() -> {
+ *     }).apply(() -&gt; {
  *         manager.make("mycommand", MyHandler.class).register();
  *         manager.make("myothercommand", MyOtherHandler.class).register();
  *     });
@@ -101,7 +101,7 @@ public class CommandManager
      * Example :
      *
      * <pre>
-     *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -> {
+     *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -&gt; {
      *         manager.make("mycommand", MyHandler.class).register();
      *         manager.make("myothercommand", MyOtherHandler.class).register();
      *     });

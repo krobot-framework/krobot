@@ -39,7 +39,7 @@ public interface Middleware
      * Handle a command call
      *
      * @param command The command that was called
-     * @param args The arguments given to the command => Null if it
+     * @param args The arguments given to the command =&gt; Null if it
      *             is called before a sub command handling
      * @param context The context of the command call
      *

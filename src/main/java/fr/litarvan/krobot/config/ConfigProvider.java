@@ -222,7 +222,7 @@ public class ConfigProvider
      *
      * Example :
      *
-     * myconfig.json =>
+     * myconfig.json =&gt;
      * <pre>
      * {
      *     "object": {

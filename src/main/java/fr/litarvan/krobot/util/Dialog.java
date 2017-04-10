@@ -120,7 +120,7 @@ public final class Dialog
      * @param color The color of the bar on the dialog' left side
      * @param title The title of the dialog
      * @param description The description of the dialog
-     * @param url The URL of the dialog icon
+     * @param icon The URL of the dialog icon
      *
      * @return The created dialog
      */

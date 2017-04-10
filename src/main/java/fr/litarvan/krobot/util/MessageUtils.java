@@ -54,6 +54,7 @@ public final class MessageUtils
      * Split a message in messages of at most a given amount of characters
      *
      * @param message The message to split
+     * @param limit The messages max characters
      *
      * @return The splitted message
      */

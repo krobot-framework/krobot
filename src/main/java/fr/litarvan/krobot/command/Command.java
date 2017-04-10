@@ -9,9 +9,13 @@ import java.util.Map;
 import net.dv8tion.jda.core.entities.User;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Command
 {
+    private static final Logger LOGGER = LogManager.getLogger("Command");
+
     private String label;
     private CommandArgument[] arguments;
     private Middleware[] middlewares;
@@ -31,6 +35,8 @@ public class Command
 
     public void call(CommandContext context, List<String> args) throws Exception
     {
+        LOGGER.debug("Parsing command call for -> " + this.label);
+
         if (args.size() > 0)
         {
             for (Command sub : subs)
@@ -39,6 +45,7 @@ public class Command
                 {
                     if (executeMiddlewares(context))
                     {
+                        LOGGER.debug("Sub command detected -> " + sub.getLabel());
                         sub.call(context, args.subList(1, args.size()));
                     }
 
@@ -172,6 +179,7 @@ public class Command
             i2++;
         }
 
+        LOGGER.debug("Handling call of -> " + this.getLabel() + " | with args -> " + map);
         handler.handle(context, map);
 
         context.getMessage().delete().queue();
@@ -233,5 +241,32 @@ public class Command
     public List<Command> getSubs()
     {
         return subs;
+    }
+
+    @Override
+    public String toString()
+    {
+        return toString("");
+    }
+
+    public String toString(String prefix)
+    {
+        StringBuilder string = new StringBuilder(prefix + this.label + " ");
+
+        for (CommandArgument argument : arguments)
+        {
+            string.append(argument).append(" ");
+        }
+
+        if (subs != null && !subs.isEmpty())
+        {
+            for (Command sub : subs)
+            {
+                string.append("\n");
+                string.append(prefix).append(sub.toString(prefix + this.getLabel() + " "));
+            }
+        }
+
+        return string.toString();
     }
 }

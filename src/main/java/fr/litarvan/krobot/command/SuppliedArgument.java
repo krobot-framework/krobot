@@ -126,4 +126,50 @@ public class SuppliedArgument
 
         return listValue;
     }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder string = new StringBuilder("[" + type.name().toLowerCase() + "]: ");
+
+        if (listValue != null)
+        {
+            string.append("{");
+
+            for (Object object : listValue)
+            {
+                switch (type)
+                {
+                    case USER:
+                        string.append(((User) object).getDiscriminator());
+                        break;
+                    case NUMBER:
+                        string.append(object);
+                        break;
+                    case STRING:
+                        string.append(object);
+                        break;
+                }
+
+                string.append(", ");
+            }
+
+            return string.substring(0, string.length() - 2) + "}";
+        }
+
+        switch (type)
+        {
+            case USER:
+                string.append(user.getName()).append("#").append(user.getDiscriminator());
+                break;
+            case NUMBER:
+                string.append(numberValue);
+                break;
+            case STRING:
+                string.append(stringValue);
+                break;
+        }
+
+        return string.toString();
+    }
 }

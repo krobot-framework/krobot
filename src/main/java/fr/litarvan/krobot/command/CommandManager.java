@@ -8,13 +8,19 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.SubscribeEvent;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+@Singleton
 public class CommandManager
 {
+    private static final Logger LOGGER = LogManager.getLogger("CommandManager");
+
     private JDA jda;
     private ExceptionHandler exHandler;
     private List<Command> commands;
@@ -71,6 +77,7 @@ public class CommandManager
 
     public void register(Command command)
     {
+        LOGGER.info("Registered command -> " + command.toString(""));
         this.commands.add(command);
     }
 

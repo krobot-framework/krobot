@@ -1,7 +1,5 @@
 package fr.litarvan.krobot.command;
 
-import fr.litarvan.krobot.command.ArgumentType;
-
 public class CommandArgument
 {
     private String key;
@@ -50,5 +48,19 @@ public class CommandArgument
     public ArgumentType getType()
     {
         return type;
+    }
+
+    @Override
+    public String toString()
+    {
+        String start = (optional ? "[" : "<");
+        String end = (optional ? "]" : ">");
+
+        if (choices != null)
+        {
+            return start + String.join("|", choices) + end;
+        }
+
+        return start + this.key + ":" + this.type.name().toLowerCase() + (list ? "..." : "") + end;
     }
 }

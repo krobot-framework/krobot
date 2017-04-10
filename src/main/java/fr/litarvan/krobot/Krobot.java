@@ -52,7 +52,7 @@ public class Krobot extends AbstractModule
 
         if (users.size() == 0)
         {
-            return null;
+            return jda.getUserById(user);
         }
 
         return users.get(0);

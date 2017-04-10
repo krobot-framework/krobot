@@ -1,5 +1,6 @@
 package fr.litarvan.krobot.command;
 
+import fr.litarvan.krobot.Krobot;
 import java.util.List;
 import net.dv8tion.jda.core.entities.User;
 
@@ -73,9 +74,9 @@ public class SuppliedArgument
             case USER:
                 return this.user;
             case STRING:
-                return null; // TODO: RESOLVE BY ID
+                return Krobot.resolve(this.stringValue);
             case NUMBER:
-                return null; // TODO: RESOLVE BY ID
+                return Krobot.resolve(String.valueOf(this.numberValue));
         }
 
         return null;

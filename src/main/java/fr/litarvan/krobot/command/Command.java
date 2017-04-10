@@ -77,7 +77,14 @@ public class Command
             {
                 if (arguments[i].isOptional())
                 {
-                    i--;
+                    if (i2 > args.size() - 1)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        i--;
+                    }
                 }
                 else
                 {
@@ -165,6 +172,8 @@ public class Command
         }
 
         handler.handle(context, map);
+
+        context.getMessage().delete().queue();
     }
 
     private boolean executeMiddlewares(CommandContext context)

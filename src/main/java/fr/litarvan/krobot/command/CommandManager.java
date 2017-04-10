@@ -87,6 +87,7 @@ public class CommandManager
     @SubscribeEvent
     protected void onMessage(MessageReceivedEvent event)
     {
+        System.out.println("Processing...");
         String[] line = splitWithQuotes(event.getMessage().getContent());
 
         if (line.length == 0)

@@ -2,9 +2,12 @@ group 'fr.litarvan.krobot'
 version '2.0.0'
 
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+archivesBaseName = 'krobot-framework'
 
 repositories {
     jcenter()
@@ -19,4 +22,46 @@ dependencies {
     compile 'com.google.inject:guice:4.1.0'
     compile 'org.apache.logging.log4j:log4j-api:2.8'
     compile 'org.apache.logging.log4j:log4j-core:2.8'
+}
+
+jar {
+    from 'LICENSE'
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId group
+            artifactId archivesBaseName
+            version = version
+
+            from components.java
+
+            artifact sourcesJar {
+                classifier 'sources'
+            }
+
+            artifact javadocJar
+        }
+    }
+
+    repositories {
+        maven {
+            url "$buildDir/repo"
+        }
+    }
 }

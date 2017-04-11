@@ -25,14 +25,14 @@ import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
- * The Command Builder
+ * The Command Builder<br/><br/>
  *
  *
  * Used to build commands, supposed to be used from the
  * {@link CommandManager} but can be used manually (the
- * group won't apply).
+ * group won't apply).<br/><br/>
  *
- * Example :
+ * Example :<br/><br/>
  *
  * <pre>
  *     manager.make("command &lt;arg1&gt; [arg2...]", MyHandler.class).register();
@@ -81,22 +81,22 @@ public class CommandBuilder
     // \B(\[|\()\w+(:\w+)?(\.\.\.)?(\]|\))
 
     /**
-     * Generate a command label and arguments from an expression.
+     * Generate a command label and arguments from an expression.<br/><br/>
      *
-     * Syntax :
+     * <b>Syntax :</b><br/><br/>
      *
-     * The first word, is the command label.
-     * Then, each argument are separated by space.
+     * The first word, is the command label.<br/>
+     * Then, each argument are separated by space.<br/><br/>
      *
-     * Argument syntax :
+     * <b>Argument syntax :</b><br/><br/>
      *
-     * If an argument is required, it is surrounded by &lt; &gt;
-     * If it is optional, it is surrounded by [ ]
+     * If an argument is required, it is surrounded by &lt; &gt;<br/>
+     * If it is optional, it is surrounded by [ ]<br/><br/>
      *
-     * In this, there is the name of the argument.
+     * In this, there is the name of the argument.<br/><br/>
      *
      * Then, you can precise the type, for this just after
-     * the argument name add a : and either
+     * the argument name add a <b>:</b> and either
      *
      * <ul>
      *     <li>user</li>
@@ -104,22 +104,22 @@ public class CommandBuilder
      *     <li>number</li>
      * </ul>
      *
-     * (string is used by default when no type is given).
+     * (string is used by default when no type is given).<br/><br/>
      *
-     * Example : [arg:number]
+     * <b>Example :</b> [arg:number]<br/><br/>
      *
      * You can use vararg-like list, for this, just after
-     * the type, put ...
-     * Example: [arg...] [arg:user...]
+     * the type, put ...<br/>
+     * <b>Example :</b> [arg...] or [arg:user...]
      *
-     * (It must to be the last argument)
+     * (It must to be the last argument)<br/><br/>
      *
-     * Instead of one of these, you can precise some fixed choices.
-     * For this, replace the type (always use the : ) by the possible
-     * choices separated by a |
-     * Example : [arg:choice1|choice2|choice3]
+     * Instead of one of these, you can precise some fixed choices.<br/>
+     * For this, replace the type (always use the <b>:</b> ) by the possible
+     * choices separated by a <b>|</b><br/>
+     * <b>Example :</b> [arg:choice1|choice2|choice3]<br/><br/>
      *
-     * Here is an example of a command path :
+     * <b>Here is an example of a command path :</b>
      *
      * <pre>
      *     command &lt;arg1&gt; &lt;arg2:user&gt; [arg3:choice1|choice2] [arg4...]
@@ -313,9 +313,10 @@ public class CommandBuilder
 
     /**
      * Build and register the command to the manager or to the
-     * parent if given.
+     * parent if given.<br/><br/>
      *
-     * Drop an exception if there is no command manager
+     * Drop an exception if there is no command manager and no parent
+     * (There must be at least one of the two)
      *
      * @return The generated command
      */

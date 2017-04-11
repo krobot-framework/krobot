@@ -35,19 +35,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * The CommandManager
+ * The CommandManager<br/><br/>
  *
  *
- * It's the starting point of a bot, and the main part of Krobot.
- *
+ * It's the starting point of a bot, and the main part of Krobot.<br/>
  * It has a command registry, and handle the command call to its
- * registered command.
+ * registered command.<br/>
+ * It uses the builders to make commands.<br/><br/>
  *
- * It uses the builders to make commands.
+ * To use it, use the {@link #make} methods.<br/><br/>
  *
- * To use it, use the {@link #make} methods.
- *
- * Examples :
+ * <b>Examples :</b>
  *
  * <pre>
  *     manager.make("/mycommand", MyHandler.class).middlewares(MyMiddleware.class).register();
@@ -65,7 +63,7 @@ import org.apache.logging.log4j.Logger;
  *     });
  * </pre>
  *
- * Don't forget to call the register function.
+ * Don't forget to call the register function at the end of the builder.
  *
  * @author Litarvan
  * @version 2.0.0
@@ -93,12 +91,12 @@ public class CommandManager
     }
 
     /**
-     * Create a group builder.
+     * Create a group builder.<br/><br/>
      *
      * A command group is some properties that will be applied
-     * to some commands at the same time.
+     * to some commands at the same time.<br/><br/>
      *
-     * Example :
+     * <b>Example :</b>
      *
      * <pre>
      *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -&gt; {
@@ -108,7 +106,7 @@ public class CommandManager
      * </pre>
      *
      * In this case, the label of mycommand and myothercommand will be
-     * !mycommand and !myothercommand, and they will have the MyMiddleware
+     * !mycommand and !myothercommand, and they will both have the MyMiddleware
      * middleware triggered before their call.
      *
      * @return A new group builder linked to this
@@ -120,7 +118,7 @@ public class CommandManager
 
     /**
      * Generate a CommandBuilder linked to this, with pre-defined
-     * path and command handler
+     * path and command handler.
      *
      * @param path The path of the command (see {@link CommandBuilder#path(String)}
      *             for the syntax
@@ -135,7 +133,7 @@ public class CommandManager
 
     /**
      * Generate a CommandBuilder linked to this, with pre-defined
-     * path and command handler
+     * path and command handler.
      *
      * @param path The path of the command (see {@link CommandBuilder#path(String)}
      *             for the syntax
@@ -168,7 +166,7 @@ public class CommandManager
 
     /**
      * Generate a CommandBuilder linked to this, with a pre-defined
-     * command handler
+     * command handler.
      *
      * @param handler The command handler
      *
@@ -191,7 +189,7 @@ public class CommandManager
     }
 
     /**
-     * Push a command group to the stack
+     * Push a command group to the stack.<br/>
      * The next command registered will have the group properties
      * applied.
      *
@@ -242,9 +240,9 @@ public class CommandManager
     }
 
     /**
-     * Split a message from whitespaces, ignoring the one in quotes.
+     * Split a message from whitespaces, ignoring the one in quotes.<br/><br/>
      *
-     * Example :
+     * <b>Example :</b>
      *
      * <pre>
      *     I am a "discord bot"

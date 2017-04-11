@@ -31,10 +31,10 @@ import java.nio.charset.Charset;
 import net.dv8tion.jda.core.utils.IOUtil;
 
 /**
- * The JSON Config
+ * The JSON Config<br/><br/>
  *
  *
- * A config made using JSON.
+ * A config made using JSON.<br/>
  * To create one, consider using the {@link ConfigProvider#json}
  * methods.
  *

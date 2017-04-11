@@ -5,6 +5,19 @@ import fr.litarvan.krobot.util.Markdown;
 import java.util.Map;
 import javax.inject.Inject;
 
+/**
+ * The Help Command<br/><br/>
+ *
+ *
+ * An automatic help command.<br/>
+ * It uses an info Dialog and displays all the commands with
+ * their syntax, their descriptions, and their subcommands
+ * recursively.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public class HelpCommand implements CommandHandler
 {
     @Inject

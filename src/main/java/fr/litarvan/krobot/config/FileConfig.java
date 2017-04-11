@@ -21,7 +21,7 @@ package fr.litarvan.krobot.config;
 import java.io.File;
 
 /**
- * The File Config
+ * The File Config<br/><br/>
  *
  *
  * A config that can be loaded/saved from/to a file.
@@ -115,6 +115,20 @@ public abstract class FileConfig implements Config
         return true;
     }
 
+    /**
+     * Load the config from the file.<br/>
+     * Will probably throw an exception if no file is set.
+     *
+     * @return This
+     */
     public abstract FileConfig load();
+
+    /**
+     * Save the config from the file.<br/>
+     * Will probably throw an exception if no file is set or
+     * saving is not supported.
+     *
+     * @return This
+     */
     public abstract FileConfig save();
 }

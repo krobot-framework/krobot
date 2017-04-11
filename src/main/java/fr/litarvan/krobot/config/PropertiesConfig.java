@@ -27,10 +27,10 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * The Properties Config
+ * The Properties Config<br/><br/>
  *
  *
- * A Config made using Java Properties.
+ * A Config made using Java Properties.<br/>
  * To create one, consider using the {@link ConfigProvider#properties}
  * methods.
  *

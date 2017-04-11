@@ -21,13 +21,13 @@ package fr.litarvan.krobot.command;
 import fr.litarvan.krobot.ExceptionHandler;
 
 /**
- * The Bad Syntax Exception
+ * The Bad Syntax Exception<br/><br/>
  *
  *
  * An exception called when the syntax of the command
- * isn't respected.
+ * isn't respected.<br/><br/>
  *
- * Supposed to be caught by the {@link ExceptionHandler}
+ * Supposed to be caught by the {@link ExceptionHandler}<br/>
  *
  * @author Litarvan
  * @version 2.0.0
@@ -35,8 +35,22 @@ import fr.litarvan.krobot.ExceptionHandler;
  */
 public class BadSyntaxException extends Exception
 {
+    /**
+     * The Bad Syntax Exception<br/>
+     * Default message is <i>"Bad command syntax"</i>
+     */
     public BadSyntaxException()
     {
         super("Bad command syntax");
+    }
+
+    /**
+     * The Bad Syntax Exception
+     *
+     * @param s The exception message
+     */
+    public BadSyntaxException(String s)
+    {
+        super(s);
     }
 }

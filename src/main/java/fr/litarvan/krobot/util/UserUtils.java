@@ -27,7 +27,7 @@ import net.dv8tion.jda.core.entities.User;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * User Utils
+ * User Utils<br/><br/>
  *
  *
  * A class containing user-related util functions.
@@ -41,9 +41,9 @@ public final class UserUtils
     private static JDA jda = Krobot.jda();
 
     /**
-     * Resolve a user from a String.
+     * Resolve a user from a String.<br/><br/>
      *
-     * Example : "@Litarvan", "Litarvan", or "87279950075293696"
+     * Example : "@Litarvan", "Litarvan", or "87279950075293696"<br/>
      * returns the JDA User object of Litarvan.
      *
      * @param user A string (mention/username/id) of the user

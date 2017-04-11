@@ -24,15 +24,15 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The Group Builder
+ * The Group Builder<br/><br/>
  *
  *
  * Used to build a command group (a list of properties that
- * will be applied to the command registered in {@link #apply(Runnable)}).
+ * will be applied to the command registered in {@link #apply(Runnable)}).<br/><br/>
  *
- * To be used from the {@link CommandManager}.
+ * To be used from the {@link CommandManager}.<br/><br/>
  *
- * Example :
+ * <b>Example :</b>
  *
  * <pre>
  *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -&gt; {
@@ -144,9 +144,9 @@ public class GroupBuilder
     }
 
     /**
-     * Setup the group
+     * Setup the group<br/><br/>
      *
-     * Example of use :
+     * <b>Example of use :</b>
      *
      * <pre>
      *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -&gt; {

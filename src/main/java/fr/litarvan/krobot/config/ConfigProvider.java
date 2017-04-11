@@ -27,10 +27,10 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The Config Provider
+ * The Config Provider<br/><br/>
  *
  *
- * Manage the configs of a bot.
+ * Manage the configs of a bot.<br/><br/>
  *
  * <b>Registering a config :</b>
  *
@@ -73,7 +73,7 @@ public class ConfigProvider
     private Map<String, Config> configs = new HashMap<>();
 
     /**
-     * Create a config from a file path.
+     * Create a config from a file path.<br/>
      * It names will be the file name without the extension.
      *
      * @param file The path of the config file
@@ -86,7 +86,7 @@ public class ConfigProvider
     }
 
     /**
-     * Create a config from a file
+     * Create a config from a file.<br/>
      * It names will be the file name without the extension.
      *
      * @param file The path of the config file
@@ -111,7 +111,7 @@ public class ConfigProvider
     }
 
     /**
-     * Create a JSON config from a file
+     * Create a JSON config from a file.<br/>
      * It names will be the file name without the extension.
      *
      * @param file The path of the config file
@@ -149,7 +149,7 @@ public class ConfigProvider
     }
 
     /**
-     * Create a Java Properties config from a file
+     * Create a Java Properties config from a file.<br/>
      * It names will be the file name without the extension.
      *
      * @param file The path of the config file
@@ -218,9 +218,9 @@ public class ConfigProvider
     }
 
     /**
-     * Finds a value with the given path.
+     * Finds a value with the given path.<br/><br/>
      *
-     * Example :
+     * <b>Example :</b>
      *
      * myconfig.json =&gt;
      * <pre>
@@ -230,9 +230,8 @@ public class ConfigProvider
      *     }
      * }
      * </pre>
-     * Registered with provider.json("myconfig.json");
-     *
-     * provider.at("myconfig.object.key") returns "value"
+     * Registered with provider.json("myconfig.json");<br/>
+     *     =&gt; provider.at("myconfig.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
      *
@@ -244,9 +243,9 @@ public class ConfigProvider
     }
 
     /**
-     * Finds a value with the given path.
+     * Finds a value with the given path.<br/><br/>
      *
-     * Example :
+     * <b>Example :</b>
      *
      * myconfig.json =&gt;
      * <pre>
@@ -256,9 +255,8 @@ public class ConfigProvider
      *     }
      * }
      * </pre>
-     * Registered with provider.json("myconfig.json");
-     *
-     * provider.at("myconfig.object.key") returns "value"
+     * Registered with provider.json("myconfig.json");<br/>
+     *     =&gt; provider.at("myconfig.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
      * @param def The default value to return if not found
@@ -270,13 +268,13 @@ public class ConfigProvider
         return at(path, def, String.class);
     }
 
-
     /**
-     * Finds a value with the given path.
-     * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link Config#get(String, String)}</b>
+     * Finds a value with the given path.<br/>
      *
-     * Example :
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link Config#get(String, String)}</b></b></b>
+     *
+     * <b>Example :</b>
      *
      * <pre>
      * {
@@ -285,9 +283,8 @@ public class ConfigProvider
      *     }
      * }
      * </pre>
-     * as "myconfig"
-     *
-     * provider.at("myconfig.object.key") returns "value"
+     * as "myconfig"<br/>
+     *     =&gt; provider.at("myconfig.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
      * @param type The type of the object to return
@@ -303,11 +300,12 @@ public class ConfigProvider
 
 
     /**
-     * Finds a value with the given path.
-     * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link Config#get(String, String)}</b>
+     * Finds a value with the given path.<br/><br/>
      *
-     * Example :
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link Config#get(String, String)}</b><br/><br/>
+     *
+     * <b>Example :</b>
      *
      * <pre>
      * {
@@ -316,9 +314,8 @@ public class ConfigProvider
      *     }
      * }
      * </pre>
-     * as "myconfig"
-     *
-     * provider.at("myconfig.object.key") returns "value"
+     * as "myconfig"<br/>
+     *     =&gt; provider.at("myconfig.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
      * @param def The default value if not found

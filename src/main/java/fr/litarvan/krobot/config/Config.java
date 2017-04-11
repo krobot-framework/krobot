@@ -121,11 +121,12 @@ public interface Config
     }
 
     /**
-     * Finds a value with the given path.
-     * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link #get(String, String)}</b>
+     * Finds a value with the given path.<br/><br/>
      *
-     * Example :
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link #get(String, String)}</b><br/><br/>
+     *
+     * <b>Example :</b>
      *
      * <pre>
      * {
@@ -150,11 +151,12 @@ public interface Config
     }
 
     /**
-     * Finds a value with the given path.
-     * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link #get(String, String)}</b>
+     * Finds a value with the given path.<br/><br/>
      *
-     * Example :
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link #get(String, String)}</b><br/><br/>
+     *
+     * <b>Example :</b>
      *
      * <pre>
      * {
@@ -180,11 +182,12 @@ public interface Config
     }
 
     /**
-     * Finds a value with the given path.
-     * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link #get(String, String)}</b>
+     * Finds a value with the given path.<br/><br/>
      *
-     * Example :
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link #get(String, String)}</b><br/><br/>
+     *
+     * <b>Example :</b>
      *
      * <pre>
      * {

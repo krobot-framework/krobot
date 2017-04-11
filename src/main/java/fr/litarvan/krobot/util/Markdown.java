@@ -19,12 +19,12 @@
 package fr.litarvan.krobot.util;
 
 /**
- * Markdown util
+ * Markdown util<br/><br/>
  *
  *
- * Functions to use Discord-markdown in messages.
+ * Functions to use Discord-markdown in messages.<br/><br/>
  *
- * Example :
+ * <b>Example :</b>
  *
  * <pre>
  *     channel.sendMessage("I am a " + Markdown.bold("bot")).queue();

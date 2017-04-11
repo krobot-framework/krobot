@@ -21,12 +21,12 @@ package fr.litarvan.krobot.command;
 import fr.litarvan.krobot.ExceptionHandler;
 
 /**
- * The User Not Found Exception
+ * The User Not Found Exception<br/><br/>
  *
  *
  * An exception thrown when the user called a command and
  * provided a {@link ArgumentType#USER} argument but of
- * a user that cannot be resolved.
+ * a user that cannot be resolved.<br/><br/>
  *
  * Supposed to be caught by the {@link ExceptionHandler}.
  *

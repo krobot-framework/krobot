@@ -19,10 +19,11 @@
 package fr.litarvan.krobot.util;
 
 import java.util.ArrayList;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Message Utils
+ * Message Utils<br/><br/>
  *
  *
  * Message-related util functions.
@@ -71,5 +72,51 @@ public final class MessageUtils
         messages.add(message);
 
         return messages.toArray(new String[messages.size()]);
+    }
+
+    /**
+     * Get the most similar message of a list to a base<br/><br/>
+     *
+     * <b>Example:</b><br/><br/>
+     *
+     * base = hello<br/>
+     * messages = [haul, hella, yay]<br/><br/>
+     *
+     * It returns <b>hella</b>
+     *
+     * @param base The base message
+     * @param messages The messages where to get the most similar
+     *
+     * @return The most similar message to the base
+     */
+    public String getMostSimilar(String base, String[] messages)
+    {
+        ArrayList<Integer> matches = new ArrayList<>();
+
+        for (String message : messages)
+        {
+            matches.add(StringUtils.getLevenshteinDistance(base, message));
+        }
+
+        int candidateIndex = 0;
+        int candidate = Integer.MAX_VALUE;
+
+        for (int i = 0; i < matches.size(); i++)
+        {
+            int entry = matches.get(i);
+
+            if (entry < candidate)
+            {
+                candidate = entry;
+                candidateIndex = i;
+            }
+        }
+
+        if (candidate > 10)
+        {
+            return null;
+        }
+
+        return messages[matches.get(candidateIndex)];
     }
 }

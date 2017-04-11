@@ -73,7 +73,8 @@ public class ExceptionHandler
         }
         else if (throwable instanceof UserNotFoundException)
         {
-            context.getChannel().sendMessage(Dialog.warn("Unknown user", "Can't find user '" + ((UserNotFoundException) throwable).getUser() + "'"));
+            context.getChannel().sendMessage(Dialog.warn("Unknown user", "Can't find user '" + ((UserNotFoundException) throwable).getUser() + "'")).queue();
+            return;
         }
 
         LOGGER.error("Exception while executing " + (context == null ? "a command" : "the command : " + command.toString("", false)), throwable);

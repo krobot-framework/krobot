@@ -79,7 +79,7 @@ public class JSONConfig extends FileConfig
     {
         try
         {
-            Files.write(config.toString(), file, Charset.defaultCharset());
+            Files.write(config.toString(4), file, Charset.defaultCharset());
         }
         catch (IOException e)
         {

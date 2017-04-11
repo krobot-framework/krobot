@@ -199,8 +199,10 @@ public class Command
 
         LOGGER.debug("Handling call of -> " + this.getLabel() + " | with args -> " + map);
 
-        executeMiddlewares(context, map);
-        handler.handle(context, map);
+        if (executeMiddlewares(context, map))
+        {
+            handler.handle(context, map);
+        }
 
         context.getMessage().delete().queue();
     }

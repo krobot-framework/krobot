@@ -112,14 +112,15 @@ public class JSONConfig extends FileConfig
                 }
 
                 object.put(split[split.length - 1], value);
-                return;
             }
             catch (JSONException ignored)
             {
             }
         }
-
-        config.put(key, value);
+        else
+        {
+            config.put(key, value);
+        }
 
         if (autoSave)
         {

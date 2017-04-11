@@ -238,9 +238,101 @@ public class ConfigProvider
      *
      * @return The value at the given path
      */
-    public Object at(String path)
+    public String at(String path)
+    {
+        return at(path, (String) null);
+    }
+
+    /**
+     * Finds a value with the given path.
+     *
+     * Example :
+     *
+     * myconfig.json =&gt;
+     * <pre>
+     * {
+     *     "object": {
+     *         "key": "value"
+     *     }
+     * }
+     * </pre>
+     * Registered with provider.json("myconfig.json");
+     *
+     * provider.at("myconfig.object.key") returns "value"
+     *
+     * @param path The path of the value to get (example config.object.key)
+     * @param def The default value to return if not found
+     *
+     * @return The value at the given path or def if not found
+     */
+    public String at(String path, String def)
+    {
+        return at(path, def, String.class);
+    }
+
+
+    /**
+     * Finds a value with the given path.
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link Config#get(String, String)}</b>
+     *
+     * Example :
+     *
+     * <pre>
+     * {
+     *     "object": {
+     *         "key": "value"
+     *     }
+     * }
+     * </pre>
+     * as "myconfig"
+     *
+     * provider.at("myconfig.object.key") returns "value"
+     *
+     * @param path The path of the value to get (example config.object.key)
+     * @param type The type of the object to return
+     *
+     * @param <T> The type of the object
+     *
+     * @return The value at the given path
+     */
+    public <T> T at(String path, Class<T> type)
+    {
+        return at(path, null, type);
+    }
+
+
+    /**
+     * Finds a value with the given path.
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link Config#get(String, String)}</b>
+     *
+     * Example :
+     *
+     * <pre>
+     * {
+     *     "object": {
+     *         "key": "value"
+     *     }
+     * }
+     * </pre>
+     * as "myconfig"
+     *
+     * provider.at("myconfig.object.key") returns "value"
+     *
+     * @param path The path of the value to get (example config.object.key)
+     * @param def The default value if not found
+     * @param type The type of the object to return
+     *
+     * @param <T> The type of the object
+     *
+     * @return The value at the given path or the default if not found
+     */
+    public <T> T at(String path, T def, Class<T> type)
     {
         int index = path.indexOf(".");
-        return get(path.substring(0, index)).at(path.substring(index + 1));
+        Config config = get(path.substring(0, index));
+
+        return config == null ? null : config.at(path.substring(index + 1), def, type);
     }
 }

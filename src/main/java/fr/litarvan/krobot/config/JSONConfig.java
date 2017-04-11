@@ -19,14 +19,16 @@
 package fr.litarvan.krobot.config;
 
 import com.google.common.io.Files;
-import fr.litarvan.krobot.ExceptionHandler;
-import fr.litarvan.krobot.Krobot;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import net.dv8tion.jda.core.utils.IOUtil;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * The JSON Config
@@ -42,7 +44,8 @@ import org.json.JSONObject;
  */
 public class JSONConfig extends FileConfig
 {
-    private JSONObject config;
+    private Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private JsonObject config;
 
     public JSONConfig()
     {
@@ -64,7 +67,7 @@ public class JSONConfig extends FileConfig
 
         try
         {
-            config = new JSONObject(new String(IOUtil.readFully(file)));
+            config = new JsonParser().parse(new String(IOUtil.readFully(file))).getAsJsonObject();
         }
         catch (IOException e)
         {
@@ -79,7 +82,7 @@ public class JSONConfig extends FileConfig
     {
         try
         {
-            Files.write(config.toString(4), file, Charset.defaultCharset());
+            Files.write(gson.toJson(config), file, Charset.defaultCharset());
         }
         catch (IOException e)
         {
@@ -90,10 +93,22 @@ public class JSONConfig extends FileConfig
     }
 
     @Override
-    public Object get(String key, Object def)
+    public String get(String key, String def)
     {
-        Object value = config.get(key);
+        return get(key, def, String.class);
+    }
+
+    @Override
+    public <T> T get(String key, T def, Class<T> type)
+    {
+        T value = gson.fromJson(config.get(key), type);
         return value == null ? def : value;
+    }
+
+    @Override
+    public void set(String key, String value)
+    {
+        set(key, (Object) value);
     }
 
     @Override
@@ -104,22 +119,29 @@ public class JSONConfig extends FileConfig
             try
             {
                 String[] split = key.split("\\.");
-                JSONObject object = config;
+                JsonObject object = config;
 
                 for (int i = 0; i < split.length - 1; i++)
                 {
-                    object = object.getJSONObject(split[i]);
+                    String str = split[i];
+
+                    if (!object.has(str))
+                    {
+                        object.add(str, new JsonObject());
+                    }
+
+                    object = object.getAsJsonObject(str);
                 }
 
-                object.put(split[split.length - 1], value);
+                object.add(split[split.length - 1], gson.toJsonTree(value));
             }
-            catch (JSONException ignored)
+            catch (JsonParseException ignored)
             {
             }
         }
         else
         {
-            config.put(key, value);
+            config.add(key, gson.toJsonTree(value));
         }
 
         if (autoSave)
@@ -129,21 +151,31 @@ public class JSONConfig extends FileConfig
     }
 
     @Override
-    public Object at(String path, Object def)
+    public <T> T at(String path, T def, Class<T> type)
     {
         try
         {
             String[] split = path.split("\\.");
-            JSONObject object = config;
+            JsonElement el = config;
 
             for (int i = 0; i < split.length - 1; i++)
             {
-                object = object.getJSONObject(split[i]);
+                el = el.getAsJsonObject().get(split[i]);
+
+                if (el == null)
+                {
+                    return null;
+                }
+
+                if (!el.isJsonObject())
+                {
+                    throw new IllegalArgumentException("Field '" + split[i] + "' isn't an object");
+                }
             }
 
-            return object.get(split[split.length - 1]);
+            return gson.fromJson(el.getAsJsonObject().get(split[split.length - 1]), type);
         }
-        catch (JSONException e)
+        catch (JsonParseException e)
         {
             return def;
         }

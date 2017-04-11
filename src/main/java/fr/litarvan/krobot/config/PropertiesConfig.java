@@ -52,15 +52,15 @@ public class PropertiesConfig extends FileConfig
     }
 
     @Override
-    public Object get(String key, Object def)
+    public String get(String key, String def)
     {
-        return properties.getProperty(key, (String) def);
+        return properties.getProperty(key, def);
     }
 
     @Override
-    public void set(String key, Object value)
+    public void set(String key, String value)
     {
-        properties.setProperty(key, (String) value);
+        properties.setProperty(key, value);
 
         if (autoSave)
         {

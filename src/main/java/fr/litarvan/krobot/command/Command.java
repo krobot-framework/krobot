@@ -30,20 +30,46 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * A Command
+ *
+ *
+ * A command definition registered to the {@link CommandManager}.
+ * Can be called using the {@link #call(CommandContext, List)}
+ * method.
+ *
+ * Can be used as start point for making sub commands, using
+ * {@link #sub} methods.
+ *
+ * @author Litarvan
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 public class Command
 {
     private static final Logger LOGGER = LogManager.getLogger("Command");
 
     private String label;
+    private String description;
     private CommandArgument[] arguments;
     private Middleware[] middlewares;
     private CommandHandler handler;
 
     private List<Command> subs;
 
-    public Command(String label, CommandArgument[] arguments, Middleware[] middlewares, CommandHandler handler)
+    /**
+     * The command
+     *
+     * @param label The command label (By exemple in !command &lt;arg&gt; the label is '!command')
+     * @param description The description of the command
+     * @param arguments The arguments that the command can receive
+     * @param middlewares The middlewares of the command
+     * @param handler The handler of the command call
+     */
+    public Command(String label, String description, CommandArgument[] arguments, Middleware[] middlewares, CommandHandler handler)
     {
         this.label = label;
+        this.description = description;
         this.arguments = arguments;
         this.middlewares = middlewares;
         this.handler = handler;
@@ -51,6 +77,14 @@ public class Command
         this.subs = new ArrayList<>();
     }
 
+    /**
+     * Call the command
+     *
+     * @param context The context of the command
+     * @param args The given args
+     *
+     * @throws Exception If the command handler threw one
+     */
     public void call(CommandContext context, List<String> args) throws Exception
     {
         LOGGER.debug("Parsing command call for -> " + this.label);
@@ -220,46 +254,99 @@ public class Command
         return true;
     }
 
+    /**
+     * Register a sub command.
+     *
+     * Example :
+     * Registering a command "sub &lt;arg&gt;" as a sub command
+     * of "!test", will be registered as "!test sub &lt;arg&gt;"
+     *
+     * @param command The sub command to register
+     */
     public void sub(Command command)
     {
         this.subs.add(command);
     }
 
+    /**
+     * Create a command builder for a sub command
+     *
+     * Example :
+     * Registering a command "sub &lt;arg&gt;" as a sub command
+     * of "!test", will be registered as "!test sub &lt;arg&gt;"
+     *
+     * @param path The path of the command (see {@link CommandBuilder#path(String)}
+     *             for the syntax)
+     * @param commandCl The command handler (to be created by the injector)
+     *
+     * @return The created CommandBuilder
+     */
     public CommandBuilder sub(String path, Class<? extends CommandHandler> commandCl)
     {
         return sub(path, Krobot.injector().getInstance(commandCl));
     }
 
+    /**
+     * Create a command builder for a sub command
+     *
+     * Example :
+     * Registering a command "sub &lt;arg&gt;" as a sub command
+     * of "!test", will be registered as "!test sub &lt;arg&gt;"
+     *
+     * @param path The path of the command (see {@link CommandBuilder#path(String)}
+     *             for the syntax)
+     * @param handler The command handler
+     *
+     * @return The created CommandBuilder
+     */
     public CommandBuilder sub(String path, CommandHandler handler)
     {
-        return sub(handler).path(path);
+        return new CommandBuilder(null).path(path).handler(handler);
     }
 
-    public CommandBuilder sub(CommandHandler handler)
-    {
-        return new CommandBuilder(null).parent(this).handler(handler);
-    }
-
+    /**
+     * @return The command label (By example in !command &lt;arg&gt; the label is '!command')
+     */
     public String getLabel()
     {
         return label;
     }
 
+    /**
+     * @return The description of the command
+     */
+    public String getDescription()
+    {
+        return description;
+    }
+
+    /**
+     * @return The arguments that the command can receive
+     */
     public CommandArgument[] getArguments()
     {
         return arguments;
     }
 
+    /**
+     * @return The middlewares of the command
+     */
     public Middleware[] getMiddlewares()
     {
         return middlewares;
     }
 
+    /**
+     * @return The handler of the command call
+     */
     public CommandHandler getHandler()
     {
         return handler;
     }
 
+    /**
+     * @return The registered sub commands
+     */
     public List<Command> getSubs()
     {
         return subs;
@@ -271,6 +358,15 @@ public class Command
         return toString("", true);
     }
 
+    /**
+     * Convert the command to a displayable string
+     * (similar to the {@link CommandBuilder#path(String)} syntax)
+     *
+     * @param prefix The prefix to add (like tabs)
+     * @param subs If the subs should be displayed too
+     *
+     * @return The generated string
+     */
     public String toString(String prefix, boolean subs)
     {
         StringBuilder string = new StringBuilder(prefix + this.label + " ");

@@ -72,6 +72,7 @@ public class CommandBuilder
     }
 
     private String label;
+    private String description;
     private List<CommandArgument> arguments;
     private Command parent;
     private CommandHandler handler;
@@ -195,6 +196,19 @@ public class CommandBuilder
     }
 
     /**
+     * Set the command description
+     *
+     * @param description The description of the command
+     *
+     * @return This
+     */
+    public CommandBuilder description(String description)
+    {
+        this.description = description;
+        return this;
+    }
+
+    /**
      * Add an argument to the command
      *
      * @param arg The argument to add
@@ -290,6 +304,7 @@ public class CommandBuilder
     public Command build()
     {
         return new Command(this.label,
+                           this.description,
                            this.arguments.toArray(new CommandArgument[this.arguments.size()]),
                            this.middlewares.toArray(new Middleware[this.middlewares.size()]),
                            this.handler);

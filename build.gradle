@@ -23,6 +23,7 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-api:2.8'
     compile 'org.apache.logging.log4j:log4j-core:2.8'
     compile 'org.jetbrains:annotations:15.0'
+    compile 'com.google.code.gson:gson:2.8.0'
 }
 
 jar {

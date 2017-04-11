@@ -226,7 +226,8 @@ public class SuppliedArgument
                 switch (type)
                 {
                     case USER:
-                        string.append(((User) object).getDiscriminator());
+                        User user = (User) object;
+                        string.append(user.getName()).append("#").append(user.getDiscriminator());
                         break;
                     case NUMBER:
                         string.append(object);

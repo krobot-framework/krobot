@@ -18,6 +18,8 @@
  */
 package fr.litarvan.krobot.config;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -41,7 +43,23 @@ public interface Config
      *
      * @return The found value or the default one if not found
      */
-    Object get(String key, Object def);
+    String get(String key, String def);
+
+    /**
+     * Get a value of the config as an object
+     *
+     * @param key The key of the value
+     * @param def The default value if not found
+     * @param type The type of the object to return
+     *
+     * @param <T> The type of the object
+     *
+     * @return The found value or the default one if not found
+     */
+    default <T> T get(String key, T def, Class<T> type)
+    {
+        throw new UnsupportedOperationException("This config does not support object serializing");
+    }
 
     /**
      * Set a value of the config
@@ -49,7 +67,18 @@ public interface Config
      * @param key The key of the value to set
      * @param value The value to set
      */
-    void set(String key, Object value);
+    void set(String key, String value);
+
+    /**
+     * Set a value of the config
+     *
+     * @param key The key of the value to set
+     * @param value The value to set
+     */
+    default void set(String key, Object value)
+    {
+        throw new UnsupportedOperationException("This config does not support object serializing");
+    }
 
     /**
      * Get a value of the config
@@ -67,7 +96,7 @@ public interface Config
     /**
      * Finds a value with the given path.
      * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link #get(String, Object)}</b>
+     * does not support objects) it just calls {@link #get(String, String)}</b>
      *
      * Example :
      *
@@ -86,7 +115,7 @@ public interface Config
      *
      * @return The value at the given path or the default if not found
      */
-    default Object at(String path, Object def)
+    default String at(String path, String def)
     {
         return get(path, def);
     }
@@ -94,7 +123,66 @@ public interface Config
     /**
      * Finds a value with the given path.
      * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link #get(String, Object)}</b>
+     * does not support objects) it just calls {@link #get(String, String)}</b>
+     *
+     * Example :
+     *
+     * <pre>
+     * {
+     *     "object": {
+     *         "key": "value"
+     *     }
+     * }
+     * </pre>
+     *
+     * config.at("object.key") returns "value"
+     *
+     * @param path The path of the value to get (example config.object.key)
+     * @param type The type of the object to return
+     *
+     * @param <T> The type of the object
+     *
+     * @return The value at the given path or the default if not found
+     */
+    default <T> T at(String path, Class<T> type)
+    {
+        return at(path, null, type);
+    }
+
+    /**
+     * Finds a value with the given path.
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link #get(String, String)}</b>
+     *
+     * Example :
+     *
+     * <pre>
+     * {
+     *     "object": {
+     *         "key": "value"
+     *     }
+     * }
+     * </pre>
+     *
+     * config.at("object.key") returns "value"
+     *
+     * @param path The path of the value to get (example config.object.key)
+     * @param def The default value if not found
+     * @param type The type of the object to return
+     *
+     * @param <T> The type of the object
+     *
+     * @return The value at the given path or the default if not found
+     */
+    default <T> T at(String path, T def, Class<T> type)
+    {
+        return get(path, def, type);
+    }
+
+    /**
+     * Finds a value with the given path.
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link #get(String, String)}</b>
      *
      * Example :
      *
@@ -113,9 +201,28 @@ public interface Config
      * @return The value at the given path or null if not found
      */
     @Nullable
-    default Object at(String path)
+    default String at(String path)
     {
-        return at(path, null);
+        return at(path, (String) null);
+    }
+
+    /**
+     * Append an object to an array of the config
+     *
+     * @param field The path (see {@link #at(String)}) of the array
+     * @param classOfArray The class of the array
+     * @param toAppend The object to append
+     *
+     * @param <T> The type of the object
+     *
+     * @return The new array
+     */
+    default <T> T[] append(String field, Class<T[]> classOfArray, T toAppend)
+    {
+        T[] array = ArrayUtils.add(at(field, classOfArray), toAppend);
+        set(field, array);
+
+        return array;
     }
 
     /**

@@ -52,6 +52,8 @@ public class Krobot extends AbstractModule
      */
     public static final String VERSION = "2.0.0";
 
+    // TODO: Better config, automatic help
+
     private static final Logger LOGGER = LogManager.getLogger("Krobot");
 
     private static boolean running = false;

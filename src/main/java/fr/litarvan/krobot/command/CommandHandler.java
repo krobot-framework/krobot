@@ -39,6 +39,8 @@ public interface CommandHandler
      *
      * @param context The context of the command call
      * @param args The supplied arguments
+     *
+     * @throws Exception If the command threw one
      */
-    void handle(CommandContext context, Map<String, SuppliedArgument> args);
+    void handle(CommandContext context, Map<String, SuppliedArgument> args) throws Exception;
 }

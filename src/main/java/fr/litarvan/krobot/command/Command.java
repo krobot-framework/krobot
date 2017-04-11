@@ -49,6 +49,7 @@ public class Command
 {
     private static final Logger LOGGER = LogManager.getLogger("Command");
 
+    private Command parent;
     private String label;
     private String description;
     private CommandArgument[] arguments;
@@ -60,14 +61,16 @@ public class Command
     /**
      * The command
      *
+     * @param parent The command parent (if it is a sub command)
      * @param label The command label (By exemple in !command &lt;arg&gt; the label is '!command')
      * @param description The description of the command
      * @param arguments The arguments that the command can receive
      * @param middlewares The middlewares of the command
      * @param handler The handler of the command call
      */
-    public Command(String label, String description, CommandArgument[] arguments, Middleware[] middlewares, CommandHandler handler)
+    public Command(Command parent, String label, String description, CommandArgument[] arguments, Middleware[] middlewares, CommandHandler handler)
     {
+        this.parent = parent;
         this.label = label;
         this.description = description;
         this.arguments = arguments;
@@ -231,7 +234,16 @@ public class Command
             i2++;
         }
 
-        LOGGER.debug("Handling call of -> " + this.getLabel() + " | with args -> " + map);
+        StringBuilder label = new StringBuilder(this.getLabel());
+        Command parent = this.getParent();
+
+        while (parent != null)
+        {
+            label.insert(0, parent.getLabel() + " > ");
+            parent = parent.getParent();
+        }
+
+        LOGGER.debug("Handling call of -> " + label + " | with args -> " + map);
 
         if (executeMiddlewares(context, map))
         {
@@ -301,7 +313,15 @@ public class Command
      */
     public CommandBuilder sub(String path, CommandHandler handler)
     {
-        return new CommandBuilder(null).path(path).handler(handler);
+        return new CommandBuilder(null).parent(this).path(path).handler(handler);
+    }
+
+    /**
+     * @return The parent command if it is a sub command
+     */
+    public Command getParent()
+    {
+        return parent;
     }
 
     /**

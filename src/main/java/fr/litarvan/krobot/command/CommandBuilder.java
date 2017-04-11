@@ -303,7 +303,8 @@ public class CommandBuilder
      */
     public Command build()
     {
-        return new Command(this.label,
+        return new Command(this.parent,
+                           this.label,
                            this.description,
                            this.arguments.toArray(new CommandArgument[this.arguments.size()]),
                            this.middlewares.toArray(new Middleware[this.middlewares.size()]),

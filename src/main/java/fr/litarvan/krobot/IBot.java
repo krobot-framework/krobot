@@ -21,11 +21,11 @@ package fr.litarvan.krobot;
 import com.google.inject.Module;
 
 /**
- * A Krobot Discord bot<br/><br/>
+ * A Krobot Discord bot<br><br>
  *
  *
  * A Discord bot that uses Krobot, just contains an initialization
- * method.<br/><br/>
+ * method.<br><br>
  *
  * To start it, use {@link Krobot#start(String, Class, Module...)}
  *

@@ -33,11 +33,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Main Krobot Class<br/><br/>
+ * Main Krobot Class<br><br>
  *
  *
- * Contains the framework base like JDA, the bot, and the Injector.<br/>
- * Used to start a bot, and as Guice module.<br/><br/>
+ * Contains the framework base like JDA, the bot, and the Injector.<br>
+ * Used to start a bot, and as Guice module.<br><br>
  *
  * Use {@link #start(String, Class, Module...)} to start a bot.
  *

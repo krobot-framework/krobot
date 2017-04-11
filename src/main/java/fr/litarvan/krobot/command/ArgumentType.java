@@ -21,7 +21,7 @@ package fr.litarvan.krobot.command;
 import net.dv8tion.jda.core.entities.User;
 
 /**
- * The Argument Types<br/><br/>
+ * The Argument Types<br><br>
  *
  *
  * The different types of argument.

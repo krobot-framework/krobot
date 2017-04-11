@@ -35,15 +35,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * The CommandManager<br/><br/>
+ * The CommandManager<br><br>
  *
  *
- * It's the starting point of a bot, and the main part of Krobot.<br/>
+ * It's the starting point of a bot, and the main part of Krobot.<br>
  * It has a command registry, and handle the command call to its
- * registered command.<br/>
- * It uses the builders to make commands.<br/><br/>
+ * registered command.<br>
+ * It uses the builders to make commands.<br><br>
  *
- * To use it, use the {@link #make} methods.<br/><br/>
+ * To use it, use the {@link #make} methods.<br><br>
  *
  * <b>Examples :</b>
  *
@@ -91,10 +91,10 @@ public class CommandManager
     }
 
     /**
-     * Create a group builder.<br/><br/>
+     * Create a group builder.<br><br>
      *
      * A command group is some properties that will be applied
-     * to some commands at the same time.<br/><br/>
+     * to some commands at the same time.<br><br>
      *
      * <b>Example :</b>
      *
@@ -189,7 +189,7 @@ public class CommandManager
     }
 
     /**
-     * Push a command group to the stack.<br/>
+     * Push a command group to the stack.<br>
      * The next command registered will have the group properties
      * applied.
      *
@@ -240,7 +240,7 @@ public class CommandManager
     }
 
     /**
-     * Split a message from whitespaces, ignoring the one in quotes.<br/><br/>
+     * Split a message from whitespaces, ignoring the one in quotes.<br><br>
      *
      * <b>Example :</b>
      *

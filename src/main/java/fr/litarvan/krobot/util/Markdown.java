@@ -19,10 +19,10 @@
 package fr.litarvan.krobot.util;
 
 /**
- * Markdown util<br/><br/>
+ * Markdown util<br><br>
  *
  *
- * Functions to use Discord-markdown in messages.<br/><br/>
+ * Functions to use Discord-markdown in messages.<br><br>
  *
  * <b>Example :</b>
  *

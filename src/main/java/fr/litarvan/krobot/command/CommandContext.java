@@ -23,10 +23,10 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 /**
- * The Command Context<br/><br/>
+ * The Command Context<br><br>
  *
  *
- * The context where the command was called.<br/>
+ * The context where the command was called.<br>
  * It contains the user that called the command, the message
  * of the command, and the channel where it was called.
  *

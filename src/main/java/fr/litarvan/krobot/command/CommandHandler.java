@@ -21,7 +21,7 @@ package fr.litarvan.krobot.command;
 import java.util.Map;
 
 /**
- * The Command Handler<br/><br/>
+ * The Command Handler<br><br>
  *
  *
  * Called by the {@link CommandManager} to handle the call

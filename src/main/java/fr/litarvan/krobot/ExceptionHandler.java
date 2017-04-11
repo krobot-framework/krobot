@@ -38,12 +38,12 @@ import static fr.litarvan.krobot.util.Markdown.*;
 import static fr.litarvan.krobot.util.MessageUtils.*;
 
 /**
- * The Exception Handler<br/><br/>
+ * The Exception Handler<br><br>
  *
  *
- * Handle the exceptions thrown during a command handling.<br/>
+ * Handle the exceptions thrown during a command handling.<br>
  * By default, it displays an error {@link Dialog}, and send a
- * complete crash report to the user that triggered the command.<br/><br/>
+ * complete crash report to the user that triggered the command.<br><br>
  *
  * You can override it using Guice binding in a module.
  *

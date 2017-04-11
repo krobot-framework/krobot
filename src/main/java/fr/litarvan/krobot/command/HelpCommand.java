@@ -6,10 +6,10 @@ import java.util.Map;
 import javax.inject.Inject;
 
 /**
- * The Help Command<br/><br/>
+ * The Help Command<br><br>
  *
  *
- * An automatic help command.<br/>
+ * An automatic help command.<br>
  * It uses an info Dialog and displays all the commands with
  * their syntax, their descriptions, and their subcommands
  * recursively.

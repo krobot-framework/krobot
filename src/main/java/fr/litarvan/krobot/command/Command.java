@@ -31,12 +31,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * A Command<br/><br/>
+ * A Command<br><br>
  *
  *
- * A command definition registered to the {@link CommandManager}.<br/>
+ * A command definition registered to the {@link CommandManager}.<br>
  * Can be called using the {@link #call(CommandContext, List)}
- * method.<br/><br/>
+ * method.<br><br>
  *
  * Can be used as start point for making sub commands, using
  * {@link #sub} methods.
@@ -267,9 +267,9 @@ public class Command
     }
 
     /**
-     * Register a sub command.<br/><br/>
+     * Register a sub command.<br><br>
      *
-     * Example :<br/>
+     * Example :<br>
      * Registering a command "sub &lt;arg&gt;" as a sub command
      * of "!test", will be registered as "!test sub &lt;arg&gt;"
      *

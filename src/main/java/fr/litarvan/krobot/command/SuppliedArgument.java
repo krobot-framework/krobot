@@ -23,7 +23,7 @@ import java.util.List;
 import net.dv8tion.jda.core.entities.User;
 
 /**
- * A Supplied Argument<br/><br/>
+ * A Supplied Argument<br><br>
  *
  *
  * An argument that was given to a command.
@@ -88,9 +88,9 @@ public class SuppliedArgument
     }
 
     /**
-     * @return The string value of the argument.<br/><br/>
+     * @return The string value of the argument.<br><br>
      *
-     * If it is a {@link ArgumentType#USER}, returns its Username.<br/>
+     * If it is a {@link ArgumentType#USER}, returns its Username.<br>
      * If it is a number, returns its String value.
      */
     public String getAsString()
@@ -111,7 +111,7 @@ public class SuppliedArgument
     /**
      * @throws IllegalStateException If it is a {@link ArgumentType#USER}
      *
-     * @return The int value of the argument.<br/><br/>
+     * @return The int value of the argument.<br><br>
      *
      * If it is a {@link ArgumentType#STRING}, it tries to parse it.
      */
@@ -133,7 +133,7 @@ public class SuppliedArgument
     /**
      * @throws IllegalStateException If it is a {@link ArgumentType#NUMBER}
      *
-     * @return The argument as a User.<br/><br/>
+     * @return The argument as a User.<br><br>
      *
      * If it is a {@link ArgumentType#STRING}, tries to resolve it.
      */

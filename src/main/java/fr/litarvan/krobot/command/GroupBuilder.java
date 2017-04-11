@@ -24,13 +24,13 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The Group Builder<br/><br/>
+ * The Group Builder<br><br>
  *
  *
  * Used to build a command group (a list of properties that
- * will be applied to the command registered in {@link #apply(Runnable)}).<br/><br/>
+ * will be applied to the command registered in {@link #apply(Runnable)}).<br><br>
  *
- * To be used from the {@link CommandManager}.<br/><br/>
+ * To be used from the {@link CommandManager}.<br><br>
  *
  * <b>Example :</b>
  *
@@ -144,7 +144,7 @@ public class GroupBuilder
     }
 
     /**
-     * Setup the group<br/><br/>
+     * Setup the group<br><br>
      *
      * <b>Example of use :</b>
      *

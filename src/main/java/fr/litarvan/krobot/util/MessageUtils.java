@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Message Utils<br/><br/>
+ * Message Utils<br><br>
  *
  *
  * Message-related util functions.
@@ -75,12 +75,12 @@ public final class MessageUtils
     }
 
     /**
-     * Get the most similar message of a list to a base<br/><br/>
+     * Get the most similar message of a list to a base<br><br>
      *
-     * <b>Example:</b><br/><br/>
+     * <b>Example:</b><br><br>
      *
-     * base = hello<br/>
-     * messages = [haul, hella, yay]<br/><br/>
+     * base = hello<br>
+     * messages = [haul, hella, yay]<br><br>
      *
      * It returns <b>hella</b>
      *

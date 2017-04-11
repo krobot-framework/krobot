@@ -23,12 +23,12 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
 /**
- * Dialog maker<br/><br/>
+ * Dialog maker<br><br>
  *
  *
- * Contains functions to make kind of "dialogs" using embeds.<br/>
- * It has three types of dialog : info, warning, error.<br/>
- * You can always create your own.<br/><br/>
+ * Contains functions to make kind of "dialogs" using embeds.<br>
+ * It has three types of dialog : info, warning, error.<br>
+ * You can always create your own.<br><br>
  *
  * <b>Examples :</b>
  *

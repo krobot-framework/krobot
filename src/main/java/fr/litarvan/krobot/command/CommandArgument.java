@@ -19,7 +19,7 @@
 package fr.litarvan.krobot.command;
 
 /**
- * A Command Argument<br/><br/>
+ * A Command Argument<br><br>
  *
  *
  * Represents a definition of an argument that can be given

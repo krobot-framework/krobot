@@ -22,7 +22,7 @@ import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A Middleware<br/><br/>
+ * A Middleware<br><br>
  *
  *
  * A Middleware is something that is called before that a/some

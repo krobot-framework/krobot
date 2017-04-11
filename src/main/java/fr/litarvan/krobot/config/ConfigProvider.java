@@ -27,10 +27,10 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The Config Provider<br/><br/>
+ * The Config Provider<br><br>
  *
  *
- * Manage the configs of a bot.<br/><br/>
+ * Manage the configs of a bot.<br><br>
  *
  * <b>Registering a config :</b>
  *
@@ -73,7 +73,7 @@ public class ConfigProvider
     private Map<String, Config> configs = new HashMap<>();
 
     /**
-     * Create a config from a file path.<br/>
+     * Create a config from a file path.<br>
      * It names will be the file name without the extension.
      *
      * @param file The path of the config file
@@ -86,7 +86,7 @@ public class ConfigProvider
     }
 
     /**
-     * Create a config from a file.<br/>
+     * Create a config from a file.<br>
      * It names will be the file name without the extension.
      *
      * @param file The path of the config file
@@ -111,7 +111,7 @@ public class ConfigProvider
     }
 
     /**
-     * Create a JSON config from a file.<br/>
+     * Create a JSON config from a file.<br>
      * It names will be the file name without the extension.
      *
      * @param file The path of the config file
@@ -149,7 +149,7 @@ public class ConfigProvider
     }
 
     /**
-     * Create a Java Properties config from a file.<br/>
+     * Create a Java Properties config from a file.<br>
      * It names will be the file name without the extension.
      *
      * @param file The path of the config file
@@ -218,7 +218,7 @@ public class ConfigProvider
     }
 
     /**
-     * Finds a value with the given path.<br/><br/>
+     * Finds a value with the given path.<br><br>
      *
      * <b>Example :</b>
      *
@@ -230,7 +230,7 @@ public class ConfigProvider
      *     }
      * }
      * </pre>
-     * Registered with provider.json("myconfig.json");<br/>
+     * Registered with provider.json("myconfig.json");<br>
      *     =&gt; provider.at("myconfig.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
@@ -243,7 +243,7 @@ public class ConfigProvider
     }
 
     /**
-     * Finds a value with the given path.<br/><br/>
+     * Finds a value with the given path.<br><br>
      *
      * <b>Example :</b>
      *
@@ -255,7 +255,7 @@ public class ConfigProvider
      *     }
      * }
      * </pre>
-     * Registered with provider.json("myconfig.json");<br/>
+     * Registered with provider.json("myconfig.json");<br>
      *     =&gt; provider.at("myconfig.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
@@ -269,7 +269,7 @@ public class ConfigProvider
     }
 
     /**
-     * Finds a value with the given path.<br/>
+     * Finds a value with the given path.<br>
      *
      * <b>If the config does not support the features (by example it
      * does not support objects) it just calls {@link Config#get(String, String)}</b></b></b>
@@ -283,7 +283,7 @@ public class ConfigProvider
      *     }
      * }
      * </pre>
-     * as "myconfig"<br/>
+     * as "myconfig"<br>
      *     =&gt; provider.at("myconfig.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
@@ -300,10 +300,10 @@ public class ConfigProvider
 
 
     /**
-     * Finds a value with the given path.<br/><br/>
+     * Finds a value with the given path.<br><br>
      *
      * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link Config#get(String, String)}</b><br/><br/>
+     * does not support objects) it just calls {@link Config#get(String, String)}</b><br><br>
      *
      * <b>Example :</b>
      *
@@ -314,7 +314,7 @@ public class ConfigProvider
      *     }
      * }
      * </pre>
-     * as "myconfig"<br/>
+     * as "myconfig"<br>
      *     =&gt; provider.at("myconfig.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +44,7 @@ import org.apache.logging.log4j.Logger;
  * {@link #sub} methods.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.0.1
  * @since 2.0.0
  */
 public class Command
@@ -250,7 +252,8 @@ public class Command
             handler.handle(context, map);
         }
 
-        context.getMessage().delete().queue();
+        if (context.getChannel().getGuild().getMember(Krobot.jda().getSelfUser()).hasPermission(Permission.MESSAGE_MANAGE))
+            context.getMessage().delete().queue();
     }
 
     private boolean executeMiddlewares(CommandContext context, Map<String, SuppliedArgument> args)

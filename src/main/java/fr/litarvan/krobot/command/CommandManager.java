@@ -66,7 +66,7 @@ import org.apache.logging.log4j.Logger;
  * Don't forget to call the register function at the end of the builder.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 @Singleton
@@ -174,7 +174,7 @@ public class CommandManager
      */
     public CommandBuilder make(CommandHandler handler)
     {
-        return new CommandBuilder(this).handler(handler);
+        return new CommandBuilder(this, jda, exHandler).handler(handler);
     }
 
     /**

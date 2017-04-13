@@ -19,6 +19,7 @@
 package fr.litarvan.krobot.command;
 
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The Command Handler<br><br>
@@ -28,7 +29,7 @@ import java.util.Map;
  * of a command.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 @FunctionalInterface
@@ -42,5 +43,5 @@ public interface CommandHandler
      *
      * @throws Exception If the command threw one
      */
-    void handle(CommandContext context, Map<String, SuppliedArgument> args) throws Exception;
+    void handle(@NotNull CommandContext context, @NotNull Map<String, SuppliedArgument> args) throws Exception;
 }

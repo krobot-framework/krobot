@@ -18,10 +18,12 @@
  */
 package fr.litarvan.krobot.command;
 
+import fr.litarvan.krobot.ExceptionHandler;
 import fr.litarvan.krobot.Krobot;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.dv8tion.jda.core.JDA;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -44,29 +46,39 @@ import org.apache.commons.lang3.ArrayUtils;
  * syntax.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 public class CommandBuilder
 {
     private CommandManager commandManager;
+    private JDA jda;
+    private ExceptionHandler exceptionHandler;
 
     /**
      * CommandBuidler for manual use
+     *
+     * @param jda The current JDA instance
+     * @param handler The exception handler that will catch the sub command throwables
      */
-    public CommandBuilder()
+    public CommandBuilder(JDA jda, ExceptionHandler handler)
     {
-        this(null);
+        this(null, jda, handler);
     }
 
     /**
      * CommandBuilder with a manager
      *
      * @param commandManager The manager where to register the command
+     * @param jda The current JDA instance
+     * @param handler The exception handler that will catch the sub command throwables
      */
-    public CommandBuilder(CommandManager commandManager)
+    public CommandBuilder(CommandManager commandManager, JDA jda, ExceptionHandler handler)
     {
         this.commandManager = commandManager;
+        this.jda = jda;
+        this.exceptionHandler = handler;
+
         this.arguments = new ArrayList<>();
         this.middlewares = new ArrayList<>();
     }
@@ -173,6 +185,11 @@ public class CommandBuilder
             {
                 list = true;
                 type = type.substring(0, type.length() - 3);
+            }
+            else if (arg.endsWith("..."))
+            {
+                list = true;
+                arg = arg.substring(0, arg.length() - 3);
             }
 
             ArgumentType argumentType = ArgumentType.valueOf(type.toUpperCase());
@@ -303,7 +320,10 @@ public class CommandBuilder
      */
     public Command build()
     {
-        return new Command(this.parent,
+        return new Command(this.jda,
+                           this.exceptionHandler,
+
+                           this.parent,
                            this.label,
                            this.description,
                            this.arguments.toArray(new CommandArgument[this.arguments.size()]),

@@ -41,7 +41,7 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
  * </pre>
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 public final class Dialog
@@ -49,7 +49,7 @@ public final class Dialog
     /**
      * Icon used in info dialogs
      */
-    public static final String INFO_ICON = "http://litarvan.github.com/krobot_icons/info.png";
+    public static final String INFO_ICON = "http://litarvan.github.com/krobot_icons/info_v2.png";
 
     /**
      * Icon used in warn dialogs
@@ -62,6 +62,21 @@ public final class Dialog
     public static final String ERROR_ICON = "http://litarvan.github.com/krobot_icons/error.png";
 
     /**
+     * The color used for the info dialogs
+     */
+    public static final Color INFO_COLOR = Color.decode("0x0094FF");
+
+    /**
+     * The color used for the warn dialogs
+     */
+    public static final Color WARN_COLOR = Color.decode("0xFFBD00");
+
+    /**
+     * The color used for the errors dialogs
+     */
+    public static final Color ERROR_COLOR = Color.decode("0xED1B2E");
+
+    /**
      * Displays an info dialog
      *
      * @param title The title of the dialog
@@ -71,7 +86,7 @@ public final class Dialog
      */
     public static MessageEmbed info(String title, String description)
     {
-        return dialog(Color.decode("0x0094FF"), title, description, INFO_ICON);
+        return dialog(INFO_COLOR, title, description, INFO_ICON);
     }
 
     /**
@@ -84,7 +99,7 @@ public final class Dialog
      */
     public static MessageEmbed warn(String title, String description)
     {
-        return dialog(Color.decode("0xFFBD00"), title, description, WARN_ICON);
+        return dialog(WARN_COLOR, title, description, WARN_ICON);
     }
 
     /**
@@ -97,7 +112,7 @@ public final class Dialog
      */
     public static MessageEmbed error(String title, String description)
     {
-        return dialog(Color.decode("0xED1B2E"), title, description, ERROR_ICON);
+        return dialog(ERROR_COLOR, title, description, ERROR_ICON);
     }
 
     /**
@@ -117,7 +132,7 @@ public final class Dialog
     /**
      * Displays a dialog
      *
-     * @param color The color of the bar on the dialog' left side
+     * @param color The color of the bar on the dialog left side
      * @param title The title of the dialog
      * @param description The description of the dialog
      * @param icon The URL of the dialog icon

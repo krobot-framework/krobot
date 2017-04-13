@@ -30,7 +30,7 @@ import net.dv8tion.jda.core.entities.User;
  * Like an instance of a {@link CommandArgument}.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 public class SuppliedArgument
@@ -109,11 +109,9 @@ public class SuppliedArgument
     }
 
     /**
-     * @throws IllegalStateException If it is a {@link ArgumentType#USER}
+     * @throws IllegalStateException If it is a {@link ArgumentType#USER} or a {@link ArgumentType#STRING}
      *
-     * @return The int value of the argument.<br><br>
-     *
-     * If it is a {@link ArgumentType#STRING}, it tries to parse it.
+     * @return The int value of the argument.
      */
     public int getAsNumber()
     {
@@ -122,7 +120,7 @@ public class SuppliedArgument
             case USER:
                 throw new IllegalStateException("Cannot convert User argument to Number argument");
             case STRING:
-                return Integer.parseInt(stringValue);
+                throw new IllegalStateException("Cannot convert String argument to Number argument");
             case NUMBER:
                 return numberValue;
         }

@@ -18,7 +18,12 @@
  */
 package fr.litarvan.krobot.command;
 
+import java.util.concurrent.Future;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
@@ -31,7 +36,7 @@ import net.dv8tion.jda.core.entities.User;
  * of the command, and the channel where it was called.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 public class CommandContext
@@ -52,6 +57,66 @@ public class CommandContext
         this.user = user;
         this.message = message;
         this.channel = channel;
+    }
+
+    /**
+     * Send a message on the context channel
+     *
+     * @param content The message content
+     *
+     * @return A Future representing the send task
+     */
+    public Future<Message> sendMessage(String content)
+    {
+        return channel.sendMessage(content).submit();
+    }
+
+    /**
+     * Send an embed message on the context channel
+     *
+     * @param content The message content
+     *
+     * @return A Future representing the send task
+     */
+    public Future<Message> sendMessage(MessageEmbed content)
+    {
+        return channel.sendMessage(content).submit();
+    }
+
+    /**
+     * Send an embed message on the context channel
+     *
+     * @param content The message content
+     *
+     * @return A Future representing the send task
+     */
+    public Future<Message> sendMessage(EmbedBuilder content)
+    {
+        return sendMessage(content.build());
+    }
+
+    /**
+     * @return Return the caller user as a mention
+     */
+    public String mentionCaller()
+    {
+        return this.getUser().getAsMention();
+    }
+
+    /**
+     * @return The guild where the command was called
+     */
+    public Guild getGuild()
+    {
+        return this.getChannel().getGuild();
+    }
+
+    /**
+     * @return The guild member that called the command
+     */
+    public Member getMember()
+    {
+        return this.getGuild().getMember(this.getUser());
     }
 
     /**

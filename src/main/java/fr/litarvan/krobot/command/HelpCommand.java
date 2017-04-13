@@ -4,6 +4,7 @@ import fr.litarvan.krobot.util.Dialog;
 import fr.litarvan.krobot.util.Markdown;
 import java.util.Map;
 import javax.inject.Inject;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The Help Command<br><br>
@@ -15,7 +16,7 @@ import javax.inject.Inject;
  * recursively.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 public class HelpCommand implements CommandHandler
@@ -24,7 +25,7 @@ public class HelpCommand implements CommandHandler
     private CommandManager commandManager;
 
     @Override
-    public void handle(CommandContext context, Map<String, SuppliedArgument> args)
+    public void handle(@NotNull CommandContext context, @NotNull Map<String, SuppliedArgument> args)
     {
         StringBuilder message = new StringBuilder();
 
@@ -33,7 +34,7 @@ public class HelpCommand implements CommandHandler
             message.append(toString("", command)).append("\n\n");
         }
 
-        context.getChannel().sendMessage(Dialog.info(Markdown.underline("List of commands :"), message.toString())).queue();
+        context.sendMessage(Dialog.info(Markdown.underline("List of commands :"), message.toString()));
     }
 
     private String toString(String prefix, Command command)
@@ -43,7 +44,7 @@ public class HelpCommand implements CommandHandler
         String str = command.toString("", false);
         String label = command.getLabel();
 
-        string.append(prefix).append(Markdown.bold(label)).append(str.substring(label.length())).append("\n");
+        string.append(prefix.replace('└', '├')).append(Markdown.bold(label)).append(str.substring(label.length())).append("\n");
 
         if (command.getDescription() != null)
         {
@@ -57,10 +58,14 @@ public class HelpCommand implements CommandHandler
 
         if (command.getSubs() != null && !command.getSubs().isEmpty())
         {
-            for (Command sub : command.getSubs())
+            for (int i = 0; i < command.getSubs().size(); i++)
             {
-                string.append("\n");
-                string.append(toString("|--- " + prefix + Markdown.bold(label) + " ", sub));
+                if (!(command.getDescription() == null && i == 0))
+                {
+                    string.append("\n");
+                }
+
+                string.append(toString((i == command.getSubs().size() - 1 ? "└" : "├") + "── " + prefix + Markdown.bold(label) + " ", command.getSubs().get(i)));
             }
         }
 

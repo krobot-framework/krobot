@@ -32,6 +32,7 @@ import net.dv8tion.jda.core.entities.PrivateChannel;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 
 import static fr.litarvan.krobot.util.Markdown.*;
@@ -48,7 +49,7 @@ import static fr.litarvan.krobot.util.MessageUtils.*;
  * You can override it using Guice binding in a module.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 @Singleton
@@ -64,24 +65,24 @@ public class ExceptionHandler
      * @param args The arguments given to the command
      * @param context The command context
      */
-    public void handle(Throwable throwable, Command command, List<String> args, CommandContext context)
+    public void handle(@NotNull Throwable throwable, @NotNull Command command, @NotNull List<String> args, @NotNull CommandContext context)
     {
         if (throwable instanceof BadSyntaxException)
         {
-            context.getChannel().sendMessage(Dialog.warn("Bad command syntax", Markdown.underline("Syntax :") + " " + command.toString("", false))).queue();
+            context.sendMessage(Dialog.warn("Bad command syntax", Markdown.underline("Syntax :") + " " + command.toString("", false) + (throwable.getMessage() != null ? "\n\n" + throwable.getMessage() : "")));
             return;
         }
         else if (throwable instanceof UserNotFoundException)
         {
-            context.getChannel().sendMessage(Dialog.warn("Unknown user", "Can't find user '" + ((UserNotFoundException) throwable).getUser() + "'")).queue();
+            context.sendMessage(Dialog.warn("Unknown user", "Can't find user '" + ((UserNotFoundException) throwable).getUser() + "'"));
             return;
         }
 
-        LOGGER.error("Exception while executing " + (context == null ? "a command" : "the command : " + command.toString("", false)), throwable);
+        LOGGER.error("Exception while executing the command : " + command.toString("", false), throwable);
 
         String report = makeCrashReport(throwable, command, args, context);
 
-        context.getChannel().sendMessage(Dialog.error("Command crashed !", "A crash report has been sent to you " + context.getUser().getAsMention() + " . Please send it to the developer as soon as possible !")).queue();
+        context.sendMessage(Dialog.error("Command crashed !", "A crash report has been sent to you " + context.getUser().getAsMention() + " . Please send it to the developer as soon as possible !"));
 
         PrivateChannel channel = UserUtils.privateChannel(context.getUser());
         for (String message : splitMessage(report, MAX_MESSAGE_CHARS - code("").length()))

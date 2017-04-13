@@ -18,6 +18,7 @@
  */
 package fr.litarvan.krobot.command;
 
+import fr.litarvan.krobot.ExceptionHandler;
 import fr.litarvan.krobot.Krobot;
 import fr.litarvan.krobot.util.UserUtils;
 import java.util.ArrayList;
@@ -25,10 +26,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,7 +48,7 @@ import org.apache.logging.log4j.Logger;
  * {@link #sub} methods.
  *
  * @author Litarvan
- * @version 2.0.1
+ * @version 2.1.0
  * @since 2.0.0
  */
 public class Command
@@ -60,8 +64,14 @@ public class Command
 
     private List<Command> subs;
 
+    private JDA jda;
+    private ExceptionHandler exHandler;
+
     /**
      * The command
+     *
+     * @param jda The current JDA instance
+     * @param exHandler The handler that will catch the sub commands call exceptions
      *
      * @param parent The command parent (if it is a sub command)
      * @param label The command label (By exemple in !command &lt;arg&gt; the label is '!command')
@@ -70,8 +80,11 @@ public class Command
      * @param middlewares The middlewares of the command
      * @param handler The handler of the command call
      */
-    public Command(Command parent, String label, String description, CommandArgument[] arguments, Middleware[] middlewares, CommandHandler handler)
+    public Command(JDA jda, ExceptionHandler exHandler, Command parent, String label, String description, CommandArgument[] arguments, Middleware[] middlewares, CommandHandler handler)
     {
+        this.jda = jda;
+        this.exHandler = exHandler;
+
         this.parent = parent;
         this.label = label;
         this.description = description;
@@ -103,7 +116,17 @@ public class Command
                     if (executeMiddlewares(context, null))
                     {
                         LOGGER.debug("Sub command detected -> " + sub.getLabel());
-                        sub.call(context, args.subList(1, args.size()));
+
+                        List<String> subArgs = args.subList(1, args.size());
+
+                        try
+                        {
+                            sub.call(context, subArgs);
+                        }
+                        catch (Throwable t)
+                        {
+                            exHandler.handle(t, sub, subArgs, context);
+                        }
                     }
 
                     return;
@@ -119,7 +142,7 @@ public class Command
 
             if (i2 > args.size() - 1)
             {
-                ex = new BadSyntaxException();
+                ex = new BadSyntaxException("Missing some args");
             }
             else if (!arguments[i].isList())
             {
@@ -128,9 +151,13 @@ public class Command
                 String[] choices = arguments[i].getChoices();
                 String arg = args.get(i2);
 
-                if ((type == ArgumentType.NUMBER && !StringUtils.isNumeric(arg)) || (choices != null && !ArrayUtils.contains(choices, arg)))
+                if (choices != null && !ArrayUtils.contains(choices, arg))
                 {
-                    ex = new BadSyntaxException();
+                    ex = new BadSyntaxException("Supplied arg '" + arg + "' isn't one of the possible choices : " + ArrayUtils.toString(choices) + " (for arg '" + arguments[i].getKey() + "')");
+                }
+                if (type == ArgumentType.NUMBER && !NumberUtils.isCreatable(arg))
+                {
+                    ex = new BadSyntaxException("Supplied arg '" + arg + "' isn't a number (for arg '" + arguments[i].getKey() + "')");
                 }
                 else if (type == ArgumentType.USER && UserUtils.resolve(arg) == null)
                 {
@@ -195,12 +222,19 @@ public class Command
                                 list.add(user);
                                 break;
                             case NUMBER:
-                                if (!StringUtils.isNumeric(value))
+                                if (!NumberUtils.isCreatable(value))
                                 {
-                                    throw new BadSyntaxException();
+                                    throw new BadSyntaxException("Supplied arg '" + value + "' (from list arg '" + arguments[i].getKey() + "') isn't a number");
                                 }
 
-                                list.add(Integer.parseInt(value));
+                                Number number = NumberUtils.createNumber(value);
+
+                                if(!(number instanceof Integer))
+                                {
+                                    throw new BadSyntaxException("Supplied arg '" + value + "' (from list arg '" + arguments[i].getKey() + "') is too big");
+                                }
+
+                                list.add((Integer) number);
                                 break;
                             case STRING:
                                 list.add(value);
@@ -220,7 +254,14 @@ public class Command
                             argument = new SuppliedArgument(UserUtils.resolve(value));
                             break;
                         case NUMBER:
-                            argument = new SuppliedArgument(Integer.parseInt(value));
+                            Number number = NumberUtils.createNumber(value);
+
+                            if(!(number instanceof Integer))
+                            {
+                                throw new BadSyntaxException("Supplied arg '" + value + "' (from list arg '" + arguments[i].getKey() + "') is too big");
+                            }
+
+                            argument = new SuppliedArgument((Integer) number);
                             break;
                         case STRING:
                             argument = new SuppliedArgument(value);
@@ -252,8 +293,10 @@ public class Command
             handler.handle(context, map);
         }
 
-        if (context.getChannel().getGuild().getMember(Krobot.jda().getSelfUser()).hasPermission(Permission.MESSAGE_MANAGE))
+        if (context.getGuild().getMember(jda.getSelfUser()).hasPermission(Permission.MESSAGE_MANAGE))
+        {
             context.getMessage().delete().queue();
+        }
     }
 
     private boolean executeMiddlewares(CommandContext context, Map<String, SuppliedArgument> args)
@@ -316,7 +359,7 @@ public class Command
      */
     public CommandBuilder sub(String path, CommandHandler handler)
     {
-        return new CommandBuilder(null).parent(this).path(path).handler(handler);
+        return new CommandBuilder(null, jda, exHandler).parent(this).path(path).handler(handler);
     }
 
     /**

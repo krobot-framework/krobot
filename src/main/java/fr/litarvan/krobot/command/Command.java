@@ -48,7 +48,7 @@ import org.apache.logging.log4j.Logger;
  * {@link #sub} methods.
  *
  * @author Litarvan
- * @version 2.1.0
+ * @version 2.1.1
  * @since 2.0.0
  */
 public class Command
@@ -213,7 +213,7 @@ public class Command
                         switch (type)
                         {
                             case USER:
-                                User user = UserUtils.resolve(value);
+                                User user = UserUtils.resolve(context.getGuild(), value);
                                 if (user == null)
                                 {
                                     throw new UserNotFoundException(value);
@@ -251,7 +251,7 @@ public class Command
                     switch (arguments[i].getType())
                     {
                         case USER:
-                            argument = new SuppliedArgument(UserUtils.resolve(value));
+                            argument = new SuppliedArgument(UserUtils.resolve(context.getGuild(), value));
                             break;
                         case NUMBER:
                             Number number = NumberUtils.createNumber(value);

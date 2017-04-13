@@ -22,6 +22,8 @@ import fr.litarvan.krobot.Krobot;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.User;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
  * A class containing user-related util functions.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.1
  * @since 2.0.0
  */
 public final class UserUtils
@@ -41,7 +43,8 @@ public final class UserUtils
     private static JDA jda = Krobot.jda();
 
     /**
-     * Resolve a user from a String.<br><br>
+     * Resolve a user from a String.<br>
+     * If it can be a nickname, use {@link #resolve(Guild, String)}<br><br>
      *
      * Example : "@Litarvan", "Litarvan", or "87279950075293696"<br>
      * returns the JDA User object of Litarvan.
@@ -66,6 +69,37 @@ public final class UserUtils
         }
 
         return users.get(0);
+    }
+
+    /**
+     * Resolve a user from a String.<br>
+     * The guild is used to check if it is a nickname and not the
+     * user real name.<br><br>
+     *
+     * Example : "@Litarvan", "Litarvan", or "87279950075293696"<br>
+     * returns the JDA User object of Litarvan.
+     *
+     * @param guild The guild where the user is
+     * @param user A string (mention/username/id) of the user
+     *             to resolve
+     *
+     * @return The resolved user
+     */
+    public static User resolve(@NotNull Guild guild, @NotNull String user)
+    {
+        List<Member> users = guild.getMembersByEffectiveName(user, true);
+
+        if (users.size() == 0 && user.startsWith("@"))
+        {
+            users = guild.getMembersByEffectiveName(user.substring(1), true);
+        }
+
+        if (users.size() == 0)
+        {
+            return resolve(user);
+        }
+
+        return users.get(0).getUser();
     }
 
     /**

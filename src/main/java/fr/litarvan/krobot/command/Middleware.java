@@ -19,6 +19,7 @@
 package fr.litarvan.krobot.command;
 
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -29,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * commands are called. It can cancel its handling.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.1
  * @since 2.0.0
  */
 @FunctionalInterface
@@ -45,5 +46,5 @@ public interface Middleware
      *
      * @return If the handling should continue
      */
-    boolean handle(Command command, @Nullable Map<String, SuppliedArgument> args, CommandContext context);
+    boolean handle(@NotNull Command command, @Nullable Map<String, SuppliedArgument> args, @NotNull CommandContext context);
 }

@@ -36,7 +36,7 @@ import net.dv8tion.jda.core.entities.User;
  * of the command, and the channel where it was called.
  *
  * @author Litarvan
- * @version 2.1.0
+ * @version 2.1.1
  * @since 2.0.0
  */
 public class CommandContext
@@ -64,7 +64,7 @@ public class CommandContext
      *
      * @param content The message content
      *
-     * @return A Future representing the send task
+     * @return A Future representing the task result
      */
     public Future<Message> sendMessage(String content)
     {
@@ -72,11 +72,24 @@ public class CommandContext
     }
 
     /**
+     * Send a formatted message on the context channel
+     *
+     * @param content The message content (will be formated by {@link String#format(String, Object...)}
+     * @param args The args for the format
+     *
+     * @return A Future representing the task result
+     */
+    public Future<Message> sendMessage(String content, Object... args)
+    {
+        return channel.sendMessage(content, args).submit();
+    }
+
+    /**
      * Send an embed message on the context channel
      *
      * @param content The message content
      *
-     * @return A Future representing the send task
+     * @return A Future representing the task result
      */
     public Future<Message> sendMessage(MessageEmbed content)
     {
@@ -86,9 +99,9 @@ public class CommandContext
     /**
      * Send an embed message on the context channel
      *
-     * @param content The message content
+     * @param content The message content (will be built)
      *
-     * @return A Future representing the send task
+     * @return A Future representing  task result
      */
     public Future<Message> sendMessage(EmbedBuilder content)
     {

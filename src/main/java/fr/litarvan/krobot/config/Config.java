@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * retrieved or set.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.2
  * @since 2.0.0
  */
 public interface Config
@@ -117,7 +117,7 @@ public interface Config
      */
     default String at(String path, String def)
     {
-        return get(path, def);
+        return at(path, def, String.class);
     }
 
     /**

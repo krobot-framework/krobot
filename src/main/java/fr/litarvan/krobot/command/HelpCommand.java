@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  * recursively.
  *
  * @author Litarvan
- * @version 2.1.0
+ * @version 2.1.2
  * @since 2.0.0
  */
 public class HelpCommand implements CommandHandler
@@ -44,7 +44,7 @@ public class HelpCommand implements CommandHandler
         String str = command.toString("", false);
         String label = command.getLabel();
 
-        string.append(prefix.replace('└', '├')).append(Markdown.bold(label)).append(str.substring(label.length())).append("\n");
+        string.append(prefix.replace("└", "├")).append(Markdown.bold(label)).append(str.substring(label.length())).append("\n");
 
         if (command.getDescription() != null)
         {

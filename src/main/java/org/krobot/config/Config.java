@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  * retrieved or set.
  *
  * @author Litarvan
- * @version 2.1.2
+ * @version 3.0.0
  * @since 2.0.0
  */
 public interface Config

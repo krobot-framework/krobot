@@ -33,7 +33,7 @@ import java.util.Properties;
  * methods.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 3.0.0
  * @since 2.0.0
  */
 public class PropertiesConfig extends FileConfig

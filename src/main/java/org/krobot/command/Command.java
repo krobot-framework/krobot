@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,22 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot.command;
+package org.krobot.command;
 
-import fr.litarvan.krobot.ExceptionHandler;
-import fr.litarvan.krobot.Krobot;
-import fr.litarvan.krobot.util.UserUtils;
+import org.krobot.ExceptionHandler;
+import org.krobot.Krobot;
+import org.krobot.util.UserUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.User;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,35 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot.command;
+package org.krobot.command;
 
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
- * A Middleware<br><br>
+ * The Command Handler<br><br>
  *
  *
- * A Middleware is something that is called before that a/some
- * commands are called. It can cancel its handling.
+ * Called by the {@link CommandManager} to handle the call
+ * of a command.
  *
  * @author Litarvan
- * @version 2.1.1
+ * @version 2.1.0
  * @since 2.0.0
  */
 @FunctionalInterface
-public interface Middleware
+public interface CommandHandler
 {
     /**
-     * Handle a command call
+     * Handle a command calling
      *
-     * @param command The command that was called
-     * @param args The arguments given to the command =&gt; Null if it
-     *             is called before a sub command handling
      * @param context The context of the command call
+     * @param args The supplied arguments
      *
-     * @return If the handling should continue
+     * @throws Exception If the command threw one
      */
-    boolean handle(@NotNull Command command, @Nullable Map<String, SuppliedArgument> args, @NotNull CommandContext context);
+    void handle(@NotNull CommandContext context, @NotNull Map<String, SuppliedArgument> args) throws Exception;
 }

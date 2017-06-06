@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,15 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot;
+package org.krobot;
 
-import fr.litarvan.krobot.command.BadSyntaxException;
-import fr.litarvan.krobot.command.Command;
-import fr.litarvan.krobot.command.CommandContext;
-import fr.litarvan.krobot.command.UserNotFoundException;
-import fr.litarvan.krobot.util.Dialog;
-import fr.litarvan.krobot.util.Markdown;
-import fr.litarvan.krobot.util.UserUtils;
+import org.krobot.command.BadSyntaxException;
+import org.krobot.command.Command;
+import org.krobot.command.CommandContext;
+import org.krobot.command.UserNotFoundException;
+import org.krobot.util.Dialog;
+import org.krobot.util.Markdown;
+import org.krobot.util.UserUtils;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Singleton;
@@ -33,10 +33,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-
-
-import static fr.litarvan.krobot.util.Markdown.*;
-import static fr.litarvan.krobot.util.MessageUtils.*;
+import org.krobot.util.MessageUtils;
 
 /**
  * The Exception Handler<br><br>
@@ -85,9 +82,9 @@ public class ExceptionHandler
         context.sendMessage(Dialog.error("Command crashed !", "A crash report has been sent to you " + context.getUser().getAsMention() + " . Please send it to the developer as soon as possible !"));
 
         PrivateChannel channel = UserUtils.privateChannel(context.getUser());
-        for (String message : splitMessage(report, MAX_MESSAGE_CHARS - code("").length()))
+        for (String message : MessageUtils.splitMessage(report, MessageUtils.MAX_MESSAGE_CHARS - Markdown.code("").length()))
         {
-            channel.sendMessage(code(message)).queue();
+            channel.sendMessage(Markdown.code(message)).queue();
         }
     }
 

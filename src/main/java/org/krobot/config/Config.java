@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,10 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot.config;
+package org.krobot.config;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -237,4 +238,23 @@ public interface Config
      * @return If the config supports saving
      */
     boolean isSavingSupported();
+
+    /**
+     * Create a file object from a classpath resource
+     *
+     * @param path The path of the resource
+     *
+     * @return The file
+     */
+    static File resource(String path)
+    {
+        try
+        {
+            return new File(Config.class.getResource("/" + (path.startsWith("/") ? path.substring(1) : path)).toURI());
+        }
+        catch (URISyntaxException e)
+        {
+            throw new RuntimeException("Malformed URI from file (shouldn't happen)", e);
+        }
+    }
 }

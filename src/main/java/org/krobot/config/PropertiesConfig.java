@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,15 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot.config;
+package org.krobot.config;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * The Properties Config<br><br>
@@ -97,6 +95,11 @@ public class PropertiesConfig extends FileConfig
     @Override
     public FileConfig save()
     {
+        if (!file.exists())
+        {
+            file.getParentFile().mkdirs();
+        }
+
         try
         {
             properties.store(new FileOutputStream(file), "Krobot generated config\n");
@@ -104,6 +107,26 @@ public class PropertiesConfig extends FileConfig
         catch (IOException e)
         {
             throw new RuntimeException("Can't save config", e);
+        }
+
+        return this;
+    }
+
+    @Override
+    public FileConfig defaultIn(File file)
+    {
+        if (!this.file.exists())
+        {
+            try
+            {
+                properties.load(new FileInputStream(file));
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException("Can't read config", e);
+            }
+
+            save();
         }
 
         return this;

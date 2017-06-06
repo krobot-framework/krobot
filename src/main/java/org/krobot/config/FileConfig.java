@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot.config;
+package org.krobot.config;
 
 import java.io.File;
 
@@ -84,6 +84,35 @@ public abstract class FileConfig implements Config
         this.file = file;
         return this;
     }
+
+    /**
+     * Provide a default configuration from a file path<br>
+     * <b>If the file is in the classpath it will tries to find it before</b>
+     *
+     * @param file The default configuration path
+     *e
+     * @return This
+     */
+    public FileConfig defaultIn(String path)
+    {
+        File file = resource(path);
+
+        if (!file.exists())
+        {
+            file = new File(path);
+        }
+
+        return defaultIn(file);
+    }
+
+    /**
+     * Provide a default configuration from a file
+     *
+     * @param file The default configuration
+     *
+     * @return This
+     */
+    public abstract FileConfig defaultIn(File file);
 
     /**
      * Enable or disable automatic saving when setting a value

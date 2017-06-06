@@ -1,7 +1,7 @@
-package fr.litarvan.krobot.command;
+package org.krobot.command;
 
-import fr.litarvan.krobot.util.Dialog;
-import fr.litarvan.krobot.util.Markdown;
+import org.krobot.util.Dialog;
+import org.krobot.util.Markdown;
 import java.util.Map;
 import javax.inject.Inject;
 import org.jetbrains.annotations.NotNull;

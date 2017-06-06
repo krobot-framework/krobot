@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot.config;
+package org.krobot.config;
 
 import com.google.common.io.Files;
 import com.google.gson.Gson;
@@ -60,11 +60,18 @@ public class JSONConfig extends FileConfig
     @Override
     public FileConfig load()
     {
-        if (file == null)
+        if (this.file == null)
         {
             throw new IllegalStateException("Config file isn't defined");
         }
 
+        load(this.file);
+
+        return this;
+    }
+
+    private void load(File file)
+    {
         try
         {
             config = new JsonParser().parse(new String(IOUtil.readFully(file))).getAsJsonObject();
@@ -73,13 +80,16 @@ public class JSONConfig extends FileConfig
         {
             throw new RuntimeException("Can't read config", e);
         }
-
-        return this;
     }
 
     @Override
     public FileConfig save()
     {
+        if (!file.exists())
+        {
+            file.getParentFile().mkdirs();
+        }
+
         try
         {
             Files.write(gson.toJson(config), file, Charset.defaultCharset());
@@ -87,6 +97,18 @@ public class JSONConfig extends FileConfig
         catch (IOException e)
         {
             throw new RuntimeException("Can't save the config", e);
+        }
+
+        return this;
+    }
+
+    @Override
+    public FileConfig defaultIn(File file)
+    {
+        if (!this.file.exists())
+        {
+            load(file);
+            save();
         }
 
         return this;

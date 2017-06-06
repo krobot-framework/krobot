@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,35 +16,41 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot.command;
+package org.krobot.command;
 
-import net.dv8tion.jda.core.entities.User;
+import org.krobot.ExceptionHandler;
 
 /**
- * The Argument Types<br><br>
+ * The User Not Found Exception<br><br>
  *
  *
- * The different types of argument.
+ * An exception thrown when the user called a command and
+ * provided a {@link ArgumentType#USER} argument but of
+ * a user that cannot be resolved.<br><br>
+ *
+ * Supposed to be caught by the {@link ExceptionHandler}.
  *
  * @author Litarvan
  * @version 2.0.0
  * @since 2.0.0
  */
-public enum ArgumentType
+public class UserNotFoundException extends Exception
 {
-    /**
-     * A User argument, will be parsed to a {@link User} object. It
-     * can be a username, id, or mention.
-     */
-    USER,
+    private String user;
 
     /**
-     * A simple string argument
+     * @param user The user that the command caller given
      */
-    STRING,
+    public UserNotFoundException(String user)
+    {
+        super("Can't find user '" + user + "'");
+    }
 
     /**
-     * A number (int) argument
+     * @return The user that the command caller given
      */
-    NUMBER;
+    public String getUser()
+    {
+        return user;
+    }
 }

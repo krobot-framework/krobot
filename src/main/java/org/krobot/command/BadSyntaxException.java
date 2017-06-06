@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,27 +16,41 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot;
+package org.krobot.command;
 
-import com.google.inject.Module;
+import org.krobot.ExceptionHandler;
 
 /**
- * A Krobot Discord bot<br><br>
+ * The Bad Syntax Exception<br><br>
  *
  *
- * A Discord bot that uses Krobot, just contains an initialization
- * method.<br><br>
+ * An exception called when the syntax of the command
+ * isn't respected.<br><br>
  *
- * To start it, use {@link Krobot#start(String, Class, Module...)}
+ * Supposed to be caught by the {@link ExceptionHandler}<br>
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
-public interface IBot
+public class BadSyntaxException extends Exception
 {
     /**
-     * Initializes the bot, called just after setting up JDA
+     * The Bad Syntax Exception<br>
+     * Default message is <i>"Bad command syntax"</i>
      */
-    void init();
+    public BadSyntaxException()
+    {
+        super("Bad command syntax");
+    }
+
+    /**
+     * The Bad Syntax Exception
+     *
+     * @param s The exception message
+     */
+    public BadSyntaxException(String s)
+    {
+        super(s);
+    }
 }

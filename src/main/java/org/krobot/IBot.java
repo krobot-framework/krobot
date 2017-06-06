@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,41 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot.command;
+package org.krobot;
 
-import fr.litarvan.krobot.ExceptionHandler;
+import com.google.inject.Module;
 
 /**
- * The User Not Found Exception<br><br>
+ * A Krobot Discord bot<br><br>
  *
  *
- * An exception thrown when the user called a command and
- * provided a {@link ArgumentType#USER} argument but of
- * a user that cannot be resolved.<br><br>
+ * A Discord bot that uses Krobot, just contains an initialization
+ * method.<br><br>
  *
- * Supposed to be caught by the {@link ExceptionHandler}.
+ * To start it, use {@link Krobot#start(String, Class, Module...)}
  *
  * @author Litarvan
  * @version 2.0.0
  * @since 2.0.0
  */
-public class UserNotFoundException extends Exception
+public interface IBot
 {
-    private String user;
-
     /**
-     * @param user The user that the command caller given
+     * Initializes the bot, called just after setting up JDA
      */
-    public UserNotFoundException(String user)
-    {
-        super("Can't find user '" + user + "'");
-    }
-
-    /**
-     * @return The user that the command caller given
-     */
-    public String getUser()
-    {
-        return user;
-    }
+    void init();
 }

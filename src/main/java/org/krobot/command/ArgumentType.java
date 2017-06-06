@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,32 +16,35 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot.command;
+package org.krobot.command;
 
-import java.util.Map;
-import org.jetbrains.annotations.NotNull;
+import net.dv8tion.jda.core.entities.User;
 
 /**
- * The Command Handler<br><br>
+ * The Argument Types<br><br>
  *
  *
- * Called by the {@link CommandManager} to handle the call
- * of a command.
+ * The different types of argument.
  *
  * @author Litarvan
- * @version 2.1.0
+ * @version 2.0.0
  * @since 2.0.0
  */
-@FunctionalInterface
-public interface CommandHandler
+public enum ArgumentType
 {
     /**
-     * Handle a command calling
-     *
-     * @param context The context of the command call
-     * @param args The supplied arguments
-     *
-     * @throws Exception If the command threw one
+     * A User argument, will be parsed to a {@link User} object. It
+     * can be a username, id, or mention.
      */
-    void handle(@NotNull CommandContext context, @NotNull Map<String, SuppliedArgument> args) throws Exception;
+    USER,
+
+    /**
+     * A simple string argument
+     */
+    STRING,
+
+    /**
+     * A number (int) argument
+     */
+    NUMBER;
 }

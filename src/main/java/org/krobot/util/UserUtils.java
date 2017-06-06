@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Adrien "Litarvan" Navratil
+ * Copyright 2017 The Krobot Contributors
  *
  * This file is part of Krobot.
  *
@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.litarvan.krobot.util;
+package org.krobot.util;
 
-import fr.litarvan.krobot.Krobot;
+import org.krobot.Krobot;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import net.dv8tion.jda.core.JDA;

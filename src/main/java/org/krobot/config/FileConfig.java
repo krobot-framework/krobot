@@ -89,13 +89,13 @@ public abstract class FileConfig implements Config
      * Provide a default configuration from a file path<br>
      * <b>If the file is in the classpath it will tries to find it before</b>
      *
-     * @param file The default configuration path
+     * @param path The default configuration path
      *e
      * @return This
      */
     public FileConfig defaultIn(String path)
     {
-        File file = resource(path);
+        File file = Config.resource(path);
 
         if (!file.exists())
         {

@@ -81,7 +81,7 @@ public class ExceptionHandler
 
         context.sendMessage(Dialog.error("Command crashed !", "A crash report has been sent to you " + context.getUser().getAsMention() + " . Please send it to the developer as soon as possible !"));
 
-        PrivateChannel channel = UserUtils.privateChannel(context.getUser());
+        PrivateChannel channel = context.getUser().openPrivateChannel().complete();
         for (String message : MessageUtils.splitMessage(report, MessageUtils.MAX_MESSAGE_CHARS - Markdown.code("").length()))
         {
             channel.sendMessage(Markdown.code(message)).queue();

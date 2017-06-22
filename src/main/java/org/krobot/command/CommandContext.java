@@ -81,7 +81,7 @@ public class CommandContext
      */
     public Future<Message> sendMessage(String content, Object... args)
     {
-        return channel.sendMessage(content, args).submit();
+        return channel.sendMessage(String.format(content, args)).submit();
     }
 
     /**

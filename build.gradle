@@ -9,6 +9,8 @@ targetCompatibility = 1.8
 
 archivesBaseName = 'krobot-framework'
 
+compileJava.options.encoding = 'UTF-8'
+
 repositories {
     jcenter()
 

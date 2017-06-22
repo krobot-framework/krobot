@@ -108,6 +108,8 @@ public final class UserUtils
      * @param user The user private channel
      *
      * @return The private channel
+     *
+     * @deprecated Deprecated in JDA, use now {@link User#openPrivateChannel()} directly.
      */
     public static PrivateChannel privateChannel(@NotNull User user)
     {

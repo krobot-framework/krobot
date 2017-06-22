@@ -20,7 +20,7 @@ import java.util.Map;
  * recursively.
  *
  * @author Litarvan
- * @version 2.1.2
+ * @version 2.2.0
  * @since 2.0.0
  */
 public class HelpCommand implements CommandHandler

@@ -18,12 +18,12 @@ repositories {
 }
 
 dependencies {
-    compile 'net.dv8tion:JDA:3.0.0_169'
+    compile 'net.dv8tion:JDA:3.1.1_215'
     compile 'com.google.inject:guice:4.1.0'
-    compile 'org.apache.logging.log4j:log4j-api:2.8'
-    compile 'org.apache.logging.log4j:log4j-core:2.8'
+    compile 'org.apache.logging.log4j:log4j-api:2.8.2'
+    compile 'org.apache.logging.log4j:log4j-core:2.8.2'
     compile 'org.jetbrains:annotations:15.0'
-    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.google.code.gson:gson:2.8.1'
 }
 
 jar {

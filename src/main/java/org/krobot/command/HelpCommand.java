@@ -1,10 +1,14 @@
 package org.krobot.command;
 
+import org.jetbrains.annotations.NotNull;
 import org.krobot.util.Dialog;
 import org.krobot.util.Markdown;
-import java.util.Map;
+import org.krobot.util.MessageUtils;
+
 import javax.inject.Inject;
-import org.jetbrains.annotations.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The Help Command<br><br>
@@ -27,14 +31,31 @@ public class HelpCommand implements CommandHandler
     @Override
     public void handle(@NotNull CommandContext context, @NotNull Map<String, SuppliedArgument> args)
     {
-        StringBuilder message = new StringBuilder();
+        StringBuilder curMessage = new StringBuilder();
+
+        List<StringBuilder> messages = new ArrayList<>();
+        messages.add(curMessage);
+
 
         for (Command command : commandManager.getCommands())
         {
-            message.append(toString("", command)).append("\n\n");
+            String cmdStr = toString("", command);
+
+            if(curMessage.length() + cmdStr.length() + 4 > MessageUtils.MAX_MESSAGE_CHARS)
+            {
+                curMessage = new StringBuilder();
+                messages.add(curMessage);
+            }
+
+            curMessage.append(cmdStr).append("\n\n");
         }
 
-        context.sendMessage(Dialog.info(Markdown.underline("List of commands :"), message.toString()));
+        context.sendMessage(Dialog.info(Markdown.underline("List of commands :"), messages.get(0).toString()));
+
+        for(int i = 1; i < messages.size(); i++)
+        {
+            context.sendMessage(Dialog.info(null, messages.get(i).toString()));
+        }
     }
 
     private String toString(String prefix, Command command)

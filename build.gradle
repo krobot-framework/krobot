@@ -1,4 +1,4 @@
-group 'fr.litarvan.krobot'
+group 'org.krobot'
 version '2.2.0'
 
 apply plugin: 'java'

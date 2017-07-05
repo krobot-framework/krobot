@@ -18,8 +18,11 @@
  */
 package org.krobot.command;
 
+import java.util.stream.Stream;
 import org.krobot.ExceptionHandler;
 import org.krobot.Krobot;
+import org.krobot.permission.BotRequires;
+import org.krobot.permission.UserRequires;
 import org.krobot.util.UserUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +49,7 @@ import org.apache.logging.log4j.Logger;
  * {@link #sub} methods.
  *
  * @author Litarvan
- * @version 2.1.1
+ * @version 2.3.0
  * @since 2.0.0
  */
 public class Command
@@ -61,6 +64,9 @@ public class Command
     private CommandHandler handler;
 
     private List<Command> subs;
+
+    private Permission[] botPermissions;
+    private Permission[] callerPermissions;
 
     private JDA jda;
     private ExceptionHandler exHandler;
@@ -91,6 +97,12 @@ public class Command
         this.handler = handler;
 
         this.subs = new ArrayList<>();
+
+        BotRequires botRequires = handler.getClass().getAnnotation(BotRequires.class);
+        UserRequires userRequires = handler.getClass().getAnnotation(UserRequires.class);
+
+        this.botPermissions = botRequires != null ? botRequires.value() : new Permission[0];
+        this.callerPermissions = userRequires != null ? userRequires.value() : new Permission[0];
     }
 
     /**
@@ -131,6 +143,9 @@ public class Command
                 }
             }
         }
+
+        Stream.of(botPermissions).forEach(context::require);
+        Stream.of(callerPermissions).forEach(context::requireCaller);
 
         Map<String, SuppliedArgument> map = new HashMap<>();
 

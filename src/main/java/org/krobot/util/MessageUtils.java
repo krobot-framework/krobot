@@ -75,6 +75,50 @@ public final class MessageUtils
     }
 
     /**
+     * Split a message in messages of at most {@link #MAX_MESSAGE_CHARS} characters,
+     * without breaking the message lines.
+     *
+     * @param message The message to split
+     *
+     * @return The splitted message
+     */
+    public static String[] splitMessageKeepLines(@NotNull String message)
+    {
+        return splitMessageKeepLines(message, MAX_MESSAGE_CHARS);
+    }
+
+    /**
+     * Split a message in messages of at most a given amount of characters,
+     * without breaking the message lines.
+     *
+     * @param message The message to split
+     * @param limit The messages max characters
+     *
+     * @return The splitted message
+     */
+    public static String[] splitMessageKeepLines(@NotNull String message, int limit)
+    {
+        ArrayList<String> messages = new ArrayList<>();
+        String[] lines = message.split("\n");
+        StringBuilder current = new StringBuilder();
+
+        for (String line : lines)
+        {
+            if (current.length() + line.length() > limit)
+            {
+                messages.add(current.toString());
+                current = new StringBuilder();
+            }
+
+            current.append(line);
+        }
+
+        messages.add(current.toString());
+
+        return messages.toArray(new String[messages.size()]);
+    }
+
+    /**
      * Get the most similar message of a list to a base<br><br>
      *
      * <b>Example:</b><br><br>

@@ -22,6 +22,8 @@ import org.krobot.command.BadSyntaxException;
 import org.krobot.command.Command;
 import org.krobot.command.CommandContext;
 import org.krobot.command.UserNotFoundException;
+import org.krobot.permission.BotNotAllowedException;
+import org.krobot.permission.UserNotAllowedException;
 import org.krobot.util.Dialog;
 import org.krobot.util.Markdown;
 import org.krobot.util.UserUtils;
@@ -74,6 +76,16 @@ public class ExceptionHandler
             context.sendMessage(Dialog.warn("Unknown user", "Can't find user '" + ((UserNotFoundException) throwable).getUser() + "'"));
             return;
         }
+        else if (throwable instanceof BotNotAllowedException)
+        {
+            context.sendMessage(Dialog.error("Missing required permission", throwable.getMessage()));
+            return;
+        }
+        else if (throwable instanceof UserNotAllowedException)
+        {
+            context.sendMessage(Dialog.error("You're missing a required permission", throwable.getMessage()));
+            return;
+        }
 
         LOGGER.error("Exception while executing the command : " + command.toString("", false), throwable);
 
@@ -82,7 +94,7 @@ public class ExceptionHandler
         context.sendMessage(Dialog.error("Command crashed !", "A crash report has been sent to you " + context.getUser().getAsMention() + " . Please send it to the developer as soon as possible !"));
 
         PrivateChannel channel = context.getUser().openPrivateChannel().complete();
-        for (String message : MessageUtils.splitMessage(report, MessageUtils.MAX_MESSAGE_CHARS - Markdown.code("").length()))
+        for (String message : MessageUtils.splitMessageKeepLines(report, MessageUtils.MAX_MESSAGE_CHARS - Markdown.code("").length()))
         {
             channel.sendMessage(Markdown.code(message)).queue();
         }

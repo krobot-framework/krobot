@@ -20,12 +20,17 @@ package org.krobot.command;
 
 import java.util.concurrent.Future;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
+import org.krobot.Krobot;
+import org.krobot.permission.BotNotAllowedException;
+import org.krobot.permission.UserNotAllowedException;
 
 /**
  * The Command Context<br><br>
@@ -57,6 +62,40 @@ public class CommandContext
         this.user = user;
         this.message = message;
         this.channel = channel;
+    }
+
+    /**
+     * Check for a <b>bot</b> required permission<br>
+     * Throws a {@link BotNotAllowedException} if it hasn't (by default,
+     * it will be caught by the ExceptionHandler to print a specific message).
+     *
+     * @param permission The permission to check
+     *
+     * @throws BotNotAllowedException If the bot hasn't the permission
+     */
+    public void require(Permission permission) throws BotNotAllowedException
+    {
+        if (!this.getGuild().getMember(Krobot.jda().getSelfUser()).hasPermission(permission))
+        {
+            throw new BotNotAllowedException(permission);
+        }
+    }
+
+    /**
+     * Check for a <b>user</b> required permission<br>
+     * Throws a {@link UserNotAllowedException} if it hasn't (by default,
+     * it will be caught by the ExceptionHandler to print a specific message).
+     *
+     * @param permission The permission to check
+     *
+     * @throws UserNotAllowedException If the user hasn't the permission
+     */
+    public void requireCaller(Permission permission) throws UserNotAllowedException
+    {
+        if (!this.getMember().hasPermission(permission))
+        {
+            throw new UserNotAllowedException(permission);
+        }
     }
 
     /**

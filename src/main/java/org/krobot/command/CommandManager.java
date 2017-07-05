@@ -66,7 +66,7 @@ import org.apache.logging.log4j.Logger;
  * Don't forget to call the register function at the end of the builder.
  *
  * @author Litarvan
- * @version 2.1.0
+ * @version 2.3.0
  * @since 2.0.0
  */
 @Singleton
@@ -78,6 +78,7 @@ public class CommandManager
     private ExceptionHandler exHandler;
     private List<Command> commands;
     private List<CommandGroup> stack;
+    private boolean typing = true;
 
     @Inject
     public CommandManager(JDA jda, ExceptionHandler exHandler)
@@ -222,6 +223,11 @@ public class CommandManager
         {
             if (command.getLabel().equalsIgnoreCase(line[0]))
             {
+                if (typing)
+                {
+                    event.getChannel().sendTyping().queue();
+                }
+
                 CommandContext context = new CommandContext(event.getAuthor(), event.getMessage(), event.getTextChannel());
                 List<String> args = Arrays.asList(ArrayUtils.subarray(line, 1, line.length));
 
@@ -277,6 +283,30 @@ public class CommandManager
         }
 
         return matchList.toArray(new String[matchList.size()]);
+    }
+
+    /**
+     * If set to true, when a command is being executed,
+     * "(Bot name) is typing..." will be displayed.<br><br>
+     *
+     * Default is true.
+     *
+     * @param typing To enable it or not
+     */
+    public void setTypingDuringExec(boolean typing)
+    {
+        this.typing = typing;
+    }
+
+    /**
+     * @return If true, when a command is being executed,
+     * "(Bot name) is typing..." will be displayed.<br><br>
+     *
+     * Default is true.
+     */
+    public boolean isTypingDuringExec()
+    {
+        return typing;
     }
 
     /**

@@ -18,6 +18,7 @@
  */
 package org.krobot.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.krobot.Krobot;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -35,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
  * A class containing user-related util functions.
  *
  * @author Litarvan
- * @version 2.1.1
+ * @version 2.3.0
  * @since 2.0.0
  */
 public final class UserUtils
@@ -63,7 +64,7 @@ public final class UserUtils
             users = jda.getUsersByName(user.substring(1), true);
         }
 
-        if (users.size() == 0)
+        if (users.size() == 0 && StringUtils.isNumeric(user))
         {
             return jda.getUserById(user);
         }

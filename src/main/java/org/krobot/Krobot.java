@@ -72,6 +72,13 @@ public class Krobot extends AbstractModule
      */
     public static void start(String token, Class<? extends IBot> botCl, Module... modules) throws LoginException, InterruptedException, RateLimitedException
     {
+        if (running)
+        {
+            throw new RuntimeException("Already up");
+        }
+
+        running = true;
+
         System.out.println();
 
         LOGGER.info("                                     ");
@@ -90,13 +97,6 @@ public class Krobot extends AbstractModule
 
         LOGGER.info("Starting Krobot v" + VERSION);
         LOGGER.debug("Using bot " + botCl.getName());
-
-        if (running)
-        {
-            throw new RuntimeException("Already up");
-        }
-
-        running = true;
 
         LOGGER.info("Loading JDA...\n");
 

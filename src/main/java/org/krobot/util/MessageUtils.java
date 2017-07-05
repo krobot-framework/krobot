@@ -117,7 +117,7 @@ public final class MessageUtils
                 current = new StringBuilder();
             }
 
-            current.append(line);
+            current.append(line).append("\n");
         }
 
         messages.add(current.toString());

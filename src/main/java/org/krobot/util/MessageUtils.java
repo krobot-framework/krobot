@@ -19,6 +19,11 @@
 package org.krobot.util;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.core.entities.Message;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  * Message-related util functions.
  *
  * @author Litarvan
- * @version 2.0.0
+ * @version 2.3.0
  * @since 2.0.0
  */
 public final class MessageUtils
@@ -38,6 +43,8 @@ public final class MessageUtils
      * Number of maximum character in a Discord message
      */
     public static final int MAX_MESSAGE_CHARS = 1999;
+
+    private static ScheduledExecutorService deletePool = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * Split a message in messages of at most {@link #MAX_MESSAGE_CHARS} characters
@@ -133,7 +140,7 @@ public final class MessageUtils
      *
      * @return The most similar message to the base
      */
-    public String getMostSimilar(String base, String[] messages)
+    public static String getMostSimilar(String base, String[] messages)
     {
         ArrayList<Integer> matches = new ArrayList<>();
 
@@ -162,5 +169,16 @@ public final class MessageUtils
         }
 
         return messages[matches.get(candidateIndex)];
+    }
+
+    /**
+     * Delete a message after a certain amount of time
+     *
+     * @param message The message to delete
+     * @param duration How much time (in milliseconds) to wait before deletion
+     */
+    public static void deleteAfter(Message message, int duration)
+    {
+        deletePool.schedule(() -> message.delete().queue(), duration, TimeUnit.MILLISECONDS);
     }
 }

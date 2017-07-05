@@ -18,6 +18,7 @@
  */
 package org.krobot;
 
+import java.util.concurrent.ExecutionException;
 import org.krobot.command.BadSyntaxException;
 import org.krobot.command.Command;
 import org.krobot.command.CommandContext;
@@ -37,6 +38,9 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.krobot.util.MessageUtils;
 
+
+import static org.krobot.util.MessageUtils.*;
+
 /**
  * The Exception Handler<br><br>
  *
@@ -48,7 +52,7 @@ import org.krobot.util.MessageUtils;
  * You can override it using Guice binding in a module.
  *
  * @author Litarvan
- * @version 2.1.0
+ * @version 2.3.0
  * @since 2.0.0
  */
 @Singleton
@@ -91,10 +95,16 @@ public class ExceptionHandler
 
         String report = makeCrashReport(throwable, command, args, context);
 
-        context.sendMessage(Dialog.error("Command crashed !", "A crash report has been sent to you " + context.getUser().getAsMention() + " . Please send it to the developer as soon as possible !"));
+        try
+        {
+            deleteAfter(context.sendMessage(Dialog.error("Command crashed !", "A crash report has been sent to you " + context.getUser().getAsMention() + " . Please send it to the developer as soon as possible !")).get(), 5000);
+        }
+        catch (InterruptedException | ExecutionException ignored)
+        {
+        }
 
         PrivateChannel channel = context.getUser().openPrivateChannel().complete();
-        for (String message : MessageUtils.splitMessageKeepLines(report, MessageUtils.MAX_MESSAGE_CHARS - Markdown.code("").length()))
+        for (String message : splitMessageKeepLines(report, MAX_MESSAGE_CHARS - Markdown.code("").length()))
         {
             channel.sendMessage(Markdown.code(message)).queue();
         }

@@ -37,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
  * A class containing user-related util functions.
  *
  * @author Litarvan
- * @version 2.3.0
+ * @version 2.3.1
  * @since 2.0.0
  */
 public final class UserUtils

@@ -19,6 +19,7 @@
 package org.krobot.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.krobot.Krobot;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -53,10 +54,12 @@ public final class UserUtils
      * @param user A string (mention/username/id) of the user
      *             to resolve
      *
-     * @return The resolved user
+     * @return The resolved user or null if none was found
      */
+    @Nullable
     public static User resolve(@NotNull String user)
     {
+        user = user.trim();
         List<User> users = jda.getUsersByName(user, true);
 
         if (users.size() == 0 && user.startsWith("@"))
@@ -69,7 +72,7 @@ public final class UserUtils
             return jda.getUserById(user);
         }
 
-        return users.get(0);
+        return users.size() > 0 ? users.get(0) : null;
     }
 
     /**
@@ -84,15 +87,17 @@ public final class UserUtils
      * @param user A string (mention/username/id) of the user
      *             to resolve
      *
-     * @return The resolved user
+     * @return The resolved user or null if none was found
      */
+    @Nullable
     public static User resolve(@NotNull Guild guild, @NotNull String user)
     {
-        List<Member> users = guild.getMembersByEffectiveName(user, true);
+        user = user.trim();
+        List<Member> users = guild.getMembersByNickname(user, true);
 
         if (users.size() == 0 && user.startsWith("@"))
         {
-            users = guild.getMembersByEffectiveName(user.substring(1), true);
+            users = guild.getMembersByNickname(user.substring(1), true);
         }
 
         if (users.size() == 0)

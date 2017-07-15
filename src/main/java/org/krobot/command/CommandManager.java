@@ -212,6 +212,8 @@ public class CommandManager
     @SubscribeEvent
     protected void onMessage(MessageReceivedEvent event)
     {
+        // TODO: Krobot 2.5.0, handle mentions with space / quotes / etc...
+
         String[] line = splitWithQuotes(event.getMessage().getContent());
 
         if (line.length == 0)

@@ -42,7 +42,7 @@ import org.apache.logging.log4j.Logger;
  * Use {@link #start(String, Class, Module...)} to start a bot.
  *
  * @author Litarvan
- * @version 2.3.1
+ * @version 2.3.2
  * @since 2.0.0
  */
 public class Krobot extends AbstractModule
@@ -50,7 +50,7 @@ public class Krobot extends AbstractModule
     /**
      * The Krobot version
      */
-    public static final String VERSION = "2.3.1";
+    public static final String VERSION = "2.3.2";
 
     private static final Logger LOGGER = LogManager.getLogger("Krobot");
 

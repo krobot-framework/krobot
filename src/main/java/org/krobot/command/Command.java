@@ -49,7 +49,7 @@ import org.apache.logging.log4j.Logger;
  * {@link #sub} methods.
  *
  * @author Litarvan
- * @version 2.3.0
+ * @version 2.3.2
  * @since 2.0.0
  */
 public class Command
@@ -149,6 +149,8 @@ public class Command
 
         Map<String, SuppliedArgument> map = new HashMap<>();
 
+        // TODO: 2.5.0 Better argument parsing than this shit
+
         for (int i = 0, i2 = 0; i < arguments.length; i++)
         {
             Exception ex = null;
@@ -172,7 +174,7 @@ public class Command
                 {
                     ex = new BadSyntaxException("Supplied arg '" + arg + "' isn't a number (for arg '" + arguments[i].getKey() + "')");
                 }
-                else if (type == ArgumentType.USER && UserUtils.resolve(arg) == null)
+                else if (type == ArgumentType.USER && UserUtils.resolve(context.getGuild(), arg) == null)
                 {
                     ex = new UserNotFoundException(arg);
                 }

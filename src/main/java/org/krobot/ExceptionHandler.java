@@ -52,7 +52,7 @@ import static org.krobot.util.MessageUtils.*;
  * You can override it using Guice binding in a module.
  *
  * @author Litarvan
- * @version 2.3.0
+ * @version 2.3.2
  * @since 2.0.0
  */
 @Singleton
@@ -77,7 +77,7 @@ public class ExceptionHandler
         }
         else if (throwable instanceof UserNotFoundException)
         {
-            context.sendMessage(Dialog.warn("Unknown user", "Can't find user '" + ((UserNotFoundException) throwable).getUser() + "'"));
+            context.sendMessage(Dialog.warn("Unknown user", throwable.getMessage()));
             return;
         }
         else if (throwable instanceof BotNotAllowedException)

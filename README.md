@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-  compile 'fr.litarvan.krobot:krobot-framework:2.1.2'
+  compile 'fr.litarvan.krobot:krobot-framework:2.3.2'
 }
 ```
 

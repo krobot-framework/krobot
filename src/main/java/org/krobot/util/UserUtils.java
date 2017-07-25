@@ -20,7 +20,7 @@ package org.krobot.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.krobot.Krobot;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import net.dv8tion.jda.core.JDA;

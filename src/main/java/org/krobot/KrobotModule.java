@@ -27,15 +27,8 @@ public abstract class KrobotModule
         this.configs = new ArrayList<>();
     }
 
-    public abstract void init();
-
-    protected void include(Class<? extends KrobotModule>... modules)
-    {
-        for (Class<? extends KrobotModule> module : modules)
-        {
-            from(module);
-        }
-    }
+    public abstract void preInit();
+    public abstract void postInit();
 
     protected ImportAccessor from(Class<? extends KrobotModule> module)
     {

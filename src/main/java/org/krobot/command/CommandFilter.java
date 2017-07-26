@@ -4,7 +4,7 @@ import java.util.Map;
 
 public abstract class CommandFilter
 {
-    public abstract boolean filter(Command command,
+    public abstract boolean filter(KrobotCommand command,
                                    CommandContext context,
                                    Map<String, SuppliedArgument> args);
 }

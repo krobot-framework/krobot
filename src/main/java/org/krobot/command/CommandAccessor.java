@@ -4,12 +4,14 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.krobot.KrobotModule;
 import org.krobot.util.PathCompiler;
 
+import java.util.Arrays;
+
 public class CommandAccessor
 {
     private KrobotModule module;
-    private Command command;
+    private KrobotCommand command;
 
-    CommandAccessor(KrobotModule module, Command command)
+    CommandAccessor(KrobotModule module, KrobotCommand command)
     {
         this.module = module;
         this.command = command;
@@ -19,6 +21,13 @@ public class CommandAccessor
     {
         command.setDescription(desc);
         return this;
+    }
+
+    public CommandAccessor filter(Class<? extends CommandFilter>... filters)
+    {
+        return filter(Arrays.stream(filters)
+                .map(filter -> module.injector().getInstance(filter))
+                .toArray(CommandFilter[]::new));
     }
 
     public CommandAccessor filter(CommandFilter... filter)
@@ -32,15 +41,15 @@ public class CommandAccessor
         PathCompiler compiler = new PathCompiler(path);
         compiler.compile();
 
-        Command sub = new Command(compiler.label(), compiler.args());
+        KrobotCommand sub = new KrobotCommand(compiler.label(), compiler.args());
 
-        Command[] merged = ArrayUtils.add(this.getCommand().getSubCommands(), sub);
+        KrobotCommand[] merged = ArrayUtils.add(this.getCommand().getSubCommands(), sub);
         this.getCommand().setSubCommands(merged);
 
         return new SubCommandAccessor(module, this, sub);
     }
 
-    public Command getCommand()
+    public KrobotCommand getCommand()
     {
         return command;
     }
@@ -49,7 +58,7 @@ public class CommandAccessor
     {
         private CommandAccessor parent;
 
-        SubCommandAccessor(KrobotModule module, CommandAccessor parent, Command child)
+        SubCommandAccessor(KrobotModule module, CommandAccessor parent, KrobotCommand child)
         {
             super(module, child);
 

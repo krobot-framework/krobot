@@ -19,7 +19,7 @@
 package org.krobot.permission;
 
 import net.dv8tion.jda.core.Permission;
-import org.krobot.command.Command;
+import org.krobot.command.KrobotCommand;
 
 /**
  * The Bot Not Allowed Exception<br><br>
@@ -51,7 +51,7 @@ public class BotNotAllowedException extends RuntimeException
      * @param permission The missing permission
      * @param command The command that failed to execute
      */
-    public BotNotAllowedException(Permission permission, Command command)
+    public BotNotAllowedException(Permission permission, KrobotCommand command)
     {
         super("The bot needs the permission '" + permission.getName() + "' to execute the command '" + command.toString("", false));
     }

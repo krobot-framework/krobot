@@ -32,7 +32,7 @@ import org.krobot.permission.BotNotAllowedException;
 import org.krobot.permission.UserNotAllowedException;
 
 /**
- * The Command Context<br><br>
+ * The KrobotCommand Context<br><br>
  *
  *
  * The context where the command was called.<br>

@@ -19,7 +19,7 @@
 package org.krobot.permission;
 
 import net.dv8tion.jda.core.Permission;
-import org.krobot.command.Command;
+import org.krobot.command.KrobotCommand;
 
 /**
  * The User Not Allowed Exception<br><br>
@@ -69,7 +69,7 @@ public class UserNotAllowedException extends RuntimeException
      * @param permission The missing permission
      * @param command The command that the user called
      */
-    public UserNotAllowedException(Permission permission, Command command)
+    public UserNotAllowedException(Permission permission, KrobotCommand command)
     {
         super("You need the permission '" + permission.getName() + "' to execute the command '" + command.toString("", false));
     }

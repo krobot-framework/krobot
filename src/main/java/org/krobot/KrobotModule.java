@@ -65,4 +65,9 @@ public abstract class KrobotModule
     {
         this.commands.setPrefix(prefix);
     }
+
+    public Injector injector()
+    {
+        return this.injector;
+    }
 }

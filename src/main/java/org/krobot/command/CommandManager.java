@@ -10,7 +10,7 @@ public class CommandManager
 {
     private KrobotModule module;
     private String prefix;
-    private List<Command> commands;
+    private List<KrobotCommand> commands;
 
     public CommandManager(KrobotModule module)
     {
@@ -23,7 +23,7 @@ public class CommandManager
         PathCompiler compiler = new PathCompiler(path);
         compiler.compile();
 
-        Command command = new Command(compiler.label(), compiler.args());
+        KrobotCommand command = new KrobotCommand(compiler.label(), compiler.args());
         commands.add(command);
 
         return new CommandAccessor(module, command);

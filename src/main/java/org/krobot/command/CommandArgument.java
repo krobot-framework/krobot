@@ -19,7 +19,7 @@
 package org.krobot.command;
 
 /**
- * A Command Argument<br><br>
+ * A KrobotCommand Argument<br><br>
  *
  *
  * Represents a definition of an argument that can be given

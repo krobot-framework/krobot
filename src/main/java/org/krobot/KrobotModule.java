@@ -1,9 +1,11 @@
 package org.krobot;
 
 import com.google.inject.Injector;
+import java.util.Arrays;
 import java.util.function.Function;
 import net.dv8tion.jda.core.entities.Guild;
 import org.krobot.command.CommandAccessor;
+import org.krobot.command.CommandFilter;
 import org.krobot.command.CommandManager;
 import org.krobot.command.ICommandHandler;
 import org.krobot.config.ConfigAccessor;

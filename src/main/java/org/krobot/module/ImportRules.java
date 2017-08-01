@@ -11,12 +11,17 @@ public class ImportRules
 {
     private Class<? extends KrobotModule> module;
 
-    private Includes[] includes = new Includes[] {COMMANDS, CONFIGS, EVENTS};
-    private List<ConfigBridge> bridges = new ArrayList<>();
+    private Includes[] includes;
+    private List<ConfigBridge> bridges;
+    private List<FilterRules> filters;
 
     public ImportRules(Class<? extends KrobotModule> module)
     {
         this.module = module;
+
+        this.includes = new Includes[] {COMMANDS, CONFIGS, EVENTS};
+        this.bridges = new ArrayList<>();
+        this.filters = new ArrayList<>();
     }
 
     public Includes[] getIncludes()
@@ -32,6 +37,11 @@ public class ImportRules
     public List<ConfigBridge> getBridges()
     {
         return bridges;
+    }
+
+    public List<FilterRules> getFilters()
+    {
+        return filters;
     }
 
     public Class<? extends KrobotModule> getModule()

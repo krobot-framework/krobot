@@ -8,16 +8,16 @@ import static org.krobot.module.ImportRules.BridgeTarget.*;
 
 public class ImportAccessor
 {
-    private ImportRules rule;
+    private ImportRules rules;
 
-    public ImportAccessor(ImportRules rule)
+    public ImportAccessor(ImportRules rules)
     {
-        this.rule = rule;
+        this.rules = rules;
     }
 
     public ImportAccessor include(Includes... includes)
     {
-        rule.setIncludes(includes);
+        rules.setIncludes(includes);
         return this;
     }
 
@@ -25,7 +25,7 @@ public class ImportAccessor
     {
         for (Includes exclude : excludes)
         {
-            rule.setIncludes(ArrayUtils.removeAllOccurences(rule.getIncludes(), exclude));
+            rules.setIncludes(ArrayUtils.removeAllOccurences(rules.getIncludes(), exclude));
         }
 
         return this;
@@ -33,7 +33,15 @@ public class ImportAccessor
 
     public ConfigBridgeAccessor bridge(String sourceConfig)
     {
-        return new ConfigBridgeAccessor(this, rule, sourceConfig);
+        return new ConfigBridgeAccessor(this, rules, sourceConfig);
+    }
+
+    public SubFilterAccessor when(Filter filter)
+    {
+        FilterRules rules = new FilterRules(filter);
+        this.rules.getFilters().add(rules);
+
+        return new SubFilterAccessor(this, rules);
     }
 
     public static class ConfigBridgeAccessor

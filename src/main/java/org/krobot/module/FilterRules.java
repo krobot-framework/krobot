@@ -17,16 +17,6 @@ public class FilterRules
         this.handlers = new ArrayList<>();
     }
 
-    public Filter getFilter()
-    {
-        return filter;
-    }
-
-    public void setFilter(Filter filter)
-    {
-        this.filter = filter;
-    }
-
     public String getPrefix()
     {
         return prefix;
@@ -50,5 +40,10 @@ public class FilterRules
     public List<Handler> getHandlers()
     {
         return handlers;
+    }
+
+    public Filter getFilter()
+    {
+        return filter;
     }
 }

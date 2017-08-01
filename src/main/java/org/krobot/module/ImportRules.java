@@ -19,7 +19,7 @@ public class ImportRules
     {
         this.module = module;
 
-        this.includes = new Includes[] {COMMANDS, CONFIGS, EVENTS};
+        this.includes = new Includes[] {COMMANDS, CONFIGS, EVENTS, FILTERS};
         this.bridges = new ArrayList<>();
         this.filters = new ArrayList<>();
     }
@@ -82,7 +82,8 @@ public class ImportRules
     {
         COMMANDS,
         CONFIGS,
-        EVENTS
+        EVENTS,
+        FILTERS
     }
 
     public enum BridgeTarget

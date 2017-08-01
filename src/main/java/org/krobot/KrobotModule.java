@@ -24,6 +24,7 @@ public abstract class KrobotModule
     protected static final Includes COMMANDS = Includes.COMMANDS;
     protected static final Includes CONFIGS = Includes.CONFIGS;
     protected static final Includes EVENTS = Includes.EVENTS;
+    protected static final Includes FILTERS = Includes.FILTERS;
 
     protected CommandManager commands;
     protected Injector injector;

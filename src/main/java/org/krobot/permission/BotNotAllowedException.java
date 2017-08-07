@@ -44,15 +44,4 @@ public class BotNotAllowedException extends RuntimeException
     {
         super("The bot needs the permission '" + permission.getName() + "' to execute this command");
     }
-
-    /**
-     * The Bot Not Allowed Exception
-     *
-     * @param permission The missing permission
-     * @param command The command that failed to execute
-     */
-    public BotNotAllowedException(Permission permission, KrobotCommand command)
-    {
-        super("The bot needs the permission '" + permission.getName() + "' to execute the command '" + command.toString("", false));
-    }
 }

@@ -62,15 +62,4 @@ public class UserNotAllowedException extends RuntimeException
     {
         super("You needs the permission '" + permission.getName() + "' to execute this command");
     }
-
-    /**
-     * The User Not Allowed Exception
-     *
-     * @param permission The missing permission
-     * @param command The command that the user called
-     */
-    public UserNotAllowedException(Permission permission, KrobotCommand command)
-    {
-        super("You need the permission '" + permission.getName() + "' to execute the command '" + command.toString("", false));
-    }
 }

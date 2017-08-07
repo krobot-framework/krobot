@@ -11,7 +11,7 @@ public class CommandAccessor
     private KrobotModule module;
     private KrobotCommand command;
 
-    CommandAccessor(KrobotModule module, KrobotCommand command)
+    public CommandAccessor(KrobotModule module, KrobotCommand command)
     {
         this.module = module;
         this.command = command;
@@ -41,17 +41,12 @@ public class CommandAccessor
         PathCompiler compiler = new PathCompiler(path);
         compiler.compile();
 
-        KrobotCommand sub = new KrobotCommand(compiler.label(), compiler.args());
+        KrobotCommand sub = new KrobotCommand(compiler.label(), compiler.args(), handler);
 
-        KrobotCommand[] merged = ArrayUtils.add(this.getCommand().getSubCommands(), sub);
-        this.getCommand().setSubCommands(merged);
+        KrobotCommand[] merged = ArrayUtils.add(command.getSubCommands(), sub);
+        this.command.setSubCommands(merged);
 
         return new SubCommandAccessor(module, this, sub);
-    }
-
-    public KrobotCommand getCommand()
-    {
-        return command;
     }
 
     public static class SubCommandAccessor extends CommandAccessor
@@ -63,6 +58,24 @@ public class CommandAccessor
             super(module, child);
 
             this.parent = parent;
+        }
+
+        @Override
+        public SubCommandAccessor description(String desc)
+        {
+            return (SubCommandAccessor) super.description(desc);
+        }
+
+        @Override
+        public SubCommandAccessor filter(Class<? extends CommandFilter>... filters)
+        {
+            return (SubCommandAccessor) super.filter(filters);
+        }
+
+        @Override
+        public SubCommandAccessor filter(CommandFilter... filter)
+        {
+            return (SubCommandAccessor) super.filter(filter);
         }
 
         public CommandAccessor then()

@@ -1,259 +1,118 @@
-/*
- * Copyright 2017 The Krobot Contributors
- *
- * This file is part of Krobot.
- *
- * Krobot is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Krobot is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
- */
 package org.krobot.command;
 
-import org.krobot.util.UserUtils;
-import java.util.List;
-import net.dv8tion.jda.core.entities.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-/**
- * A Supplied Argument<br><br>
- *
- *
- * An argument that was given to a command.
- * Like an instance of a {@link CommandArgument}.
- *
- * @author Litarvan
- * @version 2.1.0
- * @since 2.0.0
- */
 public class SuppliedArgument
 {
-    private ArgumentType type;
+    private static final Logger logger = LogManager.getLogger("SuppliedArgument");
 
-    private User user;
-    private String stringValue;
-    private int numberValue;
-    private List listValue;
+    private Object value;
+    private String[] matches;
 
-    /**
-     * A User argument
-     *
-     * @param user The given user
-     */
-    public SuppliedArgument(User user)
+    public SuppliedArgument(Object value)
     {
-        this.type = ArgumentType.USER;
-        this.user = user;
+        this.value = value;
     }
 
-    /**
-     * A String argument
-     *
-     * @param stringValue The value of the argument
-     */
-    public SuppliedArgument(String stringValue)
+    public SuppliedArgument(String[] matches)
     {
-        this.type = ArgumentType.STRING;
-        this.stringValue = stringValue;
+        this.matches = matches;
     }
 
-    /**
-     * A number argument
-     *
-     * @param numberValue The value of the argument
-     */
-    public SuppliedArgument(int numberValue)
+    public int asInt()
     {
-        this.type = ArgumentType.NUMBER;
-        this.numberValue = numberValue;
+        if (value instanceof String)
+        {
+            logger.warn("Trying to get a string as an integer, parsing it");
+            return Integer.parseInt(asString());
+        }
+
+        return as(int.class);
     }
 
-    /**
-     * A list argument
-     *
-     * @param list The given list
-     * @param type The type of the list
-     */
-    public SuppliedArgument(List list, ArgumentType type)
+    public float asFloat()
     {
-        this.type = type;
-        this.listValue = list;
+        if (value instanceof String)
+        {
+            logger.warn("Trying to get a string as an float, parsing it");
+            return Float.parseFloat(asString());
+        }
+
+        return as(float.class);
     }
 
-    /**
-     * @return The string value of the argument.<br><br>
-     *
-     * If it is a {@link ArgumentType#USER}, returns its Username.<br>
-     * If it is a number, returns its String value.
-     */
-    public String getAsString()
+    public long asLong()
     {
-        switch (this.type)
+        if (value instanceof String)
         {
-            case USER:
-                return user.getName();
-            case STRING:
-                return stringValue;
-            case NUMBER:
-                return String.valueOf(numberValue);
+            logger.warn("Trying to get a string as an long, parsing it");
+            return Long.parseLong(asString());
         }
 
-        return null;
+        return as(long.class);
     }
 
-    /**
-     * @throws IllegalStateException If it is a {@link ArgumentType#USER} or a {@link ArgumentType#STRING}
-     *
-     * @return The int value of the argument.
-     */
-    public int getAsNumber()
+    public double asDouble()
     {
-        switch (this.type)
+        if (value instanceof String)
         {
-            case USER:
-                throw new IllegalStateException("Cannot convert User argument to Number argument");
-            case STRING:
-                throw new IllegalStateException("Cannot convert String argument to Number argument");
-            case NUMBER:
-                return numberValue;
+            logger.warn("Trying to get a double as an double, parsing it");
+            return Double.parseDouble(asString());
         }
 
-        return 0;
+        return as(double.class);
     }
 
-    /**
-     * @throws IllegalStateException If it is a {@link ArgumentType#NUMBER}
-     *
-     * @return The argument as a User.<br><br>
-     *
-     * If it is a {@link ArgumentType#STRING}, tries to resolve it.
-     */
-    public User getAsUser()
+    public String asString()
     {
-        switch (this.type)
+        if (value == null)
         {
-            case USER:
-                return this.user;
-            case STRING:
-                return UserUtils.resolve(this.stringValue);
-            case NUMBER:
-                throw new IllegalStateException("Cannot convert Number argument to User argument");
+            logger.warn("Trying to get regex matches as a string; using the first match");
+            return matches[0];
         }
 
-        return null;
+        if (!(value instanceof String))
+        {
+            logger.warn("Trying to get a '" + value.getClass().getSimpleName() + "' argument as a string; using .toString()");
+            return value.toString();
+        }
+
+        return as(String.class);
     }
 
-    /**
-     * @throws IllegalStateException If it isn't a list of user
-     *
-     * @return The argument as a User list.
-     */
-    public List<User> getAsUserList()
+    public <T> T as(Class<T> type)
     {
-        if (this.listValue == null)
+        if (value == null)
         {
-            throw new IllegalStateException("Cannot convert " + this.type.name().toLowerCase() + " to list");
+            logger.error("Tried to get a regex argument as a value, returning null -> this is bad, '" + type.getSimpleName() + "' was requested");
+            return null;
         }
 
-        if (this.type != ArgumentType.USER)
+        try
         {
-            throw new IllegalStateException("Cannot convert " + this.type.name().toLowerCase() + " list to User list");
+            return (T) value;
         }
+        catch (ClassCastException e)
+        {
+            String real = value.getClass().getSimpleName();
+            String trial = type.getSimpleName();
 
-        return listValue;
+            String from = real.equalsIgnoreCase(trial) ? value.getClass().getName() : real;
+            String to = real.equalsIgnoreCase(trial) ? type.getName() : trial;
+
+            throw new IllegalArgumentException("Argument conversion failure, tried to convert '" + from + "' to '" + to + "'", e);
+        }
     }
 
-    /**
-     * @throws IllegalStateException If it isn't a list of string
-     *
-     * @return The argument as a string list.
-     */
-    public List<String> getAsStringList()
+    public String[] asMatches()
     {
-        if (this.listValue == null)
+        if (matches == null)
         {
-            throw new IllegalStateException("Cannot convert " + this.type.name().toLowerCase() + " to list");
+            logger.error("Tried to get a value argument as regex matches, returning null -> this is bad");
+            return null;
         }
 
-        if (this.type != ArgumentType.STRING)
-        {
-            throw new IllegalStateException("Cannot convert " + this.type.name().toLowerCase() + " list to String list");
-        }
-
-        return listValue;
-    }
-
-    /**
-     * @throws IllegalStateException If it isn't a list of number
-     *
-     * @return The argument as a number list.
-     */
-    public List<Integer> getAsNumberList()
-    {
-        if (this.listValue == null)
-        {
-            throw new IllegalStateException("Cannot convert " + this.type.name().toLowerCase() + " to list");
-        }
-
-        if (this.type != ArgumentType.NUMBER)
-        {
-            throw new IllegalStateException("Cannot convert " + this.type.name().toLowerCase() + " list to Number list");
-        }
-
-        return listValue;
-    }
-
-    @Override
-    public String toString()
-    {
-        StringBuilder string = new StringBuilder("[" + type.name().toLowerCase() + "]: ");
-
-        if (listValue != null)
-        {
-            string.append("{");
-
-            for (Object object : listValue)
-            {
-                switch (type)
-                {
-                    case USER:
-                        User user = (User) object;
-                        string.append(user.getName()).append("#").append(user.getDiscriminator());
-                        break;
-                    case NUMBER:
-                        string.append(object);
-                        break;
-                    case STRING:
-                        string.append(object);
-                        break;
-                }
-
-                string.append(", ");
-            }
-
-            return string.substring(0, string.length() - 2) + "}";
-        }
-
-        switch (type)
-        {
-            case USER:
-                string.append(user.getName()).append("#").append(user.getDiscriminator());
-                break;
-            case NUMBER:
-                string.append(numberValue);
-                break;
-            case STRING:
-                string.append(stringValue);
-                break;
-        }
-
-        return string.toString();
+        return this.matches;
     }
 }

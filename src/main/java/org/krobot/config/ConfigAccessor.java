@@ -20,7 +20,7 @@ public class ConfigAccessor
         return new DefaultAccessor(rules, this);
     }
 
-    public class DefaultAccessor
+    public static class DefaultAccessor
     {
         private ConfigRules rules;
         private ConfigAccessor configAccessor;

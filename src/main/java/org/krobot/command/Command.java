@@ -11,5 +11,6 @@ public @interface Command
 {
     String value();
     String desc() default "";
+    String[] aliases() default {};
     Class<? extends CommandHandler>[] subs() default {};
 }

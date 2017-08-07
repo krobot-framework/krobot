@@ -23,6 +23,12 @@ public class CommandAccessor
         return this;
     }
 
+    public CommandAccessor alias(String... aliases)
+    {
+        command.setAliases(ArrayUtils.addAll(command.getAliases(), aliases));
+        return this;
+    }
+
     public CommandAccessor filter(Class<? extends CommandFilter>... filters)
     {
         return filter(Arrays.stream(filters)

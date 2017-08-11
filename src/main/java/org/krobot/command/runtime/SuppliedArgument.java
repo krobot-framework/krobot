@@ -1,4 +1,4 @@
-package org.krobot.command;
+package org.krobot.command.runtime;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

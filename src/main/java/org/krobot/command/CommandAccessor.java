@@ -2,6 +2,7 @@ package org.krobot.command;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.krobot.KrobotModule;
+import org.krobot.command.runtime.ICommandHandler;
 import org.krobot.util.PathCompiler;
 
 import java.util.Arrays;

@@ -1,5 +1,7 @@
 package org.krobot.command;
 
+import org.krobot.command.runtime.ArgumentFactory;
+
 public class CommandArgument
 {
     private String key;

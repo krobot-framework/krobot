@@ -2,7 +2,7 @@ package org.krobot.module;
 
 import org.krobot.KrobotModule;
 import org.krobot.command.CommandFilter;
-import org.krobot.command.ICommandHandler;
+import org.krobot.command.runtime.ICommandHandler;
 
 public @interface Include
 {

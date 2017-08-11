@@ -23,11 +23,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import net.dv8tion.jda.core.Permission;
+import org.krobot.command.runtime.CommandHandler;
 
 /**
  * The User Requires Annotation<br><br>
  *
- * Put this annotation on a {@link org.krobot.command.CommandHandler}
+ * Put this annotation on a {@link CommandHandler}
  * to check for a caller permission during the command call.
  *
  * @author Litarvan

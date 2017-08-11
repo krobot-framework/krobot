@@ -1,4 +1,4 @@
-package org.krobot.command;
+package org.krobot.command.runtime;
 
 @FunctionalInterface
 public interface ArgumentFactory<T>

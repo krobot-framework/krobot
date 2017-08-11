@@ -1,7 +1,6 @@
 package org.krobot.util;
 
 import org.krobot.command.CommandArgument;
-import org.krobot.command.SuppliedArgument;
 
 public final class PathCompiler
 {

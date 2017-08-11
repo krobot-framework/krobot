@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.krobot.command;
+package org.krobot.command.runtime;
 
 import java.util.concurrent.Future;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -32,7 +32,7 @@ import org.krobot.permission.BotNotAllowedException;
 import org.krobot.permission.UserNotAllowedException;
 
 /**
- * The KrobotCommand Context<br><br>
+ * The Command Context<br><br>
  *
  *
  * The context where the command was called.<br>

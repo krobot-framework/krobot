@@ -6,3 +6,4 @@ build/
 *.ipr
 src/test
 logs/
+out/

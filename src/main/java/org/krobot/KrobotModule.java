@@ -1,6 +1,8 @@
 package org.krobot;
 
 import com.google.inject.Injector;
+import com.google.inject.Module;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -20,6 +22,7 @@ import org.krobot.module.ImportRules;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.krobot.runtime.KrobotRuntime;
 import org.krobot.util.PathCompiler;
 
 
@@ -38,10 +41,12 @@ public abstract class KrobotModule
     private List<ConfigRules> configs;
     private List<FilterRules> filters;
 
-    private Map<String, ArgumentFactory> argFactories;
+    private Map<String, ArgumentFactory> argTypes;
 
     private String prefix;
     private List<KrobotCommand> commands;
+
+    private List<Module> guiceModules;
 
     public KrobotModule()
     {
@@ -49,12 +54,15 @@ public abstract class KrobotModule
         this.configs = new ArrayList<>();
         this.filters = new ArrayList<>();
 
-        this.argFactories = new HashMap<>();
+        this.argTypes = new HashMap<>();
 
         this.commands = new ArrayList<>();
+
+        this.guiceModules = new ArrayList<>();
     }
 
     public abstract void preInit();
+    public abstract void init();
     public abstract void postInit();
 
     protected ImportAccessor from(Class<? extends KrobotModule> module)
@@ -107,9 +115,14 @@ public abstract class KrobotModule
         return new CommandAccessor(this, command);
     }
 
-    protected <T> void defineType(String name, Class<T> type, ArgumentFactory<T> factory)
+    protected <T> void defineArgType(String name, Class<T> type, ArgumentFactory<T> factory)
     {
-        this.argFactories.put(name, factory);
+        this.argTypes.put(name, factory);
+    }
+
+    protected void addGuiceModules(Module... modules)
+    {
+        this.guiceModules.addAll(Arrays.asList(modules));
     }
 
     protected void prefix(String prefix)
@@ -119,7 +132,7 @@ public abstract class KrobotModule
 
     protected JDA jda()
     {
-        return injector().getInstance(JDA.class);
+        return KrobotRuntime.get().jda();
     }
 
     public Injector injector()
@@ -127,7 +140,37 @@ public abstract class KrobotModule
         return this.injector;
     }
 
-    String getPrefix()
+    public List<ImportRules> getImports()
+    {
+        return imports;
+    }
+
+    public List<ConfigRules> getConfigs()
+    {
+        return configs;
+    }
+
+    public List<FilterRules> getFilters()
+    {
+        return filters;
+    }
+
+    public Map<String, ArgumentFactory> getArgTypes()
+    {
+        return argTypes;
+    }
+
+    public List<KrobotCommand> getCommands()
+    {
+        return commands;
+    }
+
+    public List<Module> getGuiceModules()
+    {
+        return guiceModules;
+    }
+
+    public String getPrefix()
     {
         return prefix;
     }

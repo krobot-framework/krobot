@@ -29,6 +29,8 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.User;
 import org.jetbrains.annotations.NotNull;
+import org.krobot.Krobot;
+import org.krobot.runtime.KrobotRuntime;
 
 /**
  * User Utils<br><br>
@@ -42,8 +44,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class UserUtils
 {
-    private static JDA jda = Krobot.jda();
-
     /**
      * Resolve a user from a String.<br>
      * If it can be a nickname, use {@link #resolve(Guild, String)}<br><br>
@@ -60,16 +60,16 @@ public final class UserUtils
     public static User resolve(@NotNull String user)
     {
         user = user.trim();
-        List<User> users = jda.getUsersByName(user, true);
+        List<User> users = jda().getUsersByName(user, true);
 
         if (users.size() == 0 && user.startsWith("@"))
         {
-            users = jda.getUsersByName(user.substring(1), true);
+            users = jda().getUsersByName(user.substring(1), true);
         }
 
         if (users.size() == 0 && StringUtils.isNumeric(user))
         {
-            return jda.getUserById(user);
+            return jda().getUserById(user);
         }
 
         return users.size() > 0 ? users.get(0) : null;
@@ -131,5 +131,10 @@ public final class UserUtils
         }
 
         return user.getPrivateChannel();
+    }
+
+    private static JDA jda()
+    {
+        return KrobotRuntime.get().jda();
     }
 }

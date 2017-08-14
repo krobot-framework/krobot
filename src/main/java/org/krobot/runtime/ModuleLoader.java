@@ -2,16 +2,13 @@ package org.krobot.runtime;
 
 import com.google.inject.Module;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.krobot.KrobotModule;
-import org.krobot.command.runtime.ArgumentFactory;
 import org.krobot.config.ConfigRules;
 import org.krobot.module.FilterRules;
 import org.krobot.module.ImportRules.ConfigBridge;
@@ -83,6 +80,8 @@ public class ModuleLoader
     {
         module.getModule().preInit();
 
+        // Importing everything
+
         module.getFilters().addAll(module.getModule().getFilters());
         module.getConfigs().addAll(module.getModule().getConfigs());
         module.getGuiceModules().addAll(module.getModule().getGuiceModules());
@@ -103,6 +102,10 @@ public class ModuleLoader
             loaded.getFilters().addAll(rules.getFilters());
             loaded.setIncludes(rules.getIncludes());
         });
+
+        // Cleaning for further use
+        module.getFilters().removeIf(item -> true);
+        module.getGuiceModules().removeIf(item -> true);
     }
 
     public List<ComputedModule> getModules()

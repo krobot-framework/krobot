@@ -18,8 +18,7 @@
  */
 package org.krobot.runtime;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.core.JDA;
 import org.apache.logging.log4j.LogManager;
@@ -38,12 +37,15 @@ public class KrobotRuntime
     private Class<? extends KrobotModule> botClass;
     private String key;
 
+    private List<RuntimeModule> modules;
     private JDA jda;
 
     private KrobotRuntime(Class<? extends KrobotModule> botClass, String key)
     {
         this.botClass = botClass;
         this.key = key;
+
+        this.modules = new ArrayList<>();
     }
 
     private void launch()
@@ -73,10 +75,22 @@ public class KrobotRuntime
         log.info("----> 1/4 Pre-initialization");
         timerStart();
 
+        log.info("Computing module tree...");
+
         ModuleLoader loader = new ModuleLoader();
         loader.load(botClass);
 
+        log.info("Processing configs...");
+
         List<ComputedModule> modules = loader.getModules();
+        modules.forEach(source -> {
+            RuntimeModule module = new RuntimeModule(source);
+
+            ConfigLoader configLoader = new ConfigLoader(module);
+            configLoader.load();
+
+            this.modules.add(module);
+        });
 
         log.info("----> Done in " + timerGet() + "ms\n");
     }
@@ -84,6 +98,24 @@ public class KrobotRuntime
     private void end()
     {
 
+    }
+
+    public RuntimeModule getRuntimeModule(Class<? extends KrobotModule> moduleClass)
+    {
+        for (RuntimeModule module : modules)
+        {
+            if (module.getComputed().getModule().getClass() == moduleClass)
+            {
+                return module;
+            }
+        }
+
+        return null;
+    }
+
+    public JDA jda()
+    {
+        return jda;
     }
 
     private void timerStart()
@@ -94,11 +126,6 @@ public class KrobotRuntime
     private long timerGet()
     {
         return System.currentTimeMillis() - time;
-    }
-
-    public JDA jda()
-    {
-        return jda;
     }
 
     public static KrobotRuntime start(Class<? extends KrobotModule> bot, String key)

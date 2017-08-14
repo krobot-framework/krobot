@@ -1,0 +1,143 @@
+package org.krobot.runtime;
+
+import com.google.common.io.Files;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.krobot.KrobotModule;
+import org.krobot.config.ConfigRules;
+import org.krobot.config.ConfigRules.DefaultPath;
+import org.krobot.config.runtime.BridgeConfig;
+import org.krobot.config.runtime.FileConfig;
+import org.krobot.module.ImportRules.ConfigBridge;
+
+public class ConfigLoader
+{
+    private static final Logger log = LogManager.getLogger("ConfigLoader");
+
+    private RuntimeModule module;
+
+    public ConfigLoader(RuntimeModule module)
+    {
+        this.module = module;
+    }
+
+    public void load()
+    {
+        // Bridges
+        module.getComputed().getBridges().forEach(this::load);
+
+        // Configs
+        module.getComputed().getConfigs().forEach(this::load);
+    }
+
+    public void load(ConfigRules rules)
+    {
+        // If a bridge exists for this config, not doing anything
+        if (module.getConfig().has(rules.getName()))
+        {
+            return;
+        }
+
+        String path = rules.getPath();
+
+        if (!path.contains("/"))
+        {
+            path = "./" + path;
+        }
+
+        File file = new File(path);
+        File def = null;
+
+        String name = rules.getName();
+
+        if (name == null)
+        {
+            name = file.getName();
+
+            if (name.contains("."))
+            {
+                name = name.substring(0, name.lastIndexOf('.'));
+            }
+        }
+
+        if (!file.exists())
+        {
+            file.getParentFile().mkdirs();
+
+            if (rules.getDef() == null)
+            {
+                try
+                {
+                    Files.write("{}", file, Charset.defaultCharset());
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException("Error while creating empty config in '" + file + "'", e);
+                }
+            }
+            else
+            {
+                def = getDefaultFile(rules.getDef());
+
+                if (def == null)
+                {
+                    throw new RuntimeException("Unknown error while resolving default file of config '" + name + "' (at " + rules.getDef() + ")");
+                }
+
+                try
+                {
+                    Files.copy(def, file);
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException("Exception while copying default configuration of config '" + name + "' (at " + def + ")", e);
+                }
+            }
+        }
+
+        try
+        {
+            module.getConfig().register(name, new FileConfig(file));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Exception while loading config '" + name + "' (at " + file + ")", e);
+        }
+
+        log.info("Loaded config '" + name + "' " + (rules.getDef() == null ? "as empty config" : (def != null ? "from default file '" + def + "'" : "from file '" + file + "'")));
+    }
+
+    public void load(Pair<ConfigBridge, KrobotModule> pair)
+    {
+        ConfigBridge bridge = pair.getLeft();
+
+        RuntimeModule target = KrobotRuntime.get().getRuntimeModule(pair.getRight().getClass());
+        module.getConfig().register(bridge.getConfig(), new BridgeConfig(target.getConfig(), bridge.getDest()));
+
+        log.info("Defined bridge from " + module.getComputed().getModule().getClass().getName() + "#" + bridge.getConfig() + " <---- to ----> " + bridge.getDest() + "#" + target.getComputed().getModule().getClass().getName());
+    }
+
+    private File getDefaultFile(DefaultPath def)
+    {
+        switch (def.getLocation())
+        {
+            case FILESYSTEM:
+                return new File(def.getPath());
+            case CLASSPATH:
+                try
+                {
+                    return new File(module.getClass().getResource(def.getPath()).toURI());
+                }
+                catch (URISyntaxException ignored)
+                {
+                }
+        }
+
+        return null;
+    }
+}

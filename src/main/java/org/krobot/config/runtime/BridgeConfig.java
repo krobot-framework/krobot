@@ -1,21 +1,31 @@
 package org.krobot.config.runtime;
 
-import com.google.gson.JsonObject;
-
-public class BridgeConfig extends ObjectConfig
+public class BridgeConfig implements Config
 {
-    private FileConfig root;
+    private ConfigProvider target;
+    private String path;
 
-    public BridgeConfig(FileConfig root, JsonObject config)
+    public BridgeConfig(ConfigProvider target, String path)
     {
-        super(config);
-        this.root = root;
+        this.target = target;
+        this.path = path;
+    }
+
+    @Override
+    public <T> T get(String key, T def, Class<T> type)
+    {
+        return at(key, def, type);
     }
 
     @Override
     public void set(String key, Object value)
     {
-        super.set(key, value);
-        root.save();
+        target.set(path + "." + key, value);
+    }
+
+    @Override
+    public <T> T at(String path, T def, Class<T> type)
+    {
+        return target.at(this.path + "." + path, def, type);
     }
 }

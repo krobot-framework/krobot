@@ -53,13 +53,11 @@ public class ImportRules
     {
         private String config;
         private String dest;
-        private BridgeTarget target;
 
-        ConfigBridge(String config, String dest, BridgeTarget target)
+        ConfigBridge(String config, String dest)
         {
             this.config = config;
             this.dest = dest;
-            this.target = target;
         }
 
         public String getConfig()
@@ -71,11 +69,6 @@ public class ImportRules
         {
             return dest;
         }
-
-        public BridgeTarget getTarget()
-        {
-            return target;
-        }
     }
 
     public enum Includes
@@ -84,11 +77,5 @@ public class ImportRules
         CONFIGS,
         EVENTS,
         FILTERS
-    }
-
-    public enum BridgeTarget
-    {
-        CONFIG,
-        PATH
     }
 }

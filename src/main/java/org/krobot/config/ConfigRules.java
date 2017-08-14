@@ -56,6 +56,12 @@ public class ConfigRules
         {
             return location;
         }
+
+        @Override
+        public String toString()
+        {
+            return "(from " + location.name().toLowerCase() + ") " + path;
+        }
     }
 
     public enum PathLocation

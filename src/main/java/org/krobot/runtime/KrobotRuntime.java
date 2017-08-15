@@ -20,11 +20,14 @@ package org.krobot.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
+
 import net.dv8tion.jda.core.JDA;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.krobot.Krobot;
 import org.krobot.KrobotModule;
+import org.krobot.module.LoadModule;
 import org.krobot.runtime.ModuleLoader.ComputedModule;
 
 public class KrobotRuntime
@@ -75,14 +78,33 @@ public class KrobotRuntime
         log.info("----> 1/4 Pre-initialization");
         timerStart();
 
-        log.info("Computing module tree...");
+        log.info("Computing modules...");
 
         ModuleLoader loader = new ModuleLoader();
         loader.load(botClass);
 
+        List<ComputedModule> modules = loader.getModules();
+
+        modules.stream()
+                .map(ComputedModule::getModule)
+                .forEach(module -> Stream.of(module.getClass().getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(LoadModule.class))
+                .forEach(field -> {
+                    field.setAccessible(true); try
+                    {
+                        field.set(module,
+                                modules.stream()
+                                        .map(ComputedModule::getModule)
+                                        .filter(m -> m.getClass() == field.getType())
+                                        .findFirst()
+                                        .get());
+                    }
+                    catch (IllegalAccessException ignored) {}
+                    field.setAccessible(false);
+                }));
+
         log.info("Processing configs...");
 
-        List<ComputedModule> modules = loader.getModules();
         modules.forEach(source -> {
             RuntimeModule module = new RuntimeModule(source);
 

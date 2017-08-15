@@ -4,6 +4,7 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -86,7 +87,7 @@ public class ConfigLoader
 
                 if (def == null)
                 {
-                    throw new RuntimeException("Unknown error while resolving default file of config '" + name + "' (at " + rules.getDef() + ")");
+                    throw new RuntimeException("Could not resolve default file of config '" + name + "' (at " + rules.getDef() + ")");
                 }
 
                 try
@@ -131,7 +132,14 @@ public class ConfigLoader
             case CLASSPATH:
                 try
                 {
-                    return new File(module.getClass().getResource(def.getPath()).toURI());
+                    URL res = module.getClass().getResource(def.getPath());
+
+                    if (res == null)
+                    {
+                        return null;
+                    }
+
+                    return new File(res.toURI());
                 }
                 catch (URISyntaxException ignored)
                 {

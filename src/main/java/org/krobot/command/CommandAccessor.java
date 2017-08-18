@@ -30,7 +30,8 @@ public class CommandAccessor
         return this;
     }
 
-    public CommandAccessor filter(Class<? extends CommandFilter>... filters)
+    @SafeVarargs // If you don't want your whole command(...) chain to be underlined
+    public final /* @SafeVarargs requires the method to be final */ CommandAccessor filter(Class<? extends CommandFilter>... filters)
     {
         return filter(Arrays.stream(filters)
                 .map(filter -> module.injector().getInstance(filter))
@@ -73,8 +74,9 @@ public class CommandAccessor
             return (SubCommandAccessor) super.description(desc);
         }
 
-        @Override
-        public SubCommandAccessor filter(Class<? extends CommandFilter>... filters)
+        @SafeVarargs // If you don't want your whole command(...) chain to be underlined
+        // @Override Couldn't override method, because @SafeVarargs makes it final. Renamed it to filterS
+        public final /* @SafeVarargs requires the method to be final */ SubCommandAccessor filters(Class<? extends CommandFilter>... filters)
         {
             return (SubCommandAccessor) super.filter(filters);
         }

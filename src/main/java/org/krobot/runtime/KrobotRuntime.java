@@ -97,7 +97,7 @@ public class KrobotRuntime
                                         .map(ComputedModule::getModule)
                                         .filter(m -> m.getClass() == field.getType())
                                         .findFirst()
-                                        .get());
+                                        .orElseThrow(() -> new RuntimeException("Cannot load module " + field.getType().getName() + " as it isn't imported. @LoadModule annotation can't be used without @Include / from(...)")));
                     }
                     catch (IllegalAccessException ignored) {}
                     field.setAccessible(false);

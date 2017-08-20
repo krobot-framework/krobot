@@ -18,8 +18,13 @@
  */
 package org.krobot.runtime;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.dv8tion.jda.core.JDA;
@@ -41,6 +46,7 @@ public class KrobotRuntime
     private String key;
 
     private List<RuntimeModule> modules;
+    private Injector injector;
     private JDA jda;
 
     private KrobotRuntime(Class<? extends KrobotModule> botClass, String key)
@@ -112,6 +118,44 @@ public class KrobotRuntime
             configLoader.load();
 
             this.modules.add(module);
+        });
+
+        log.info("Processing dependency injection...");
+
+        List<Module> guiceModules = new ArrayList<>();
+        modules.stream().map(m -> m.getModule().getGuiceModules()).forEach(guiceModules::addAll);
+        guiceModules.add(new KrobotGuiceModule());
+
+        injector = Guice.createInjector(guiceModules);
+        this.modules.forEach((module) ->
+        {
+            KrobotModule m = module.getComputed().getModule();
+            injector.injectMembers(m);
+
+            try
+            {
+                Field field = KrobotModule.class.getDeclaredField("injector");
+
+                field.setAccessible(true);
+                {
+                    field.set(m, injector.createChildInjector(new ModuleModule(module)));
+                }
+                field.setAccessible(false);
+            }
+            catch (IllegalAccessException | NoSuchFieldException e)
+            {
+                e.printStackTrace();
+            }
+        });
+
+        log.info("----> Done in " + timerGet() + "ms\n");
+
+        log.info("----> 2/4 Initialization");
+        timerStart();
+
+        modules.stream().map(ComputedModule::getModule).forEach(module -> {
+            module.injector().injectMembers(module);
+            module.init();
         });
 
         log.info("----> Done in " + timerGet() + "ms\n");
@@ -192,5 +236,10 @@ public class KrobotRuntime
         }
 
         get().end();
+    }
+
+    public List<RuntimeModule> getModules()
+    {
+        return modules;
     }
 }

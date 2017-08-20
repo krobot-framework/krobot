@@ -46,6 +46,11 @@ public class ConfigLoader
 
         String path = rules.getPath();
 
+        if (!path.contains("."))
+        {
+            path += ".json";
+        }
+
         if (!path.contains("/"))
         {
             path = "./" + path;
@@ -110,7 +115,10 @@ public class ConfigLoader
             throw new RuntimeException("Exception while loading config '" + name + "' (at " + file + ")", e);
         }
 
-        log.info("Loaded config '" + name + "' " + (rules.getDef() == null ? "as empty config" : (def != null ? "from default file '" + def + "'" : "from file '" + file + "'")));
+        log.info("Loaded config '{}' ({}) {}",
+                 name,
+                 file,
+                 (rules.getDef() == null ? "as empty config" : (def != null ? "from default file '" + def + "'" : "from file '" + file + "'")));
     }
 
     public void load(Pair<ConfigBridge, KrobotModule> pair)
@@ -120,7 +128,12 @@ public class ConfigLoader
         RuntimeModule target = KrobotRuntime.get().getRuntimeModule(pair.getRight().getClass());
         module.getConfig().register(bridge.getConfig(), new BridgeConfig(target.getConfig(), bridge.getDest()));
 
-        log.info("Defined bridge from " + module.getComputed().getModule().getClass().getName() + "#" + bridge.getConfig() + " <---- to ----> " + bridge.getDest() + "#" + target.getComputed().getModule().getClass().getName());
+        log.info("Defined bridge from {}#{} <---- to ----> {}#{}",
+                 module.getComputed().getModule().getClass().getName(),
+                 bridge.getConfig(),
+
+                 bridge.getDest(),
+                 target.getComputed().getModule().getClass().getName());
     }
 
     private File getDefaultFile(DefaultPath def)

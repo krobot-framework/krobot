@@ -82,9 +82,7 @@ public class ModuleLoader
 
         // Importing everything
 
-        module.getFilters().addAll(module.getModule().getFilters());
         module.getConfigs().addAll(module.getModule().getConfigs());
-        module.getGuiceModules().addAll(module.getModule().getGuiceModules());
 
         module.getModule().getImports().forEach(rules -> {
             ComputedModule loaded = load(rules.getModule());
@@ -102,10 +100,6 @@ public class ModuleLoader
             loaded.getFilters().addAll(rules.getFilters());
             loaded.setIncludes(rules.getIncludes());
         });
-
-        // Cleaning for further use
-        module.getFilters().removeIf(item -> true);
-        module.getGuiceModules().removeIf(item -> true);
     }
 
     public List<ComputedModule> getModules()
@@ -120,7 +114,6 @@ public class ModuleLoader
         private List<FilterRules> filters;
         private List<ConfigRules> configs;
         private List<Pair<ConfigBridge, KrobotModule>> bridges;
-        private List<Module> guiceModules;
 
         private Includes[] includes;
 
@@ -131,7 +124,6 @@ public class ModuleLoader
             this.filters = new ArrayList<>();
             this.configs = new ArrayList<>();
             this.bridges = new ArrayList<>();
-            this.guiceModules = new ArrayList<>();
 
             this.includes = null;
         }
@@ -154,11 +146,6 @@ public class ModuleLoader
         public List<Pair<ConfigBridge, KrobotModule>> getBridges()
         {
             return bridges;
-        }
-
-        public List<Module> getGuiceModules()
-        {
-            return guiceModules;
         }
 
         public Includes[] getIncludes()

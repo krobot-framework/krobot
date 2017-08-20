@@ -2,6 +2,7 @@ package org.krobot;
 
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.krobot.command.runtime.ICommandHandler;
 import org.krobot.command.KrobotCommand;
 import org.krobot.config.ConfigAccessor;
 import org.krobot.config.ConfigRules;
+import org.krobot.module.ConfigFolder;
 import org.krobot.module.Filter;
 import org.krobot.module.FilterAccessor;
 import org.krobot.module.FilterRules;
@@ -79,6 +81,16 @@ public abstract class KrobotModule
         this.configs.add(rules);
 
         return new ConfigAccessor(rules);
+    }
+
+    protected ConfigFolder folder(String path)
+    {
+        return folder(new File(path));
+    }
+
+    protected ConfigFolder folder(File file)
+    {
+        return new ConfigFolder(configs, file);
     }
 
     protected FilterAccessor when(Filter filter)

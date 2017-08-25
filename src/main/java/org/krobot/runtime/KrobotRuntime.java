@@ -24,14 +24,28 @@ import com.google.inject.Module;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 import java.util.stream.Stream;
 
+import javax.security.auth.login.LoginException;
+import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.exceptions.RateLimitedException;
+import net.dv8tion.jda.core.hooks.AnnotatedEventManager;
+import net.dv8tion.jda.core.hooks.SubscribeEvent;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.krobot.Bot;
 import org.krobot.Krobot;
 import org.krobot.KrobotModule;
+import org.krobot.command.CommandFilter;
+import org.krobot.command.runtime.CommandCall;
+import org.krobot.command.runtime.MessageContext;
+import org.krobot.command.runtime.CommandManager;
+import org.krobot.command.runtime.SuppliedArgument;
 import org.krobot.module.LoadModule;
 import org.krobot.runtime.ModuleLoader.ComputedModule;
 
@@ -40,25 +54,41 @@ public class KrobotRuntime
     private static final Logger log = LogManager.getLogger("Krobot");
     private static KrobotRuntime current;
 
+    private long startTime;
     private long time;
 
+    private Bot bot;
     private Class<? extends KrobotModule> botClass;
-    private String key;
+    private String token;
 
     private List<RuntimeModule> modules;
-    private Injector injector;
-    private JDA jda;
 
-    private KrobotRuntime(Class<? extends KrobotModule> botClass, String key)
+    private JDA jda;
+    private Injector injector;
+    private FilterRunner filterRunner;
+
+    private StateBar stateBar;
+
+    private KrobotRuntime(Class<? extends KrobotModule> botClass, String token)
     {
         this.botClass = botClass;
-        this.key = key;
+        this.token = token;
 
         this.modules = new ArrayList<>();
     }
 
     private void launch()
     {
+        startTime = System.currentTimeMillis();
+
+        bot = botClass.getAnnotation(Bot.class);
+
+        if (bot == null)
+        {
+            log.error("The provided bot class ({}) doesn't have the @Bot annotation", botClass.getName());
+            System.exit(1);
+        }
+
         String disableProperty = System.getProperty(Krobot.PROPERTY_DISABLE_START_MESSAGE);
 
         if (disableProperty == null || !disableProperty.equalsIgnoreCase("true"))
@@ -78,10 +108,12 @@ public class KrobotRuntime
             log.info("                                     \n");
         }
 
-        log.info("Krobot 3.0.0");
+        log.info("--> Starting {} v{} by {}\n", bot.name(), bot.version(), bot.author());
+
+        log.info("Running Krobot 3.0.0");
         log.info("Copyright (c) 2017 The Krobot Contributors\n");
 
-        log.info("----> 1/4 Pre-initialization");
+        log.info("----> 1/3 Pre-initialization");
         timerStart();
 
         log.info("Computing modules...");
@@ -120,6 +152,11 @@ public class KrobotRuntime
             this.modules.add(module);
         });
 
+        log.info("----> Done in " + timerGet() + "ms\n");
+
+        log.info("----> 2/3 Initialization");
+        timerStart();
+
         log.info("Processing dependency injection...");
 
         List<Module> guiceModules = new ArrayList<>();
@@ -148,22 +185,98 @@ public class KrobotRuntime
             }
         });
 
-        log.info("----> Done in " + timerGet() + "ms\n");
-
-        log.info("----> 2/4 Initialization");
-        timerStart();
-
-        modules.stream().map(ComputedModule::getModule).forEach(module -> {
+        modules.stream().map(ComputedModule::getModule).forEach(module ->
+        {
             module.injector().injectMembers(module);
             module.init();
         });
 
+        log.info("Processing filters...");
+        filterRunner = new FilterRunner(modules.toArray(new ComputedModule[modules.size()]));
+
+        modules.forEach(module -> module.getModule().getCommands().forEach(command ->
+        {
+            command.setFilters(ArrayUtils.add(command.getFilters(), new CommandFilter()
+            {
+                @Override
+                public void filter(CommandCall call, MessageContext context, Map<String, SuppliedArgument> args)
+                {
+                    if (filterRunner.isDisabled(context, module.getModule()))
+                    {
+                        call.setCancelled(true);
+                    }
+                }
+            }));
+        }));
+
+        log.info("Processing commands...");
+
+        CommandManager commandManager = new CommandManager();
+
+        modules.forEach(module -> module.getModule().getCommandFilters().forEach(filter ->
+        {
+            commandManager.getFilters().add(new CommandFilter()
+            {
+                @Override
+                public void filter(CommandCall command, MessageContext context, Map<String, SuppliedArgument> args)
+                {
+                    if (!filterRunner.isDisabled(context, module.getModule()))
+                    {
+                        filter.filter(command, context, args);
+                    }
+                }
+            });
+        }));
+
+        modules.forEach(m -> commandManager.getCommands().addAll(m.getModule().getCommands()));
+
         log.info("----> Done in " + timerGet() + "ms\n");
+
+        log.info("----> 3/3 Starting JDA");
+        timerStart();
+
+        try
+        {
+            jda = new JDABuilder(AccountType.BOT)
+                .setEventManager(new AnnotatedEventManager())
+                .addEventListener(this)
+                .setToken(token)
+                .buildBlocking();
+        }
+        catch (LoginException e)
+        {
+            log.error("Wrong bot token provided ! Exiting...");
+            System.exit(1);
+        }
+        catch (InterruptedException ignored)
+        {
+        }
+        catch (RateLimitedException e)
+        {
+            log.error("Got rate limited when logging in ! Please try again later, exiting...");
+            System.exit(1);
+        }
+
+        log.info("----> Done in " + timerGet() + "ms\n");
+
+        log.info("Now running {} v{} by {} [{}] (started in {}ms)\n", bot.name(), bot.version(), bot.author(), botClass.getName(), System.currentTimeMillis() - startTime);
+
+        stateBar = new StateBar();
+        stateBar.start();
+    }
+
+    @SubscribeEvent
+    public void onMessage(MessageReceivedEvent event)
+    {
+        MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getTextChannel()); // El famoso (kappa)
+
+        filterRunner.runFilters(context);
     }
 
     private void end()
     {
-
+        stateBar.interrupt();
+        jda.shutdown();
     }
 
     public RuntimeModule getRuntimeModule(Class<? extends KrobotModule> moduleClass)
@@ -177,6 +290,16 @@ public class KrobotRuntime
         }
 
         return null;
+    }
+
+    public Bot getBot()
+    {
+        return bot;
+    }
+
+    public FilterRunner getFilterRunner()
+    {
+        return filterRunner;
     }
 
     public JDA jda()

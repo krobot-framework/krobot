@@ -7,8 +7,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
+import org.krobot.command.CommandFilter;
 import org.krobot.command.runtime.ArgumentFactory;
 import org.krobot.command.CommandAccessor;
 import org.krobot.command.runtime.ICommandHandler;
@@ -43,10 +45,10 @@ public abstract class KrobotModule
     private List<ConfigRules> configs;
     private List<FilterRules> filters;
 
-    private Map<String, ArgumentFactory> argTypes;
-
     private String prefix;
     private List<KrobotCommand> commands;
+    private List<CommandFilter> commandFilters;
+    private Map<String, ArgumentFactory> argTypes;
 
     private List<Module> guiceModules;
 
@@ -56,9 +58,9 @@ public abstract class KrobotModule
         this.configs = new ArrayList<>();
         this.filters = new ArrayList<>();
 
-        this.argTypes = new HashMap<>();
-
         this.commands = new ArrayList<>();
+        this.commandFilters = new ArrayList<>();
+        this.argTypes = new HashMap<>();
 
         this.guiceModules = new ArrayList<>();
     }
@@ -127,6 +129,17 @@ public abstract class KrobotModule
         return new CommandAccessor(this, command);
     }
 
+    @SafeVarargs /* To suppress an ugly warning */
+    protected final /* @SafeVarargs requires final */ void filters(Class<CommandFilter>... filters)
+    {
+        filters(Stream.of(filters).map(injector::getInstance).toArray(CommandFilter[]::new));
+    }
+
+    protected void filters(CommandFilter... filters)
+    {
+        commandFilters.addAll(Arrays.asList(filters));
+    }
+
     protected <T> void defineArgType(String name, Class<T> type, ArgumentFactory<T> factory)
     {
         this.argTypes.put(name, factory);
@@ -167,9 +180,9 @@ public abstract class KrobotModule
         return filters;
     }
 
-    public Map<String, ArgumentFactory> getArgTypes()
+    public String getPrefix()
     {
-        return argTypes;
+        return prefix;
     }
 
     public List<KrobotCommand> getCommands()
@@ -177,13 +190,18 @@ public abstract class KrobotModule
         return commands;
     }
 
+    public List<CommandFilter> getCommandFilters()
+    {
+        return commandFilters;
+    }
+
+    public Map<String, ArgumentFactory> getArgTypes()
+    {
+        return argTypes;
+    }
+
     public List<Module> getGuiceModules()
     {
         return guiceModules;
-    }
-
-    public String getPrefix()
-    {
-        return prefix;
     }
 }

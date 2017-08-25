@@ -11,7 +11,7 @@ import static org.krobot.Krobot.*;
 
 public class KrobotRunner
 {
-    private String key;
+    private String token;
     private int trial;
 
     public KrobotRunner()
@@ -19,27 +19,27 @@ public class KrobotRunner
         this.trial = 0;
     }
 
-    public KrobotRunner setKey(String key)
+    public KrobotRunner setToken(String token)
     {
-        System.setProperty(PROPERTY_KEY, key);
+        System.setProperty(PROPERTY_TOKEN, token);
         return this;
     }
 
-    public KrobotRunner saveKeyIn(String path)
+    public KrobotRunner saveTokenIn(String path)
     {
-        System.setProperty(PROPERTY_KEY_FILE, path);
+        System.setProperty(PROPERTY_TOKEN_FILE, path);
         return this;
     }
 
-    public KrobotRunner disableKeySaving()
+    public KrobotRunner disableTokenSaving()
     {
-        System.setProperty(PROPERTY_DISABLE_KEY_SAVING, "true");
+        System.setProperty(PROPERTY_DISABLE_TOKEN_SAVING, "true");
         return this;
     }
 
-    public KrobotRunner disableAskingKey()
+    public KrobotRunner disableAskingToken()
     {
-        System.setProperty(PROPERTY_DISABLE_ASKING_KEY, "true");
+        System.setProperty(PROPERTY_DISABLE_ASKING_TOKEN, "true");
         return this;
     }
 
@@ -49,11 +49,11 @@ public class KrobotRunner
         return this;
     }
 
-    public KrobotRunner readKeyFromArgs(String[] args)
+    public KrobotRunner readTokenFromArgs(String[] args)
     {
         if (args.length > 0)
         {
-            return setKey(args[0]);
+            return setToken(args[0]);
         }
 
         return this;
@@ -61,35 +61,35 @@ public class KrobotRunner
 
     public KrobotRuntime run(Class<? extends KrobotModule> bot)
     {
-        String[] checks = {null, Krobot.PROPERTY_DISABLE_KEY_SAVING, Krobot.PROPERTY_DISABLE_ASKING_KEY};
+        String[] checks = {null, Krobot.PROPERTY_DISABLE_TOKEN_SAVING, Krobot.PROPERTY_DISABLE_ASKING_TOKEN};
 
-        while ((key == null || (key = key.trim()).isEmpty()) && trial < 3)
+        while ((token == null || (token = token.trim()).isEmpty()) && trial < 3)
         {
             String check = checks[trial];
 
             if (check == null || System.getProperty(check) == null || System.getProperty(check).equalsIgnoreCase("true"))
             {
-                key = next();
+                token = next();
             }
 
             trial++;
         }
 
-        if (key == null)
+        if (token == null)
         {
-            System.err.println("Couldn't find any way to retrieve the bot key\nUnable to launch : all possibles ways are disabled/unusable\n\nYou can set it by passing it as an argument if the bot allows it, or using -Dkrobot.key=thekey as JVM argument");
+            System.err.println("Couldn't find any way to retrieve the bot token\nUnable to launch : all possibles ways are disabled/unusable\n\nYou can set it by passing it as an argument if the bot allows it, or using -Dkrobot.token=thetoken as JVM argument");
             System.exit(1);
         }
 
-        if (key.length() < 12)
+        if (token.length() < 20)
         {
-            System.err.println("The provided key '" + key + "' is way to small\nUnable to launch");
+            System.err.println("The provided token '" + token + "' is way to small\nUnable to launch");
             System.exit(1);
         }
 
-        System.out.println("Using key '" + key.substring(0, key.length() - 10) + "**********'\n");
+        System.out.println("Using token '" + token.substring(0, token.length() - 20) + "********************'\n");
 
-        return KrobotRuntime.start(bot, key);
+        return KrobotRuntime.start(bot, token);
     }
 
     private String next()
@@ -97,10 +97,10 @@ public class KrobotRunner
         switch (trial)
         {
             case 0:
-                return System.getProperty(Krobot.PROPERTY_KEY);
+                return System.getProperty(Krobot.PROPERTY_TOKEN);
             case 1:
-                String path = System.getProperty(Krobot.PROPERTY_KEY_FILE);
-                File file = new File(path == null ? ".key" : path);
+                String path = System.getProperty(Krobot.PROPERTY_TOKEN_FILE);
+                File file = new File(path == null ? ".token" : path);
 
                 try
                 {
@@ -115,9 +115,9 @@ public class KrobotRunner
                     return null;
                 }
 
-                System.out.print("Enter bot key : ");
+                System.out.print("Enter bot token : ");
                 Scanner sc = new Scanner(System.in);
-                key = sc.nextLine();
+                token = sc.nextLine();
 
                 sc.close();
         }

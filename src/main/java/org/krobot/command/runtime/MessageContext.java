@@ -43,7 +43,7 @@ import org.krobot.permission.UserNotAllowedException;
  * @version 2.1.1
  * @since 2.0.0
  */
-public class CommandContext
+public class MessageContext
 {
     private JDA jda;
     private User user;
@@ -57,7 +57,7 @@ public class CommandContext
      * @param message The command message
      * @param channel The channel where the command was called
      */
-    public CommandContext(JDA jda, User user, Message message, TextChannel channel)
+    public MessageContext(JDA jda, User user, Message message, TextChannel channel)
     {
         this.jda = jda;
         this.user = user;

@@ -1,5 +1,6 @@
 package org.krobot.command;
 
+import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.krobot.KrobotModule;
 import org.krobot.command.runtime.ICommandHandler;
@@ -33,9 +34,9 @@ public class CommandAccessor
     @SafeVarargs // If you don't want your whole command(...) chain to be underlined
     public final /* @SafeVarargs requires the method to be final */ CommandAccessor filter(Class<? extends CommandFilter>... filters)
     {
-        return filter(Arrays.stream(filters)
-                .map(filter -> module.injector().getInstance(filter))
-                .toArray(CommandFilter[]::new));
+        return filter(Stream.of(filters)
+                            .map(filter -> module.injector().getInstance(filter))
+                            .toArray(CommandFilter[]::new));
     }
 
     public CommandAccessor filter(CommandFilter... filter)

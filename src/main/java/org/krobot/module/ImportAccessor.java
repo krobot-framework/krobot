@@ -36,11 +36,13 @@ public class ImportAccessor
         return this;
     }
 
-    public SubFilterAccessor when(Filter filter)
+    public ImportAccessor disableIf(Filter filter)
     {
         FilterRules rules = new FilterRules(filter);
+        rules.setDisabled(true);
+
         this.rules.getFilters().add(rules);
 
-        return new SubFilterAccessor(this, rules);
+        return this;
     }
 }

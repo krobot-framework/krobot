@@ -25,12 +25,15 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Stream;
 
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.MessageReaction;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.AnnotatedEventManager;
@@ -42,15 +45,17 @@ import org.krobot.Bot;
 import org.krobot.Krobot;
 import org.krobot.KrobotModule;
 import org.krobot.command.CommandFilter;
+import org.krobot.command.runtime.ArgumentMap;
 import org.krobot.command.runtime.CommandCall;
 import org.krobot.command.runtime.MessageContext;
 import org.krobot.command.runtime.CommandManager;
-import org.krobot.command.runtime.SuppliedArgument;
 import org.krobot.module.LoadModule;
 import org.krobot.runtime.ModuleLoader.ComputedModule;
 
 public class KrobotRuntime
 {
+    public static final int DEFAULT_MAX_THREAD = 25;
+
     private static final Logger log = LogManager.getLogger("Krobot");
     private static KrobotRuntime current;
 
@@ -62,12 +67,19 @@ public class KrobotRuntime
     private String token;
 
     private List<RuntimeModule> modules;
+    private ComputedModule rootModule;
 
     private JDA jda;
     private Injector injector;
+    private String prefix;
     private FilterRunner filterRunner;
+    private CommandManager commandManager;
+
+    private int maxThread;
+    private ThreadPoolExecutor threadPool;
 
     private StateBar stateBar;
+    private long lastExecutionTime;
 
     private KrobotRuntime(Class<? extends KrobotModule> botClass, String token)
     {
@@ -75,6 +87,10 @@ public class KrobotRuntime
         this.token = token;
 
         this.modules = new ArrayList<>();
+
+        this.maxThread = DEFAULT_MAX_THREAD;
+
+        this.lastExecutionTime = 0;
     }
 
     private void launch()
@@ -119,7 +135,9 @@ public class KrobotRuntime
         log.info("Computing modules...");
 
         ModuleLoader loader = new ModuleLoader();
-        loader.load(botClass);
+        rootModule = loader.load(botClass);
+
+        prefix = rootModule.getModule().getPrefix();
 
         List<ComputedModule> modules = loader.getModules();
 
@@ -192,14 +210,14 @@ public class KrobotRuntime
         });
 
         log.info("Processing filters...");
-        filterRunner = new FilterRunner(modules.toArray(new ComputedModule[modules.size()]));
+        filterRunner = new FilterRunner(this, modules.toArray(new ComputedModule[modules.size()]));
 
         modules.forEach(module -> module.getModule().getCommands().forEach(command ->
         {
             command.setFilters(ArrayUtils.add(command.getFilters(), new CommandFilter()
             {
                 @Override
-                public void filter(CommandCall call, MessageContext context, Map<String, SuppliedArgument> args)
+                public void filter(CommandCall call, MessageContext context, ArgumentMap args)
                 {
                     if (filterRunner.isDisabled(context, module.getModule()))
                     {
@@ -211,14 +229,16 @@ public class KrobotRuntime
 
         log.info("Processing commands...");
 
-        CommandManager commandManager = new CommandManager();
+        commandManager = new CommandManager(this);
+
+        // TODO: Command annotations
 
         modules.forEach(module -> module.getModule().getCommandFilters().forEach(filter ->
         {
             commandManager.getFilters().add(new CommandFilter()
             {
                 @Override
-                public void filter(CommandCall command, MessageContext context, Map<String, SuppliedArgument> args)
+                public void filter(CommandCall command, MessageContext context, ArgumentMap args)
                 {
                     if (!filterRunner.isDisabled(context, module.getModule()))
                     {
@@ -229,6 +249,8 @@ public class KrobotRuntime
         }));
 
         modules.forEach(m -> commandManager.getCommands().addAll(m.getModule().getCommands()));
+
+        log.info("Registered {} commands", commandManager.getCommands().size());
 
         log.info("----> Done in " + timerGet() + "ms\n");
 
@@ -259,18 +281,41 @@ public class KrobotRuntime
 
         log.info("----> Done in " + timerGet() + "ms\n");
 
+        this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThread);
+
         log.info("Now running {} v{} by {} [{}] (started in {}ms)\n", bot.name(), bot.version(), bot.author(), botClass.getName(), System.currentTimeMillis() - startTime);
 
-        stateBar = new StateBar();
+        stateBar = new StateBar(this);
         stateBar.start();
     }
 
     @SubscribeEvent
     public void onMessage(MessageReceivedEvent event)
     {
-        MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getTextChannel()); // El famoso (kappa)
+        if (threadPool == null)
+        {
+            return;
+        }
 
-        filterRunner.runFilters(context);
+        final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getTextChannel()); // El famoso (kappa)
+
+        threadPool.submit(() -> {
+            long time = System.currentTimeMillis();
+
+            filterRunner.runFilters(context);
+
+            try
+            {
+                commandManager.handle(context);
+            }
+            catch (Exception e)
+            {
+                // TODO: Exception handler
+                e.printStackTrace();
+            }
+
+            setLastExecutionTime(System.currentTimeMillis() - time);
+        });
     }
 
     private void end()
@@ -292,9 +337,24 @@ public class KrobotRuntime
         return null;
     }
 
+    public boolean isRootModule(KrobotModule module)
+    {
+        return module == getRootModule().getModule();
+    }
+
+    public ComputedModule getRootModule()
+    {
+        return rootModule;
+    }
+
     public Bot getBot()
     {
         return bot;
+    }
+
+    public ThreadPoolExecutor getThreadPool()
+    {
+        return threadPool;
     }
 
     public FilterRunner getFilterRunner()
@@ -305,6 +365,26 @@ public class KrobotRuntime
     public JDA jda()
     {
         return jda;
+    }
+
+    public String getPrefix()
+    {
+        return prefix;
+    }
+
+    public void setMaxThread(int maxThread)
+    {
+        this.maxThread = maxThread;
+    }
+
+    public long getLastExecutionTime()
+    {
+        return lastExecutionTime;
+    }
+
+    private synchronized void setLastExecutionTime(long lastExecutionTime)
+    {
+        this.lastExecutionTime = lastExecutionTime;
     }
 
     private void timerStart()

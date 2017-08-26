@@ -27,7 +27,7 @@ import org.krobot.module.ImportRules;
 import java.util.ArrayList;
 import java.util.List;
 import org.krobot.runtime.KrobotRuntime;
-import org.krobot.util.PathCompiler;
+import org.krobot.command.PathCompiler;
 
 
 import static org.krobot.module.ImportRules.*;

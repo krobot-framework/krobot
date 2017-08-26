@@ -1,8 +1,6 @@
-package org.krobot.util;
+package org.krobot.command;
 
-import org.krobot.command.CommandArgument;
-
-public final class PathCompiler
+public class PathCompiler
 {
     private String path;
 

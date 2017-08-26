@@ -1,5 +1,4 @@
-package org.krobot.command.runtime;
-
+package org.krobot.command;
 
 @FunctionalInterface
 public interface ICommandHandler

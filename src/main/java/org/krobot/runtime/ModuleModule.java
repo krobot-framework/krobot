@@ -1,7 +1,7 @@
 package org.krobot.runtime;
 
 import com.google.inject.AbstractModule;
-import org.krobot.config.runtime.ConfigProvider;
+import org.krobot.config.ConfigProvider;
 
 public class ModuleModule extends AbstractModule
 {

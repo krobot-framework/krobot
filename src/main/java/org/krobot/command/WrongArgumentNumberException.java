@@ -1,6 +1,4 @@
-package org.krobot.command.runtime;
-
-import org.krobot.command.KrobotCommand;
+package org.krobot.command;
 
 public class WrongArgumentNumberException extends Exception
 {

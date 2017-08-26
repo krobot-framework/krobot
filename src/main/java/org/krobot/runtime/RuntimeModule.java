@@ -1,6 +1,6 @@
 package org.krobot.runtime;
 
-import org.krobot.config.runtime.ConfigProvider;
+import org.krobot.config.ConfigProvider;
 import org.krobot.runtime.ModuleLoader.ComputedModule;
 
 public class RuntimeModule

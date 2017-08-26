@@ -1,7 +1,5 @@
 package org.krobot.command;
 
-import org.krobot.command.runtime.ICommandHandler;
-
 public class KrobotCommand
 {
     private String label;

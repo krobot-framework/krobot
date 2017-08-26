@@ -23,7 +23,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import net.dv8tion.jda.core.Permission;
-import org.krobot.command.runtime.CommandHandler;
+import org.krobot.command.CommandHandler;
 
 /**
  * The Bot Requires Annotation<br><br>

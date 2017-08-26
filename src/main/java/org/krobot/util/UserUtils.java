@@ -48,7 +48,7 @@ public final class UserUtils
      * Resolve a user from a String.<br>
      * If it can be a nickname, use {@link #resolve(Guild, String)}<br><br>
      *
-     * Example : "@Litarvan", "Litarvan", or "87279950075293696"<br>
+     * Example : "@Litarvan", "Litarvan", "&lt;@!87279950075293696&gt;" or "87279950075293696"<br>
      * returns the JDA User object of Litarvan.
      *
      * @param user A string (mention/username/id) of the user
@@ -61,6 +61,17 @@ public final class UserUtils
     {
         user = user.trim();
         List<User> users = jda().getUsersByName(user, true);
+
+        if (users.size() == 0 && user.startsWith("<@!") && user.endsWith(">"))
+        {
+            try
+            {
+                return jda().getUserById(Long.parseLong(user.substring(3, user.length() - 1)));
+            }
+            catch (NumberFormatException ignored)
+            {
+            }
+        }
 
         if (users.size() == 0 && user.startsWith("@"))
         {
@@ -80,7 +91,7 @@ public final class UserUtils
      * The guild is used to check if it is a nickname and not the
      * user real name.<br><br>
      *
-     * Example : "@Litarvan", "Litarvan", or "87279950075293696"<br>
+     * Example : "@Litarvan", "Litarvan", "&lt;@!87279950075293696&gt;" or "87279950075293696"<br>
      * returns the JDA User object of Litarvan.
      *
      * @param guild The guild where the user is

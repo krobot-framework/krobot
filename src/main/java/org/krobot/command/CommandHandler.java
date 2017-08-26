@@ -1,4 +1,4 @@
-package org.krobot.command.runtime;
+package org.krobot.command;
 
 public abstract class CommandHandler implements ICommandHandler
 {

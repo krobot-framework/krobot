@@ -26,6 +26,7 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-core:2.8.2'
     compile 'org.jetbrains:annotations:15.0'
     compile 'com.google.code.gson:gson:2.8.1'
+    compile 'org.fusesource.jansi:jansi:1.16'
 }
 
 jar {

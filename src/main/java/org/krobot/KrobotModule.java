@@ -11,9 +11,10 @@ import java.util.stream.Stream;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import org.krobot.command.CommandFilter;
-import org.krobot.command.runtime.ArgumentFactory;
+import org.krobot.command.PathCompiler.PathSyntaxException;
+import org.krobot.command.ArgumentFactory;
 import org.krobot.command.CommandAccessor;
-import org.krobot.command.runtime.ICommandHandler;
+import org.krobot.command.ICommandHandler;
 import org.krobot.command.KrobotCommand;
 import org.krobot.config.ConfigAccessor;
 import org.krobot.config.ConfigRules;
@@ -120,8 +121,16 @@ public abstract class KrobotModule
 
     protected CommandAccessor command(String path, ICommandHandler handler)
     {
-        PathCompiler compiler = new PathCompiler(path);
-        compiler.compile();
+        PathCompiler compiler = new PathCompiler(path.trim());
+
+        try
+        {
+            compiler.compile();
+        }
+        catch (PathSyntaxException e)
+        {
+            System.exit(0);
+        }
 
         KrobotCommand command = new KrobotCommand(compiler.label(), compiler.args(), handler);
         commands.add(command);

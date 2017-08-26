@@ -1,4 +1,4 @@
-package org.krobot.config.runtime;
+package org.krobot.config;
 
 import java.util.HashMap;
 import java.util.Map;

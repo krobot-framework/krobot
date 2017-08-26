@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.krobot.command.runtime;
+package org.krobot.command;
 
 import java.util.concurrent.Future;
 import net.dv8tion.jda.core.EmbedBuilder;

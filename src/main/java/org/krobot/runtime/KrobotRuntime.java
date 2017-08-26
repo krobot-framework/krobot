@@ -24,7 +24,6 @@ import com.google.inject.Module;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Stream;
@@ -33,30 +32,33 @@ import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.MessageReaction;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.core.hooks.SubscribeEvent;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.fusesource.jansi.AnsiConsole;
 import org.krobot.Bot;
 import org.krobot.Krobot;
 import org.krobot.KrobotModule;
 import org.krobot.command.CommandFilter;
-import org.krobot.command.runtime.ArgumentMap;
-import org.krobot.command.runtime.CommandCall;
-import org.krobot.command.runtime.MessageContext;
-import org.krobot.command.runtime.CommandManager;
+import org.krobot.command.ArgumentMap;
+import org.krobot.command.CommandCall;
+import org.krobot.command.MessageContext;
+import org.krobot.command.CommandManager;
 import org.krobot.module.LoadModule;
 import org.krobot.runtime.ModuleLoader.ComputedModule;
+import org.krobot.util.ColoredLogger;
+
+
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 
 public class KrobotRuntime
 {
     public static final int DEFAULT_MAX_THREAD = 25;
 
-    private static final Logger log = LogManager.getLogger("Krobot");
+    private static final ColoredLogger log = ColoredLogger.getLogger("Krobot");
     private static KrobotRuntime current;
 
     private long startTime;
@@ -80,6 +82,7 @@ public class KrobotRuntime
 
     private StateBar stateBar;
     private long lastExecutionTime;
+    private long uptime;
 
     private KrobotRuntime(Class<? extends KrobotModule> botClass, String token)
     {
@@ -105,31 +108,34 @@ public class KrobotRuntime
             System.exit(1);
         }
 
+        AnsiConsole.systemInstall();
+
         String disableProperty = System.getProperty(Krobot.PROPERTY_DISABLE_START_MESSAGE);
 
         if (disableProperty == null || !disableProperty.equalsIgnoreCase("true"))
         {
+            log.info(ansi().eraseScreen());
             log.info("                                     ");
-            log.info("         hMMMMM:      -dMMMMMMs`     ");
-            log.info("        +MMMMMs     oNMMMMMd-        ");
-            log.info("       .MMMMMm   -dMMMMMN+           ");
-            log.info("       +MMMMMo.yMMMMMNo`             ");
-            log.info("       dMMMMMyMMMMMMy`               ");
-            log.info("      oMMMMMMMMMMMMMMy               ");
-            log.info("      mMMMMMMNs-mMMMMMo              ");
-            log.info("     -MMMMMNo`  .NMMMMM+             ");
-            log.info("    sMMMMMd       yMMMMMN.           ");
-            log.info("   sMMMMM+        `dMMMMMd`          ");
-            log.info("   /+++++`         `++++++-          ");
-            log.info("                                     \n");
+            log.infoBold(BLUE, "         hMMMMM:      -dMMMMMMs`     ");
+            log.infoBold(BLUE, "        +MMMMMs     oNMMMMMd-        ");
+            log.infoBold(BLUE, "       .MMMMMm   -dMMMMMN+           ");
+            log.infoBold(BLUE, "       +MMMMMo.yMMMMMNo`             ");
+            log.infoBold(BLUE, "       dMMMMMyMMMMMMy`               ");
+            log.infoBold(BLUE, "      oMMMMMMMMMMMMMMy               ");
+            log.infoBold(BLUE, "      mMMMMMMNs-mMMMMMo              ");
+            log.infoBold(BLUE, "     -MMMMMNo`  .NMMMMM+             ");
+            log.infoBold(BLUE, "    sMMMMMd       yMMMMMN.           ");
+            log.infoBold(BLUE, "   sMMMMM+        `dMMMMMd`          ");
+            log.infoBold(BLUE, "   /+++++`         `++++++-          ");
+            log.infoBold(BLUE, "                                     \n");
         }
 
-        log.info("--> Starting {} v{} by {}\n", bot.name(), bot.version(), bot.author());
+        log.infoBold("--> Starting {} v{} by {}\n", bot.name(), bot.version(), bot.author());
 
         log.info("Running Krobot 3.0.0");
         log.info("Copyright (c) 2017 The Krobot Contributors\n");
 
-        log.info("----> 1/3 Pre-initialization");
+        log.infoBold("----> 1/3 Pre-initialization");
         timerStart();
 
         log.info("Computing modules...");
@@ -170,9 +176,9 @@ public class KrobotRuntime
             this.modules.add(module);
         });
 
-        log.info("----> Done in " + timerGet() + "ms\n");
+        log.infoBold("----> Done in " + timerGet() + "ms\n");
 
-        log.info("----> 2/3 Initialization");
+        log.infoBold("----> 2/3 Initialization");
         timerStart();
 
         log.info("Processing dependency injection...");
@@ -205,6 +211,8 @@ public class KrobotRuntime
 
         modules.stream().map(ComputedModule::getModule).forEach(module ->
         {
+            log.info("({}) Initialization...", module.getClass().getName());
+
             module.injector().injectMembers(module);
             module.init();
         });
@@ -252,9 +260,9 @@ public class KrobotRuntime
 
         log.info("Registered {} commands", commandManager.getCommands().size());
 
-        log.info("----> Done in " + timerGet() + "ms\n");
+        log.infoBold("----> Done in " + timerGet() + "ms\n");
 
-        log.info("----> 3/3 Starting JDA");
+        log.infoBold("----> 3/3 Starting JDA");
         timerStart();
 
         try
@@ -279,14 +287,27 @@ public class KrobotRuntime
             System.exit(1);
         }
 
-        log.info("----> Done in " + timerGet() + "ms\n");
+        log.infoBold("----> Done in " + timerGet() + "ms\n");
+
+        if (System.console() == null && System.getProperty(Krobot.PROPERTY_DISABLE_STATE_BAR) == null)
+        {
+            log.info(Color.YELLOW, "No console detected, you are probably running from an IDE");
+            log.info(Color.YELLOW, "In these case, state bar can be really buggy");
+            log.info(Color.YELLOW, "If it is, disable it by adding -Dkrobot.disableStateBar=true in the run VM args\n");
+        }
 
         this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThread);
 
-        log.info("Now running {} v{} by {} [{}] (started in {}ms)\n", bot.name(), bot.version(), bot.author(), botClass.getName(), System.currentTimeMillis() - startTime);
+        log.infoAuto("@|green Now running|@ @|bold,green {} v{} by {}|@ @|green [{}] (started in|@ @|bold,green {}ms|@@|green )|@\n", bot.name(), bot.version(), bot.author(), botClass.getName(), System.currentTimeMillis() - startTime);
 
-        stateBar = new StateBar(this);
-        stateBar.start();
+        String disable = System.getProperty(Krobot.PROPERTY_DISABLE_STATE_BAR);
+        if (disable == null || !disable.equals("true"))
+        {
+            stateBar = new StateBar(this);
+            stateBar.start();
+        }
+
+        uptime = System.currentTimeMillis();
     }
 
     @SubscribeEvent
@@ -380,6 +401,11 @@ public class KrobotRuntime
     public long getLastExecutionTime()
     {
         return lastExecutionTime;
+    }
+
+    public long getUptime()
+    {
+        return System.currentTimeMillis() - uptime;
     }
 
     private synchronized void setLastExecutionTime(long lastExecutionTime)

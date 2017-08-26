@@ -1,4 +1,4 @@
-package org.krobot.config.runtime;
+package org.krobot.config;
 
 public class BridgeConfig implements Config
 {

@@ -49,6 +49,12 @@ public class KrobotRunner
         return this;
     }
 
+    public KrobotRunner disableStateBar()
+    {
+        System.setProperty(PROPERTY_DISABLE_STATE_BAR, "true");
+        return this;
+    }
+
     public KrobotRunner readTokenFromArgs(String[] args)
     {
         if (args.length > 0)

@@ -10,7 +10,8 @@ public final class Krobot
     public static final String PROPERTY_TOKEN_FILE = "krobot.keyFile";
     public static final String PROPERTY_DISABLE_TOKEN_SAVING = "krobot.disableKeySaving";
     public static final String PROPERTY_DISABLE_ASKING_TOKEN = "krobot.disableAskingKey";
-    public static final String PROPERTY_DISABLE_START_MESSAGE = "krobot.krobot.disableStartMessage";
+    public static final String PROPERTY_DISABLE_START_MESSAGE = "krobot.disableStartMessage";
+    public static final String PROPERTY_DISABLE_STATE_BAR = "krobot.disableStateBar";
 
     public static KrobotRunner create()
     {

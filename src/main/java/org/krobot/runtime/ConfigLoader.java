@@ -12,8 +12,8 @@ import org.apache.logging.log4j.Logger;
 import org.krobot.KrobotModule;
 import org.krobot.config.ConfigRules;
 import org.krobot.config.ConfigRules.DefaultPath;
-import org.krobot.config.runtime.BridgeConfig;
-import org.krobot.config.runtime.FileConfig;
+import org.krobot.config.BridgeConfig;
+import org.krobot.config.FileConfig;
 import org.krobot.module.ImportRules.ConfigBridge;
 
 public class ConfigLoader

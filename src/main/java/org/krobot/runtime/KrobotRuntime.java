@@ -283,6 +283,16 @@ public class KrobotRuntime
 
         modules.forEach(m -> commandManager.getCommands().addAll(m.getModule().getCommands()));
 
+        List<String> labels = new ArrayList<>();
+        commandManager.getCommands().forEach(command -> {
+            if (labels.contains(command.getLabel()))
+            {
+                log.error(Color.RED, "Duplicated command '{}' => One will be randomly executed", command.getLabel());
+            }
+
+            labels.add(command.getLabel());
+        });
+
         log.info("Registered {} commands", commandManager.getCommands().size());
 
         log.infoBold("----> Done in " + timerGet() + "ms\n");

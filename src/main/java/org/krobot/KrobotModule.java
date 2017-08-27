@@ -68,7 +68,6 @@ public abstract class KrobotModule
 
     public abstract void preInit();
     public abstract void init();
-    public abstract void postInit();
 
     protected ImportAccessor from(Class<? extends KrobotModule> module)
     {

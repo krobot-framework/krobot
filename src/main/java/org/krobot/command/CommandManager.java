@@ -9,9 +9,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.User;
 import org.apache.commons.lang3.ArrayUtils;
+import org.krobot.permission.BotNotAllowedException;
+import org.krobot.permission.BotRequires;
+import org.krobot.permission.UserNotAllowedException;
+import org.krobot.permission.UserRequires;
 import org.krobot.runtime.KrobotRuntime;
 import org.krobot.util.UserUtils;
 
@@ -90,6 +96,34 @@ public class CommandManager
 
     public void execute(MessageContext context, KrobotCommand command, String[] args) throws Exception
     {
+        ICommandHandler handler = command.getHandler();
+
+        if (handler.getClass().isAnnotationPresent(BotRequires.class))
+        {
+            Member botMember = context.getGuild().getMember(runtime.jda().getSelfUser());
+
+            for (Permission perm : handler.getClass().getAnnotation(BotRequires.class).value())
+            {
+                if (!botMember.hasPermission(perm))
+                {
+                    throw new BotNotAllowedException(perm);
+                }
+            }
+        }
+
+        if (handler.getClass().isAnnotationPresent(UserRequires.class))
+        {
+            for (Permission perm : handler.getClass().getAnnotation(UserRequires.class).value())
+            {
+                Member userMember = context.getMember();
+
+                if (!userMember.hasPermission(perm))
+                {
+                    throw new UserNotAllowedException(perm);
+                }
+            }
+        }
+
         Map<String, Object> supplied = new HashMap<>();
 
         int i;
@@ -121,7 +155,17 @@ public class CommandManager
 
         if (!call.isCancelled())
         {
-            Object result = command.getHandler().handle(context, argsMap);
+            Object result;
+
+            try
+            {
+                result = command.getHandler().handle(context, argsMap);
+            }
+            catch (Throwable t)
+            {
+                runtime.getExceptionHandler().handle(context, command, args, t);
+                return;
+            }
 
             if (result != null)
             {

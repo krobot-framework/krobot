@@ -35,6 +35,8 @@ import org.krobot.command.KrobotCommand;
  */
 public class UserNotAllowedException extends RuntimeException
 {
+    private Permission permission;
+
     /**
      * The User Not Allowed Exception (with a simple message)
      */
@@ -61,5 +63,12 @@ public class UserNotAllowedException extends RuntimeException
     public UserNotAllowedException(Permission permission)
     {
         super("You needs the permission '" + permission.getName() + "' to execute this command");
+
+        this.permission = permission;
+    }
+
+    public Permission getPermission()
+    {
+        return permission;
     }
 }

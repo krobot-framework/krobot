@@ -18,4 +18,14 @@ public class BadArgumentTypeException extends Exception
         this.value = value;
         this.type = type;
     }
+
+    public String getValue()
+    {
+        return value;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
 }

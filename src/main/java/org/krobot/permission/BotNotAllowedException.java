@@ -35,6 +35,8 @@ import org.krobot.command.KrobotCommand;
  */
 public class BotNotAllowedException extends RuntimeException
 {
+    private Permission permission;
+
     /**
      * The Bot Not Allowed Exception
      *
@@ -43,5 +45,12 @@ public class BotNotAllowedException extends RuntimeException
     public BotNotAllowedException(Permission permission)
     {
         super("The bot needs the permission '" + permission.getName() + "' to execute this command");
+
+        this.permission = permission;
+    }
+
+    public Permission getPermission()
+    {
+        return permission;
     }
 }

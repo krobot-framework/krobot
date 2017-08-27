@@ -45,6 +45,7 @@ import org.krobot.command.Command;
 import org.krobot.command.CommandFilter;
 import org.krobot.command.ArgumentMap;
 import org.krobot.command.CommandCall;
+import org.krobot.command.ExceptionHandler;
 import org.krobot.command.ICommandHandler;
 import org.krobot.command.KrobotCommand;
 import org.krobot.command.MessageContext;
@@ -400,6 +401,11 @@ public class KrobotRuntime
         jda.shutdown();
     }
 
+    public ExceptionHandler getExceptionHandler()
+    {
+        return injector.getInstance(ExceptionHandler.class);
+    }
+
     public RuntimeModule getRuntimeModule(Class<? extends KrobotModule> moduleClass)
     {
         for (RuntimeModule module : modules)
@@ -416,6 +422,11 @@ public class KrobotRuntime
     public boolean isRootModule(KrobotModule module)
     {
         return module == getRootModule().getModule();
+    }
+
+    public Injector getInjector()
+    {
+        return injector;
     }
 
     public ComputedModule getRootModule()

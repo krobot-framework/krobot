@@ -23,6 +23,17 @@ public class KrobotCommand
         this.subs = subs;
     }
 
+    public KrobotCommand(String label, CommandArgument[] arguments, String description, String[] aliases, CommandFilter[] filters, ICommandHandler handler, KrobotCommand[] subs)
+    {
+        this.label = label;
+        this.aliases = aliases;
+        this.arguments = arguments;
+        this.description = description;
+        this.filters = filters;
+        this.subs = subs;
+        this.handler = handler;
+    }
+
     public String getLabel()
     {
         return label;

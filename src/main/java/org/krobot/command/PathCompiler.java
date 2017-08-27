@@ -95,7 +95,7 @@ public class PathCompiler
 
             if (required && !last.isRequired())
             {
-                throw error("Can't put a required argument after one/multiple optional argument(s)", start, cursor);
+                throw error("Can't put a required argument after an optional one", start, cursor);
             }
             else if (last.isList())
             {

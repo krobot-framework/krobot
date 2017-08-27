@@ -41,11 +41,16 @@ import org.fusesource.jansi.AnsiConsole;
 import org.krobot.Bot;
 import org.krobot.Krobot;
 import org.krobot.KrobotModule;
+import org.krobot.command.Command;
 import org.krobot.command.CommandFilter;
 import org.krobot.command.ArgumentMap;
 import org.krobot.command.CommandCall;
+import org.krobot.command.ICommandHandler;
+import org.krobot.command.KrobotCommand;
 import org.krobot.command.MessageContext;
 import org.krobot.command.CommandManager;
+import org.krobot.command.PathCompiler;
+import org.krobot.module.Include;
 import org.krobot.module.LoadModule;
 import org.krobot.runtime.ModuleLoader.ComputedModule;
 import org.krobot.util.ColoredLogger;
@@ -256,6 +261,25 @@ public class KrobotRuntime
             });
         }));
 
+        modules.forEach(module -> {
+            Class<? extends KrobotModule> cl = module.getModule().getClass();
+
+            if (cl.isAnnotationPresent(Include.class))
+            {
+                Class<? extends ICommandHandler>[] classes = cl.getAnnotation(Include.class).commands();
+
+                for (Class<? extends ICommandHandler> commandClass : classes)
+                {
+                    KrobotCommand command = registerCommandClass(module.getModule(), commandClass);
+
+                    if (command != null)
+                    {
+                        commandManager.getCommands().add(command);
+                    }
+                }
+            }
+        });
+
         modules.forEach(m -> commandManager.getCommands().addAll(m.getModule().getCommands()));
 
         log.info("Registered {} commands", commandManager.getCommands().size());
@@ -308,6 +332,37 @@ public class KrobotRuntime
         }
 
         uptime = System.currentTimeMillis();
+    }
+
+    protected KrobotCommand registerCommandClass(KrobotModule module, Class<? extends ICommandHandler> commandClass)
+    {
+        if (!commandClass.isAnnotationPresent(Command.class))
+        {
+            log.error(Color.RED, "Class '{}' declared in @Include#commands is missing @Command annotation", commandClass.getName());
+            log.error(Color.RED, "Command will not be registered");
+
+            return null;
+        }
+
+        Command command = commandClass.getAnnotation(Command.class);
+
+        PathCompiler compiler = new PathCompiler(command.value());
+
+        try
+        {
+            compiler.compile();
+        }
+        catch (PathCompiler.PathSyntaxException e)
+        {
+            System.exit(1);
+        }
+
+        Injector injector = module.injector();
+
+        CommandFilter[] filters = Stream.of(command.filters()).map(injector::getInstance).toArray(CommandFilter[]::new);
+        KrobotCommand[] subs = Stream.of(command.subs()).map(c -> registerCommandClass(module, c)).toArray(KrobotCommand[]::new);
+
+        return new KrobotCommand(compiler.label(), compiler.args(), command.desc(), command.aliases(), filters, injector.getInstance(commandClass), subs);
     }
 
     @SubscribeEvent

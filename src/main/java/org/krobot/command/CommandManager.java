@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -99,7 +100,7 @@ public class CommandManager
 
         if (args.length > 0)
         {
-            Optional<KrobotCommand> sub = Stream.of(command.getSubCommands()).filter(s -> s.getLabel().equalsIgnoreCase(args[0])).findFirst();
+            Optional<KrobotCommand> sub = Stream.of(command.getSubCommands()).filter(s -> s.getLabel().equalsIgnoreCase(args[0]) || ArrayUtils.contains(s.getAliases(), args[0])).findFirst();
 
             if (sub.isPresent())
             {
@@ -195,9 +196,13 @@ public class CommandManager
         ArgumentMap argsMap = new ArgumentMap(supplied);
 
         CommandCall call = new CommandCall(command);
-        for (CommandFilter filter : command.getFilters())
+
+        if (command.getFilters() != null)
         {
-            filter.filter(call, context, argsMap);
+            for (CommandFilter filter : command.getFilters())
+            {
+                filter.filter(call, context, argsMap);
+            }
         }
 
         if (!call.isCancelled())
@@ -229,7 +234,7 @@ public class CommandManager
                 {
                     context.send((MessageEmbed) result);
                 }
-                else
+                else if (!(result instanceof Future))
                 {
                     context.send(result.toString());
                 }

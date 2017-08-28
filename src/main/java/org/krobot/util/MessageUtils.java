@@ -19,11 +19,12 @@
 package org.krobot.util;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -180,5 +181,32 @@ public final class MessageUtils
     public static void deleteAfter(Message message, int duration)
     {
         deletePool.schedule(() -> message.delete().queue(), duration, TimeUnit.MILLISECONDS);
+    }
+
+    public static Message search(TextChannel channel, String query, int max)
+    {
+        List<Message> messages = channel.getHistory().retrievePast(100).complete();
+        messages.remove(0);
+
+        Message result = null;
+        int searched = 0;
+
+        while (result == null && searched < max)
+        {
+            messages = channel.getHistory().retrievePast(100).complete();
+
+            for (Message message : messages)
+            {
+                if (message.getContent().toLowerCase().contains(query.toLowerCase().trim()))
+                {
+                    result = message;
+                    break;
+                }
+            }
+
+            searched += messages.size();
+        }
+
+        return result;
     }
 }

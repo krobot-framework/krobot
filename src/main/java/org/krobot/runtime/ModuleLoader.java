@@ -1,6 +1,5 @@
 package org.krobot.runtime;
 
-import com.google.inject.Module;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;

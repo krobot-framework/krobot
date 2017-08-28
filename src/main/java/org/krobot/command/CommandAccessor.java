@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.krobot.KrobotModule;
 
-public class  CommandAccessor
+public class CommandAccessor
 {
     private KrobotModule module;
     private KrobotCommand command;
@@ -41,6 +41,11 @@ public class  CommandAccessor
         return this;
     }
 
+    public SubCommandAccessor sub(String path, Class<? extends CommandHandler> handler)
+    {
+        return sub(path, module.injector().getInstance(handler));
+    }
+
     public SubCommandAccessor sub(String path, CommandHandler handler)
     {
         PathCompiler compiler = new PathCompiler(path);
@@ -69,6 +74,12 @@ public class  CommandAccessor
         public SubCommandAccessor description(String desc)
         {
             return (SubCommandAccessor) super.description(desc);
+        }
+
+        @Override
+        public SubCommandAccessor alias(String... aliases)
+        {
+            return (SubCommandAccessor) super.alias(aliases);
         }
 
         @SafeVarargs // If you don't want your whole command(...) chain to be underlined

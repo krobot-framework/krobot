@@ -85,16 +85,6 @@ public class ColoredLogger
         logger.error(String.valueOf(text), format);
     }
 
-    public void error(Object text, Throwable error)
-    {
-        logger.error(text, error);
-    }
-
-    public void error(Object text, Throwable error, Object... format)
-    {
-        logger.error(String.valueOf(text), error, format);
-    }
-
     public void errorBold(Object text, Object... format)
     {
         logger.error(ansi().bold().a(text).reset().toString(), format);
@@ -110,13 +100,28 @@ public class ColoredLogger
         logger.error(ansi().bold().fg(color).a(text).reset().toString(), format);
     }
 
+    public void errorBold(Color color, Object text, Throwable t)
+    {
+        logger.error(ansi().bold().fg(color).a(text).reset().toString(), t);
+    }
+
     public void errorAuto(String text, Object... format)
     {
         logger.error(ansi().render(text).reset().toString(), format);
     }
 
+    public void errorAuto(String text, Throwable t)
+    {
+        logger.error(ansi().render(text).reset().toString(), t);
+    }
+
     public void errorAuto(Color color, String text, Object... format)
     {
         logger.error(ansi().fg(color).render(text).reset().toString(), format);
+    }
+
+    public void errorAuto(Color color, String text, Throwable t)
+    {
+        logger.error(ansi().fg(color).render(text).reset().toString(), t);
     }
 }

@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import javax.inject.Singleton;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.User;
 import org.apache.commons.lang3.ArrayUtils;
@@ -171,7 +170,21 @@ public class CommandManager
                 throw new WrongArgumentNumberException(command, args.length);
             }
 
-            supplied.put(arg.getKey(), arg.getFactory().process(args[0]));
+            if (arg.isList())
+            {
+                List list = new ArrayList();
+
+                for (; i < args.length; i++)
+                {
+                    list.add(arg.getFactory().process(args[i]));
+                }
+
+                supplied.put(arg.getKey(), list.toArray(arg.getFactory().createArray()));
+            }
+            else
+            {
+                supplied.put(arg.getKey(), arg.getFactory().process(args[i]));
+            }
         }
 
         if (i < args.length - 1)
@@ -286,39 +299,85 @@ public class CommandManager
 
     static
     {
-        registerArgumentFactory("string", a -> a);
+        registerArgumentFactory("string", new ArgumentFactory<String>()
+        {
+            @Override
+            public String process(String a) throws BadArgumentTypeException
+            {
+                return a;
+            }
 
-        registerArgumentFactory("number", argument -> {
-            try
+            @Override
+            public String[] createArray()
             {
-                return Integer.parseInt(argument);
-            }
-            catch (NumberFormatException e)
-            {
-                throw new BadArgumentTypeException(argument, "number");
-            }
-        });
-
-        registerArgumentFactory("float", argument -> {
-            try
-            {
-                return Float.parseFloat(argument);
-            }
-            catch (NumberFormatException e)
-            {
-                throw new BadArgumentTypeException(argument, "float");
+                return new String[0];
             }
         });
 
-        registerArgumentFactory("user", argument -> {
-            User result = UserUtils.resolve(argument);
-
-            if (result == null)
+        registerArgumentFactory("number", new ArgumentFactory<Integer>()
+        {
+            @Override
+            public Integer process(String argument) throws BadArgumentTypeException
             {
-                throw new BadArgumentTypeException("Can't find user '" + argument + "'", argument, "user");
+                try
+                {
+                    return Integer.parseInt(argument);
+                }
+                catch (NumberFormatException e)
+                {
+                    throw new BadArgumentTypeException(argument, "number");
+                }
             }
 
-            return result;
+            @Override
+            public Integer[] createArray()
+            {
+                return new Integer[0];
+            }
+        });
+
+        registerArgumentFactory("float", new ArgumentFactory<Float>()
+        {
+            @Override
+            public Float process(String argument) throws BadArgumentTypeException
+            {
+                try
+                {
+                    return Float.parseFloat(argument);
+                }
+                catch (NumberFormatException e)
+                {
+                    throw new BadArgumentTypeException(argument, "float");
+                }
+            }
+
+            @Override
+            public Float[] createArray()
+            {
+                return new Float[0];
+            }
+        });
+
+        registerArgumentFactory("user", new ArgumentFactory<User>()
+        {
+            @Override
+            public User process(String argument) throws BadArgumentTypeException
+            {
+                User result = UserUtils.resolve(argument);
+
+                if (result == null)
+                {
+                    throw new BadArgumentTypeException("Can't find user '" + argument + "'", argument, "user");
+                }
+
+                return result;
+            }
+
+            @Override
+            public User[] createArray()
+            {
+                return new User[0];
+            }
         });
 
         // Aliases

@@ -62,11 +62,11 @@ public final class UserUtils
         user = user.trim();
         List<User> users = jda().getUsersByName(user, true);
 
-        if (users.size() == 0 && user.startsWith("<@!") && user.endsWith(">"))
+        if (users.size() == 0 && user.startsWith("<@") && user.endsWith(">"))
         {
             try
             {
-                return jda().getUserById(Long.parseLong(user.substring(3, user.length() - 1)));
+                return jda().getUserById(Long.parseLong(user.substring(2, user.length() - 1)));
             }
             catch (NumberFormatException ignored)
             {

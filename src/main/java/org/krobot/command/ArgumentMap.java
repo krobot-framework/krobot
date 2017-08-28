@@ -1,6 +1,8 @@
 package org.krobot.command;
 
 import java.util.Map;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ClassUtils;
 
 public class ArgumentMap
 {
@@ -18,6 +20,13 @@ public class ArgumentMap
 
     public <T> T get(String key)
     {
-        return (T) args.get(key);
+        Object val = args.get(key);
+
+        if (val.getClass().isArray() && ClassUtils.isPrimitiveWrapper(val.getClass().getComponentType()))
+        {
+            val = ArrayUtils.toPrimitive(val);
+        }
+
+        return (T) val;
     }
 }

@@ -7,18 +7,18 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.fusesource.jansi.Ansi.Color;
 import org.krobot.KrobotModule;
 import org.krobot.config.ConfigRules;
 import org.krobot.config.ConfigRules.DefaultPath;
 import org.krobot.config.BridgeConfig;
 import org.krobot.config.FileConfig;
 import org.krobot.module.ImportRules.ConfigBridge;
+import org.krobot.util.ColoredLogger;
 
 public class ConfigLoader
 {
-    private static final Logger log = LogManager.getLogger("ConfigLoader");
+    private static final ColoredLogger log = ColoredLogger.getLogger("ConfigLoader");
 
     private RuntimeModule module;
 
@@ -77,14 +77,7 @@ public class ConfigLoader
 
             if (rules.getDef() == null)
             {
-                try
-                {
-                    Files.write("{}", file, Charset.defaultCharset());
-                }
-                catch (IOException e)
-                {
-                    throw new RuntimeException("Error while creating empty config in '" + file + "'", e);
-                }
+                createEmpty(file);
             }
             else
             {
@@ -92,16 +85,21 @@ public class ConfigLoader
 
                 if (def == null)
                 {
-                    throw new RuntimeException("Could not resolve default file of config '" + name + "' (at " + rules.getDef() + ")");
-                }
+                    log.error(Color.RED, "Unable to find default file at {} (for config '{}')", rules.getDef(), name);
+                    log.error(Color.RED, "Skipping default file of config '{}'", name);
 
-                try
-                {
-                    Files.copy(def, file);
+                    createEmpty(file);
                 }
-                catch (IOException e)
+                else
                 {
-                    throw new RuntimeException("Exception while copying default configuration of config '" + name + "' (at " + def + ")", e);
+                    try
+                    {
+                        Files.copy(def, file);
+                    }
+                    catch (IOException e)
+                    {
+                        throw new RuntimeException("Exception while copying default configuration of config '" + name + "' (at " + def + ")", e);
+                    }
                 }
             }
         }
@@ -118,7 +116,7 @@ public class ConfigLoader
         log.info("Loaded config '{}' ({}) {}",
                  name,
                  file,
-                 (rules.getDef() == null ? "as empty config" : (def != null ? "from default file '" + def + "'" : "from file '" + file + "'")));
+                 (rules.getDef() == null || (rules.getDef() != null && def == null) ? "as empty config" : (def != null ? "from default file '" + def + "'" : "from file '" + file + "'")));
     }
 
     public void load(Pair<ConfigBridge, KrobotModule> pair)
@@ -134,6 +132,18 @@ public class ConfigLoader
 
                  bridge.getDest(),
                  target.getComputed().getModule().getClass().getName());
+    }
+
+    private void createEmpty(File file)
+    {
+        try
+        {
+            Files.write("{}", file, Charset.defaultCharset());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Error while creating empty config in '" + file + "'", e);
+        }
     }
 
     private File getDefaultFile(DefaultPath def)

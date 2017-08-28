@@ -1,6 +1,6 @@
 package org.krobot.module;
 
-import org.krobot.command.MessageContext;
+import org.krobot.MessageContext;
 
 @FunctionalInterface
 public interface Handler

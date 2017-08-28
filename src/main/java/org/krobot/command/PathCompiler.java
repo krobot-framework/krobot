@@ -112,7 +112,7 @@ public class PathCompiler
             throw error("Unknown argument type '" + type + "'", cursor - type.length(), cursor - 1);
         }
 
-        args.add(new CommandArgument(required, name, factory, list));
+        args.add(new CommandArgument(required, name, type, factory, list));
     }
 
     protected void skipEnsure(char c)

@@ -43,12 +43,10 @@ import org.krobot.Krobot;
 import org.krobot.KrobotModule;
 import org.krobot.command.Command;
 import org.krobot.command.CommandFilter;
-import org.krobot.command.ArgumentMap;
-import org.krobot.command.CommandCall;
 import org.krobot.command.ExceptionHandler;
-import org.krobot.command.ICommandHandler;
+import org.krobot.command.CommandHandler;
 import org.krobot.command.KrobotCommand;
-import org.krobot.command.MessageContext;
+import org.krobot.MessageContext;
 import org.krobot.command.CommandManager;
 import org.krobot.command.PathCompiler;
 import org.krobot.module.Include;
@@ -149,8 +147,6 @@ public class KrobotRuntime
         ModuleLoader loader = new ModuleLoader();
         rootModule = loader.load(botClass);
 
-        prefix = rootModule.getModule().getPrefix();
-
         List<ComputedModule> modules = loader.getModules();
 
         modules.stream()
@@ -191,13 +187,12 @@ public class KrobotRuntime
 
         List<Module> guiceModules = new ArrayList<>();
         modules.stream().map(m -> m.getModule().getGuiceModules()).forEach(guiceModules::addAll);
-        guiceModules.add(new KrobotGuiceModule());
+        guiceModules.add(new KrobotGuiceModule(this));
 
         injector = Guice.createInjector(guiceModules);
         this.modules.forEach((module) ->
         {
             KrobotModule m = module.getComputed().getModule();
-            injector.injectMembers(m);
 
             try
             {
@@ -223,20 +218,17 @@ public class KrobotRuntime
             module.init();
         });
 
+        prefix = rootModule.getModule().getPrefix();
+
         log.info("Processing filters...");
         filterRunner = new FilterRunner(this, modules.toArray(new ComputedModule[modules.size()]));
 
         modules.forEach(module -> module.getModule().getCommands().forEach(command ->
         {
-            command.setFilters(ArrayUtils.add(command.getFilters(), new CommandFilter()
-            {
-                @Override
-                public void filter(CommandCall call, MessageContext context, ArgumentMap args)
+            command.setFilters(ArrayUtils.add(command.getFilters(), (call, context, args) -> {
+                if (filterRunner.isDisabled(context, module.getModule()))
                 {
-                    if (filterRunner.isDisabled(context, module.getModule()))
-                    {
-                        call.setCancelled(true);
-                    }
+                    call.setCancelled(true);
                 }
             }));
         }));
@@ -245,19 +237,12 @@ public class KrobotRuntime
 
         commandManager = new CommandManager(this);
 
-        // TODO: Command annotations
-
         modules.forEach(module -> module.getModule().getCommandFilters().forEach(filter ->
         {
-            commandManager.getFilters().add(new CommandFilter()
-            {
-                @Override
-                public void filter(CommandCall command, MessageContext context, ArgumentMap args)
+            commandManager.getFilters().add((command, context, args) -> {
+                if (!filterRunner.isDisabled(context, module.getModule()))
                 {
-                    if (!filterRunner.isDisabled(context, module.getModule()))
-                    {
-                        filter.filter(command, context, args);
-                    }
+                    filter.filter(command, context, args);
                 }
             });
         }));
@@ -267,9 +252,9 @@ public class KrobotRuntime
 
             if (cl.isAnnotationPresent(Include.class))
             {
-                Class<? extends ICommandHandler>[] classes = cl.getAnnotation(Include.class).commands();
+                Class<? extends CommandHandler>[] classes = cl.getAnnotation(Include.class).commands();
 
-                for (Class<? extends ICommandHandler> commandClass : classes)
+                for (Class<? extends CommandHandler> commandClass : classes)
                 {
                     KrobotCommand command = registerCommandClass(module.getModule(), commandClass);
 
@@ -322,6 +307,8 @@ public class KrobotRuntime
             System.exit(1);
         }
 
+        modules.forEach(m -> jda.addEventListener(m.getModule().getEventListeners()));
+
         log.infoBold("----> Done in " + timerGet() + "ms\n");
 
         if (System.console() == null && System.getProperty(Krobot.PROPERTY_DISABLE_STATE_BAR) == null)
@@ -345,7 +332,7 @@ public class KrobotRuntime
         uptime = System.currentTimeMillis();
     }
 
-    protected KrobotCommand registerCommandClass(KrobotModule module, Class<? extends ICommandHandler> commandClass)
+    protected KrobotCommand registerCommandClass(KrobotModule module, Class<? extends CommandHandler> commandClass)
     {
         if (!commandClass.isAnnotationPresent(Command.class))
         {
@@ -390,16 +377,7 @@ public class KrobotRuntime
             long time = System.currentTimeMillis();
 
             filterRunner.runFilters(context);
-
-            try
-            {
-                commandManager.handle(context);
-            }
-            catch (Exception e)
-            {
-                // TODO: Exception handler
-                e.printStackTrace();
-            }
+            commandManager.handle(context);
 
             setLastExecutionTime(System.currentTimeMillis() - time);
         });
@@ -482,6 +460,11 @@ public class KrobotRuntime
     public long getUptime()
     {
         return System.currentTimeMillis() - uptime;
+    }
+
+    public CommandManager getCommandManager()
+    {
+        return commandManager;
     }
 
     private synchronized void setLastExecutionTime(long lastExecutionTime)

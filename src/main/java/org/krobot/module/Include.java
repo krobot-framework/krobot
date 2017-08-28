@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.krobot.KrobotModule;
 import org.krobot.command.CommandFilter;
-import org.krobot.command.ICommandHandler;
+import org.krobot.command.CommandHandler;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
@@ -14,5 +14,5 @@ public @interface Include
 {
     Class<? extends KrobotModule>[] imports() default {};
     Class<? extends CommandFilter>[] filters() default {};
-    Class<? extends ICommandHandler>[] commands() default {};
+    Class<? extends CommandHandler>[] commands() default {};
 }

@@ -41,7 +41,7 @@ public class  CommandAccessor
         return this;
     }
 
-    public SubCommandAccessor sub(String path, ICommandHandler handler)
+    public SubCommandAccessor sub(String path, CommandHandler handler)
     {
         PathCompiler compiler = new PathCompiler(path);
         compiler.compile();

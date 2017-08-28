@@ -4,13 +4,15 @@ public class CommandArgument
 {
     private boolean required;
     private String key;
+    private String type;
     private ArgumentFactory factory;
     private boolean list;
 
-    public CommandArgument(boolean required, String key, ArgumentFactory factory, boolean list)
+    public CommandArgument(boolean required, String key, String type, ArgumentFactory factory, boolean list)
     {
         this.required = required;
         this.key = key;
+        this.type = type;
         this.factory = factory;
         this.list = list;
     }
@@ -25,6 +27,11 @@ public class CommandArgument
         return key;
     }
 
+    public String getType()
+    {
+        return type;
+    }
+
     public ArgumentFactory getFactory()
     {
         return factory;
@@ -33,5 +40,11 @@ public class CommandArgument
     public boolean isList()
     {
         return list;
+    }
+
+    @Override
+    public String toString()
+    {
+        return (isRequired() ? "<" : "[") + getKey() + ":" + getType() + (isRequired() ? ">" : "]");
     }
 }

@@ -8,12 +8,14 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import javax.inject.Singleton;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.User;
 import org.apache.commons.lang3.ArrayUtils;
+import org.krobot.MessageContext;
 import org.krobot.permission.BotNotAllowedException;
 import org.krobot.permission.BotRequires;
 import org.krobot.permission.UserNotAllowedException;
@@ -21,6 +23,7 @@ import org.krobot.permission.UserRequires;
 import org.krobot.runtime.KrobotRuntime;
 import org.krobot.util.UserUtils;
 
+@Singleton
 public class CommandManager
 {
     private static final Map<String, ArgumentFactory> argumentFactories = new HashMap<>();
@@ -38,25 +41,40 @@ public class CommandManager
         this.filters = new ArrayList<>();
     }
 
-    public void handle(MessageContext context) throws Exception
+    public void handle(MessageContext context)
     {
-        String content = context.getMessage().getRawContent();
+        String content = context.getMessage().getRawContent().trim();
         String prefix = runtime.getFilterRunner().getPrefix(context);
-        String[] split = splitWithQuotes(content);
 
         String botMention = "<@!" + runtime.jda().getSelfUser().getId() + "> ";
 
-        if (content.startsWith(botMention))
+        if (content.startsWith(botMention) && !content.equals(botMention))
         {
             prefix = botMention;
         }
 
-        if (prefix != null && (!split[0].startsWith(prefix) || split[0].equalsIgnoreCase(prefix)))
+        if (prefix != null && (!content.startsWith(prefix) || content.equals(prefix)))
         {
             return;
         }
 
-        String label = prefix == null ? split[0] : split[0].trim().substring(prefix.length(), split[0].length());
+        if (content.startsWith(botMention))
+        {
+            content = content.substring(botMention.length());
+        }
+        else if (prefix != null && content.startsWith(prefix))
+        {
+            content = content.substring(prefix.length());
+        }
+
+        String[] split = splitWithQuotes(content);
+
+        if (split.length == 0)
+        {
+            return;
+        }
+
+        String label = split[0];
 
         Optional<KrobotCommand> optional = commands.stream().filter(c -> {
             if (c.getAliases() != null)
@@ -86,25 +104,43 @@ public class CommandManager
 
             if (sub.isPresent())
             {
-                execute(context, sub.get(), ArrayUtils.subarray(args, 1, args.length));
+                try
+                {
+                    execute(context, sub.get(), ArrayUtils.subarray(args, 1, args.length));
+                }
+                catch (Exception e)
+                {
+                    runtime.getExceptionHandler().handle(context, command, args, e);
+                }
+
                 return;
             }
         }
 
-        execute(context, command, args);
+        if (!command.getHandler().getClass().isAnnotationPresent(NoTyping.class))
+        {
+            context.getChannel().sendTyping();
+        }
+
+        try
+        {
+            execute(context, command, args);
+        }
+        catch (Exception e)
+        {
+            runtime.getExceptionHandler().handle(context, command, args, e);
+        }
     }
 
     public void execute(MessageContext context, KrobotCommand command, String[] args) throws Exception
     {
-        ICommandHandler handler = command.getHandler();
+        CommandHandler handler = command.getHandler();
 
         if (handler.getClass().isAnnotationPresent(BotRequires.class))
         {
-            Member botMember = context.getGuild().getMember(runtime.jda().getSelfUser());
-
             for (Permission perm : handler.getClass().getAnnotation(BotRequires.class).value())
             {
-                if (!botMember.hasPermission(perm))
+                if (!context.botHasPermission(perm))
                 {
                     throw new BotNotAllowedException(perm);
                 }
@@ -115,9 +151,7 @@ public class CommandManager
         {
             for (Permission perm : handler.getClass().getAnnotation(UserRequires.class).value())
             {
-                Member userMember = context.getMember();
-
-                if (!userMember.hasPermission(perm))
+                if (!context.hasPermission(perm))
                 {
                     throw new UserNotAllowedException(perm);
                 }
@@ -167,19 +201,24 @@ public class CommandManager
                 return;
             }
 
+            if (context.botHasPermission(Permission.MESSAGE_MANAGE))
+            {
+                context.getMessage().delete().reason("Command triggered").queue();
+            }
+
             if (result != null)
             {
                 if (result instanceof EmbedBuilder)
                 {
-                    context.sendMessage((EmbedBuilder) result);
+                    context.send((EmbedBuilder) result);
                 }
                 else if (result instanceof MessageEmbed)
                 {
-                    context.sendMessage((MessageEmbed) result);
+                    context.send((MessageEmbed) result);
                 }
                 else
                 {
-                    context.sendMessage(result.toString());
+                    context.send(result.toString());
                 }
             }
         }

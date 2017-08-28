@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.krobot.Krobot;
+import org.krobot.MessageContext;
 import org.krobot.permission.BotNotAllowedException;
 import org.krobot.permission.UserNotAllowedException;
 import org.krobot.util.ColoredLogger;
@@ -44,7 +45,7 @@ public class ExceptionHandler
 
         try
         {
-            MessageUtils.deleteAfter(context.sendMessage(Dialog.error("Command crashed !", "A crash report has been sent to you " + context.getUser().getAsMention() + " . Please send it to the developer as soon as possible !")).get(), 5000);
+            MessageUtils.deleteAfter(context.send(Dialog.error("Command crashed !", "A crash report has been sent to you " + context.getUser().getAsMention() + " . Please send it to the developer as soon as possible !")).get(), 5000);
         }
         catch (InterruptedException | ExecutionException ignored)
         {
@@ -95,13 +96,13 @@ public class ExceptionHandler
 
     // Default handlers
     {
-        on(WrongArgumentNumberException.class, (context, t) -> context.sendMessage(Dialog.warn("Wrong number of argument", t.getMessage())));
+        on(WrongArgumentNumberException.class, (context, t) -> context.send(Dialog.warn("Wrong number of argument", t.getMessage())));
         on(BadArgumentTypeException.class, (context, t) -> {
             String message = t.getMessage() != null ? t.getMessage() : "Can't convert '" + t.getValue() + "' to a '" + t.getType() + "'";
-            context.sendMessage(Dialog.warn("Wrong argument types", message));
+            context.send(Dialog.warn("Wrong argument types", message));
         });
 
-        on(BotNotAllowedException.class, (context, t) -> context.sendMessage(Dialog.error("Missing required permission", t.getMessage())));
-        on(UserNotAllowedException.class, (context, t) -> context.sendMessage(Dialog.error("You're missing a required permission", t.getMessage())));
+        on(BotNotAllowedException.class, (context, t) -> context.send(Dialog.error("Missing required permission", t.getMessage())));
+        on(UserNotAllowedException.class, (context, t) -> context.send(Dialog.error("You're missing a required permission", t.getMessage())));
     }
 }

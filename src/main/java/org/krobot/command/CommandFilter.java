@@ -1,8 +1,9 @@
 package org.krobot.command;
 
-public abstract class CommandFilter
+import org.krobot.MessageContext;
+
+@FunctionalInterface
+public interface CommandFilter
 {
-    public abstract void filter(CommandCall command,
-                                MessageContext context,
-                                ArgumentMap args);
+    void filter(CommandCall command, MessageContext context, ArgumentMap args);
 }

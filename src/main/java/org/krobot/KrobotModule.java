@@ -14,11 +14,11 @@ import org.krobot.command.CommandFilter;
 import org.krobot.command.PathCompiler.PathSyntaxException;
 import org.krobot.command.ArgumentFactory;
 import org.krobot.command.CommandAccessor;
-import org.krobot.command.ICommandHandler;
+import org.krobot.command.CommandHandler;
 import org.krobot.command.KrobotCommand;
 import org.krobot.config.ConfigAccessor;
 import org.krobot.config.ConfigRules;
-import org.krobot.module.ConfigFolder;
+import org.krobot.config.ConfigFolder;
 import org.krobot.module.Filter;
 import org.krobot.module.FilterAccessor;
 import org.krobot.module.FilterRules;
@@ -45,6 +45,7 @@ public abstract class KrobotModule
     private List<ImportRules> imports;
     private List<ConfigRules> configs;
     private List<FilterRules> filters;
+    private List<Object> eventListeners;
 
     private String prefix;
     private List<KrobotCommand> commands;
@@ -58,6 +59,7 @@ public abstract class KrobotModule
         this.imports = new ArrayList<>();
         this.configs = new ArrayList<>();
         this.filters = new ArrayList<>();
+        this.eventListeners = new ArrayList<>();
 
         this.commands = new ArrayList<>();
         this.commandFilters = new ArrayList<>();
@@ -113,12 +115,12 @@ public abstract class KrobotModule
         return guild(guild -> guild.getName().equalsIgnoreCase(guildName));
     }
 
-    protected CommandAccessor command(String path, Class<? extends ICommandHandler> handler)
+    protected CommandAccessor command(String path, Class<? extends CommandHandler> handler)
     {
         return command(path, injector.getInstance(handler));
     }
 
-    protected CommandAccessor command(String path, ICommandHandler handler)
+    protected CommandAccessor command(String path, CommandHandler handler)
     {
         PathCompiler compiler = new PathCompiler(path.trim());
 
@@ -146,6 +148,11 @@ public abstract class KrobotModule
     protected void filters(CommandFilter... filters)
     {
         commandFilters.addAll(Arrays.asList(filters));
+    }
+
+    protected void listener(Object... listeners)
+    {
+        eventListeners.addAll(Arrays.asList(listeners));
     }
 
     protected <T> void defineArgType(String name, Class<T> type, ArgumentFactory<T> factory)
@@ -186,6 +193,11 @@ public abstract class KrobotModule
     public List<FilterRules> getFilters()
     {
         return filters;
+    }
+
+    public List<Object> getEventListeners()
+    {
+        return eventListeners;
     }
 
     public String getPrefix()

@@ -1,5 +1,7 @@
 package org.krobot.command;
 
+import org.krobot.MessageContext;
+
 @FunctionalInterface
 public interface IExceptionHandler<T extends Throwable>
 {

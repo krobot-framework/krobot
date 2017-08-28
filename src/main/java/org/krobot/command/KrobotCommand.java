@@ -8,14 +8,14 @@ public class KrobotCommand
     private String description;
     private CommandFilter[] filters;
     private KrobotCommand[] subs;
-    private ICommandHandler handler;
+    private CommandHandler handler;
 
-    public KrobotCommand(String label, CommandArgument[] arguments, ICommandHandler handler)
+    public KrobotCommand(String label, CommandArgument[] arguments, CommandHandler handler)
     {
         this(label, arguments, handler, new KrobotCommand[] {});
     }
 
-    public KrobotCommand(String label, CommandArgument[] arguments, ICommandHandler handler, KrobotCommand[] subs)
+    public KrobotCommand(String label, CommandArgument[] arguments, CommandHandler handler, KrobotCommand[] subs)
     {
         this.label = label;
         this.arguments = arguments;
@@ -23,7 +23,7 @@ public class KrobotCommand
         this.subs = subs;
     }
 
-    public KrobotCommand(String label, CommandArgument[] arguments, String description, String[] aliases, CommandFilter[] filters, ICommandHandler handler, KrobotCommand[] subs)
+    public KrobotCommand(String label, CommandArgument[] arguments, String description, String[] aliases, CommandFilter[] filters, CommandHandler handler, KrobotCommand[] subs)
     {
         this.label = label;
         this.aliases = aliases;
@@ -84,8 +84,44 @@ public class KrobotCommand
         this.subs = subs;
     }
 
-    public ICommandHandler getHandler()
+    public CommandHandler getHandler()
     {
         return handler;
+    }
+
+    @Override
+    public String toString()
+    {
+        return toString("", true);
+    }
+
+    /**
+     * Convert the command to a displayable string
+     * (similar to the {@link PathCompiler} syntax)
+     *
+     * @param prefix The prefix to add (like tabs)
+     * @param subs If the subs should be displayed too
+     *
+     * @return The generated string
+     */
+    public String toString(String prefix, boolean subs)
+    {
+        StringBuilder string = new StringBuilder(prefix + this.label + " ");
+
+        for (CommandArgument argument : arguments)
+        {
+            string.append(argument).append(" ");
+        }
+
+        if (subs && this.subs != null && this.subs.length != 0)
+        {
+            for (KrobotCommand sub : this.subs)
+            {
+                string.append("\n");
+                string.append(prefix).append(sub.toString(prefix + this.getLabel() + " ", true));
+            }
+        }
+
+        return string.toString();
     }
 }

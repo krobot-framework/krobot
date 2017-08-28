@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.krobot.command;
+package org.krobot;
 
 import java.util.concurrent.Future;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -30,6 +30,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import org.krobot.permission.BotNotAllowedException;
 import org.krobot.permission.UserNotAllowedException;
+import org.krobot.util.Dialog;
 
 /**
  * The Command Context<br><br>
@@ -106,7 +107,7 @@ public class MessageContext
      *
      * @return A Future representing the task result
      */
-    public Future<Message> sendMessage(String content)
+    public Future<Message> send(String content)
     {
         return channel.sendMessage(content).submit();
     }
@@ -119,7 +120,7 @@ public class MessageContext
      *
      * @return A Future representing the task result
      */
-    public Future<Message> sendMessage(String content, Object... args)
+    public Future<Message> send(String content, Object... args)
     {
         return channel.sendMessage(String.format(content, args)).submit();
     }
@@ -131,7 +132,7 @@ public class MessageContext
      *
      * @return A Future representing the task result
      */
-    public Future<Message> sendMessage(MessageEmbed content)
+    public Future<Message> send(MessageEmbed content)
     {
         return channel.sendMessage(content).submit();
     }
@@ -143,9 +144,34 @@ public class MessageContext
      *
      * @return A Future representing  task result
      */
-    public Future<Message> sendMessage(EmbedBuilder content)
+    public Future<Message> send(EmbedBuilder content)
     {
-        return sendMessage(content.build());
+        return send(content.build());
+    }
+
+    public Future<Message> info(String title, String message)
+    {
+        return send(Dialog.info(title, message));
+    }
+
+    public Future<Message> warn(String title, String message)
+    {
+        return send(Dialog.warn(title, message));
+    }
+
+    public Future<Message> error(String title, String message)
+    {
+        return send(Dialog.error(title, message));
+    }
+
+    public boolean hasPermission(Permission... permissions)
+    {
+        return getMember().hasPermission(getChannel(), permissions);
+    }
+
+    public boolean botHasPermission(Permission... permissions)
+    {
+        return getBotMember().hasPermission(getChannel(), permissions);
     }
 
     /**
@@ -162,6 +188,11 @@ public class MessageContext
     public Guild getGuild()
     {
         return this.getChannel().getGuild();
+    }
+
+    public Member getBotMember()
+    {
+        return this.getGuild().getMember(jda.getSelfUser());
     }
 
     /**

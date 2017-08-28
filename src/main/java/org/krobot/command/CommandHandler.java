@@ -1,5 +1,9 @@
 package org.krobot.command;
 
-public abstract class CommandHandler implements ICommandHandler
+import org.krobot.MessageContext;
+
+@FunctionalInterface
+public interface CommandHandler
 {
+    Object handle(MessageContext context, ArgumentMap args) throws Exception;
 }

@@ -80,7 +80,7 @@ public class HelpCommand implements CommandHandler
 
         string.append(prefix.replace("└", "├")).append(Markdown.bold(label)).append(str.substring(label.length())).append("\n");
 
-        if (command.getDescription() != null)
+        if (command.getDescription() != null && !command.getDescription().trim().isEmpty())
         {
             if (!prefix.isEmpty())
             {

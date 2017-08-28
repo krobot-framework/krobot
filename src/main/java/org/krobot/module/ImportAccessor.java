@@ -45,4 +45,10 @@ public class ImportAccessor
 
         return this;
     }
+
+    public ImportAccessor asSubsOf(String parentCommandLabel, String defaultCommand)
+    {
+        rules.setParentCommand(new ParentCommand(parentCommandLabel, defaultCommand));
+        return this;
+    }
 }

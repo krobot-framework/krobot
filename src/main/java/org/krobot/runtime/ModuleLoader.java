@@ -5,18 +5,21 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.fusesource.jansi.Ansi.Color;
 import org.krobot.KrobotModule;
+import org.krobot.command.CommandArgument;
+import org.krobot.command.KrobotCommand;
 import org.krobot.config.ConfigRules;
 import org.krobot.module.FilterRules;
 import org.krobot.module.ImportRules.ConfigBridge;
 import org.krobot.module.ImportRules.Includes;
 import org.krobot.module.Include;
+import org.krobot.module.ParentCommand;
+import org.krobot.util.ColoredLogger;
 
 public class ModuleLoader
 {
-    private static final Logger log = LogManager.getLogger("Loader");
+    private static final ColoredLogger log = ColoredLogger.getLogger("ModuleLoader");
 
     private List<ComputedModule> modules;
 
@@ -49,7 +52,7 @@ public class ModuleLoader
             }
             catch (InstantiationException | IllegalAccessException e)
             {
-                log.fatal("Error while creating instance of module " + moduleClass.getName() + "; remember modules must have an empty constructor", e);
+                log.errorAuto("@|red Error while creating instance of module|@ @|red,bold " + moduleClass.getName() + "|@|@red ; remember that@| |@red,bold modules must have an empty constructor|@", e);
                 System.exit(1);
             }
 
@@ -91,13 +94,44 @@ public class ModuleLoader
 
             if (loaded.getIncludes() != null)
             {
-                log.warn("The module " + loaded.getModule().getClass().getName() + " was imported using from(...) multiple times");
-                log.warn("If you defined inclusions/exclusions, they may differ from what you excepted");
+                log.warn(Color.YELLOW,  "The module " + loaded.getModule().getClass().getName() + " was imported using from(...) multiple times");
+                log.warn(Color.YELLOW, "If you defined inclusions/exclusions, they may differ from what you excepted");
             }
 
             loaded.getBridges().addAll(bridges);
             loaded.getFilters().addAll(rules.getFilters());
             loaded.setIncludes(rules.getIncludes());
+
+            if (rules.getParentCommand() != null)
+            {
+                ParentCommand parent = rules.getParentCommand();
+                KrobotCommand command = new KrobotCommand(parent.getParentLabel(), new CommandArgument[]{}, null);
+
+                command.setHandler((context, args) -> {
+                    KrobotCommand sub = null;
+
+                    for (KrobotCommand c : command.getSubCommands())
+                    {
+                        if (c.getLabel().equals(parent.getDefaultSub()))
+                        {
+                            sub = c;
+                            break;
+                        }
+                    }
+
+                    if (sub == null)
+                    {
+                        log.warnAuto("@|yellow Module '|@@|yellow,bold{}|@@|yellow' was imported as sub-commands of command '|@@|yellow,bold{}|@@|yellow', but|@", module.getModule().getClass().getName(), command.getLabel());
+                        log.warnAuto("@|yellow Can't find the default sub command '|@@|yellow,bold{}|@@|yellow', nothing will be done|@", parent.getDefaultSub());
+
+                        return null;
+                    }
+
+                    return sub.getHandler().handle(context, args);
+                });
+
+                loaded.setParentCommand(command);
+            }
         });
     }
 
@@ -113,6 +147,7 @@ public class ModuleLoader
         private List<FilterRules> filters;
         private List<ConfigRules> configs;
         private List<Pair<ConfigBridge, KrobotModule>> bridges;
+        private KrobotCommand parentCommand;
 
         private Includes[] includes;
 
@@ -155,6 +190,16 @@ public class ModuleLoader
         public void setIncludes(Includes[] includes)
         {
             this.includes = includes;
+        }
+
+        public KrobotCommand getParentCommand()
+        {
+            return parentCommand;
+        }
+
+        public void setParentCommand(KrobotCommand parentCommand)
+        {
+            this.parentCommand = parentCommand;
         }
     }
 }

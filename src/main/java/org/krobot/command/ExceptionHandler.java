@@ -34,7 +34,7 @@ public class ExceptionHandler
             return;
         }
 
-        log.errorAuto("@|red Unhandled |@ @|red,bold '" + t.getClass().getName() + "'|@ @|red while executing command '" + command.getLabel() + "'|@", t);
+        log.errorAuto("@|red Unhandled |@ @|red,bold '" + t.getClass().getName() + "'|@ @|red while executing command '|@@|red,bold" + command.getLabel() + "|@@|red '|@", t);
 
         String report = makeCrashReport(t, command, args, context);
 

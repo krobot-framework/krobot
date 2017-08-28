@@ -51,6 +51,7 @@ import org.krobot.command.CommandManager;
 import org.krobot.command.PathCompiler;
 import org.krobot.module.Include;
 import org.krobot.module.LoadModule;
+import org.krobot.module.ParentCommand;
 import org.krobot.runtime.ModuleLoader.ComputedModule;
 import org.krobot.util.ColoredLogger;
 
@@ -260,13 +261,34 @@ public class KrobotRuntime
 
                     if (command != null)
                     {
+                        KrobotCommand parent = module.getParentCommand();
+
+                        if (parent != null)
+                        {
+                            parent.setSubCommands(ArrayUtils.add(parent.getSubCommands(), command));
+                            continue;
+                        }
+
                         commandManager.getCommands().add(command);
                     }
                 }
             }
         });
 
-        modules.forEach(m -> commandManager.getCommands().addAll(m.getModule().getCommands()));
+        modules.forEach(m -> {
+            KrobotCommand parent = m.getParentCommand();
+            List<KrobotCommand> commands = m.getModule().getCommands();
+
+            if (parent != null)
+            {
+                parent.setSubCommands(ArrayUtils.addAll(parent.getSubCommands(), commands.toArray(new KrobotCommand[0])));
+                commandManager.getCommands().add(parent);
+
+                return;
+            }
+
+            commandManager.getCommands().addAll(commands);
+        });
 
         List<String> labels = new ArrayList<>();
         commandManager.getCommands().forEach(command -> {

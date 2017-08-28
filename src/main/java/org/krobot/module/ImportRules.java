@@ -14,6 +14,7 @@ public class ImportRules
     private Includes[] includes;
     private List<ConfigBridge> bridges;
     private List<FilterRules> filters;
+    private ParentCommand parentCommand;
 
     public ImportRules(Class<? extends KrobotModule> module)
     {
@@ -42,6 +43,16 @@ public class ImportRules
     public List<FilterRules> getFilters()
     {
         return filters;
+    }
+
+    public ParentCommand getParentCommand()
+    {
+        return parentCommand;
+    }
+
+    public void setParentCommand(ParentCommand parentCommand)
+    {
+        this.parentCommand = parentCommand;
     }
 
     public Class<? extends KrobotModule> getModule()

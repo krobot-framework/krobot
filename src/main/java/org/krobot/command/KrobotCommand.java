@@ -39,6 +39,11 @@ public class KrobotCommand
         return label;
     }
 
+    public void setLabel(String label)
+    {
+        this.label = label;
+    }
+
     public String[] getAliases()
     {
         return aliases;
@@ -52,6 +57,11 @@ public class KrobotCommand
     public CommandArgument[] getArguments()
     {
         return arguments;
+    }
+
+    public void setArguments(CommandArgument[] arguments)
+    {
+        this.arguments = arguments;
     }
 
     public String getDescription()
@@ -87,6 +97,11 @@ public class KrobotCommand
     public CommandHandler getHandler()
     {
         return handler;
+    }
+
+    public void setHandler(CommandHandler handler)
+    {
+        this.handler = handler;
     }
 
     @Override

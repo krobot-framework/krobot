@@ -22,12 +22,7 @@ public class ExceptionHandler
 {
     private static final ColoredLogger log = ColoredLogger.getLogger("ExceptionHandler");
 
-    private Map<Class<? extends Throwable>, IExceptionHandler> handlers;
-
-    public ExceptionHandler()
-    {
-        this.handlers = new HashMap<>();
-    }
+    private Map<Class<? extends Throwable>, IExceptionHandler> handlers = new HashMap<>();
 
     public void handle(MessageContext context, KrobotCommand command, String[] args, Throwable t)
     {

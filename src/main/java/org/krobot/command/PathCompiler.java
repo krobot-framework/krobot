@@ -70,23 +70,50 @@ public class PathCompiler
         if (next == ':')
         {
             type = readWord();
-            next = next("'...' or '" + end + "'");
+            next = next("'...', '|' or '" + end + "'");
         }
 
+        ArgumentFactory factory = null;
         boolean list = false;
 
-        if (next == '.')
+        if (type != null && next == '|')
         {
-            skipEnsure('.');
-            skipEnsure('.');
+            List<String> choices = new ArrayList<>();
+            choices.add(type);
 
-            list = true;
+            while (next == '|')
+            {
+                choices.add(readWord());
+                next = next("'|' or '" + end + "'");
+            }
 
-            skipEnsure(end);
+            type = String.join("|", choices);
+            String finalType = type;
+
+            factory = argument -> {
+                if (!choices.contains(argument))
+                {
+                    throw new BadArgumentTypeException("Can only be one of : " + String.join(", ", choices) + "; but not '" + argument + "'", argument, finalType);
+                }
+
+                return argument;
+            };
         }
-        else if (next != end)
+        else
         {
-            throw error("Expected " + (type == null ? "':' or " : "") + "'" + end + "' got '" + next + "'");
+            if (next == '.')
+            {
+                skipEnsure('.');
+                skipEnsure('.');
+
+                list = true;
+
+                skipEnsure(end);
+            }
+            else if (next != end)
+            {
+                throw error("Expected " + (type == null ? "':' or " : "") + "'" + end + "' got '" + next + "'");
+            }
         }
 
         if (args.size() > 0)
@@ -104,8 +131,7 @@ public class PathCompiler
         }
 
         type = type == null ? "string" : type;
-
-        ArgumentFactory factory = CommandManager.getArgumentFactory(type);
+        factory = factory == null ? CommandManager.getArgumentFactory(type) : factory;
 
         if (factory == null)
         {

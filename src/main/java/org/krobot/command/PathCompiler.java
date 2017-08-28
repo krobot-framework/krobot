@@ -90,13 +90,24 @@ public class PathCompiler
             type = String.join("|", choices);
             String finalType = type;
 
-            factory = argument -> {
-                if (!choices.contains(argument))
+            factory = new ArgumentFactory<String>()
+            {
+                @Override
+                public String process(String argument) throws BadArgumentTypeException
                 {
-                    throw new BadArgumentTypeException("Can only be one of : " + String.join(", ", choices) + "; but not '" + argument + "'", argument, finalType);
+                    if (!choices.contains(argument))
+                    {
+                        throw new BadArgumentTypeException("Can only be one of : " + String.join(", ", choices) + "; but not '" + argument + "'", argument, finalType);
+                    }
+
+                    return argument;
                 }
 
-                return argument;
+                @Override
+                public String[] createArray()
+                {
+                    return new String[0];
+                }
             };
         }
         else

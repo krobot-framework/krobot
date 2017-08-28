@@ -128,20 +128,10 @@ public final class UserUtils
      *
      * @deprecated Deprecated in JDA, use now {@link User#openPrivateChannel()} directly.
      */
+    @Deprecated
     public static PrivateChannel privateChannel(@NotNull User user)
     {
-        if (!user.hasPrivateChannel())
-        {
-            try
-            {
-                return user.openPrivateChannel().submit().get();
-            }
-            catch (InterruptedException | ExecutionException ignored)
-            {
-            }
-        }
-
-        return user.getPrivateChannel();
+        return user.openPrivateChannel().complete();
     }
 
     private static JDA jda()

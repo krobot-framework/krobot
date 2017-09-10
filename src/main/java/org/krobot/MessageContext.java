@@ -18,7 +18,6 @@
  */
 package org.krobot;
 
-import java.util.concurrent.Future;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
@@ -28,6 +27,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.requests.RequestFuture;
 import org.krobot.permission.BotNotAllowedException;
 import org.krobot.permission.UserNotAllowedException;
 import org.krobot.util.Dialog;
@@ -107,7 +107,7 @@ public class MessageContext
      *
      * @return A Future representing the task result
      */
-    public Future<Message> send(String content)
+    public RequestFuture<Message> send(String content)
     {
         return channel.sendMessage(content).submit();
     }
@@ -120,7 +120,7 @@ public class MessageContext
      *
      * @return A Future representing the task result
      */
-    public Future<Message> send(String content, Object... args)
+    public RequestFuture<Message> send(String content, Object... args)
     {
         return channel.sendMessage(String.format(content, args)).submit();
     }
@@ -132,7 +132,7 @@ public class MessageContext
      *
      * @return A Future representing the task result
      */
-    public Future<Message> send(MessageEmbed content)
+    public RequestFuture<Message> send(MessageEmbed content)
     {
         return channel.sendMessage(content).submit();
     }
@@ -144,22 +144,22 @@ public class MessageContext
      *
      * @return A Future representing  task result
      */
-    public Future<Message> send(EmbedBuilder content)
+    public RequestFuture<Message> send(EmbedBuilder content)
     {
         return send(content.build());
     }
 
-    public Future<Message> info(String title, String message)
+    public RequestFuture<Message> info(String title, String message)
     {
         return send(Dialog.info(title, message));
     }
 
-    public Future<Message> warn(String title, String message)
+    public RequestFuture<Message> warn(String title, String message)
     {
         return send(Dialog.warn(title, message));
     }
 
-    public Future<Message> error(String title, String message)
+    public RequestFuture<Message> error(String title, String message)
     {
         return send(Dialog.error(title, message));
     }

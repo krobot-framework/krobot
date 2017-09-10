@@ -61,10 +61,7 @@ public class ConfigProvider
     /**
      * Finds a value with the given path.<br><br>
      *
-     * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link #get(String, String)}</b><br><br>
-     *
-     * <b>Example :</b>
+     * <b>Example :</b> config named 'test'
      *
      * <pre>
      * {
@@ -74,7 +71,7 @@ public class ConfigProvider
      * }
      * </pre>
      *
-     * config.at("object.key") returns "value"
+     * config.at("test.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
      *
@@ -88,10 +85,8 @@ public class ConfigProvider
 
     /**
      * Finds a value with the given path.
-     * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link #get(String, String)}</b>
      *
-     * Example :
+     * <b>Example :</b> Config named 'test'
      *
      * <pre>
      * {
@@ -101,7 +96,7 @@ public class ConfigProvider
      * }
      * </pre>
      *
-     * config.at("object.key") returns "value"
+     * config.at("test.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
      * @param def The default value if not found
@@ -116,10 +111,7 @@ public class ConfigProvider
     /**
      * Finds a value with the given path.<br><br>
      *
-     * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link #get(String, String)}</b><br><br>
-     *
-     * <b>Example :</b>
+     * <b>Example :</b> Config named 'test'
      *
      * <pre>
      * {
@@ -129,7 +121,7 @@ public class ConfigProvider
      * }
      * </pre>
      *
-     * config.at("object.key") returns "value"
+     * config.at("test.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
      * @param type The type of the object to return
@@ -146,10 +138,7 @@ public class ConfigProvider
     /**
      * Finds a value with the given path.<br><br>
      *
-     * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link #get(String, String)}</b><br><br>
-     *
-     * <b>Example :</b>
+     * <b>Example :</b> Config named 'test'
      *
      * <pre>
      * {
@@ -159,7 +148,7 @@ public class ConfigProvider
      * }
      * </pre>
      *
-     * config.at("object.key") returns "value"
+     * config.at("test.object.key") returns "value"
      *
      * @param path The path of the value to get (example config.object.key)
      * @param def The default value if not found

@@ -56,6 +56,11 @@ public class StateBar extends Thread
 
     public void update()
     {
+        if (runtime.getConsole().isTyping())
+        {
+            return;
+        }
+
         String result = "";
 
         // Date

@@ -73,6 +73,12 @@ public class KrobotRunner
         return this;
     }
 
+    public KrobotRunner disableConsole()
+    {
+        System.setProperty(PROPERTY_DISABLE_CONSOLE, "true");
+        return this;
+    }
+
     public KrobotRunner readTokenFromArgs(String[] args)
     {
         if (args.length > 0)

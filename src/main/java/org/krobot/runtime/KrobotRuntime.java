@@ -22,6 +22,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import java.lang.reflect.Field;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -49,6 +50,7 @@ import org.krobot.command.KrobotCommand;
 import org.krobot.MessageContext;
 import org.krobot.command.CommandManager;
 import org.krobot.command.PathCompiler;
+import org.krobot.console.ConsoleCommandProcessor;
 import org.krobot.module.Include;
 import org.krobot.module.LoadModule;
 import org.krobot.module.ParentCommand;
@@ -85,6 +87,7 @@ public class KrobotRuntime
     private int maxThread;
     private ThreadPoolExecutor threadPool;
 
+    private ConsoleCommandProcessor console;
     private StateBar stateBar;
     private long lastExecutionTime;
     private long uptime;
@@ -317,7 +320,15 @@ public class KrobotRuntime
         }
         catch (LoginException e)
         {
-            log.error("Wrong bot token provided ! Exiting...");
+            if (e.getCause() instanceof UnknownHostException)
+            {
+                log.error("You aren't connected to the Internet ! Exiting...");
+            }
+            else
+            {
+                log.error("Wrong bot token provided ! Exiting...");
+            }
+
             System.exit(1);
         }
         catch (InterruptedException ignored)
@@ -338,6 +349,12 @@ public class KrobotRuntime
             log.info(Color.YELLOW, "No console detected, you are probably running from an IDE");
             log.info(Color.YELLOW, "In these case, state bar can be really buggy");
             log.info(Color.YELLOW, "If it is, disable it by adding -Dkrobot.disableStateBar=true in the run VM args\n");
+        }
+
+        if (System.console() != null && (System.getProperty(Krobot.PROPERTY_DISABLE_CONSOLE) == null || !System.getProperty(Krobot.PROPERTY_DISABLE_CONSOLE).equals("true")))
+        {
+            console = new ConsoleCommandProcessor(this);
+            console.start();
         }
 
         this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThread);
@@ -407,7 +424,11 @@ public class KrobotRuntime
 
     private void end()
     {
-        stateBar.interrupt();
+        if (stateBar != null)
+        {
+            stateBar.interrupt();
+        }
+
         jda.shutdown();
     }
 
@@ -487,6 +508,11 @@ public class KrobotRuntime
     public CommandManager getCommandManager()
     {
         return commandManager;
+    }
+
+    public ConsoleCommandProcessor getConsole()
+    {
+        return console;
     }
 
     private synchronized void setLastExecutionTime(long lastExecutionTime)

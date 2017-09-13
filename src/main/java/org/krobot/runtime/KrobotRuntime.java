@@ -50,10 +50,9 @@ import org.krobot.command.KrobotCommand;
 import org.krobot.MessageContext;
 import org.krobot.command.CommandManager;
 import org.krobot.command.PathCompiler;
-import org.krobot.console.ConsoleCommandProcessor;
+import org.krobot.console.KrobotConsole;
 import org.krobot.module.Include;
 import org.krobot.module.LoadModule;
-import org.krobot.module.ParentCommand;
 import org.krobot.runtime.ModuleLoader.ComputedModule;
 import org.krobot.util.ColoredLogger;
 
@@ -87,7 +86,7 @@ public class KrobotRuntime
     private int maxThread;
     private ThreadPoolExecutor threadPool;
 
-    private ConsoleCommandProcessor console;
+    private KrobotConsole console;
     private StateBar stateBar;
     private long lastExecutionTime;
     private long uptime;
@@ -305,6 +304,11 @@ public class KrobotRuntime
 
         log.info("Registered {} commands", commandManager.getCommands().size());
 
+        console = new KrobotConsole(this);
+        modules.forEach(m -> m.getModule().getConsoleCommands().forEach(c -> console.register(c)));
+
+        log.info("Registered {} console commands", console.getCommands().size());
+
         log.infoBold("----> Done in " + timerGet() + "ms\n");
 
         log.infoBold("----> 3/3 Starting JDA");
@@ -353,7 +357,6 @@ public class KrobotRuntime
 
         if (System.console() != null && (System.getProperty(Krobot.PROPERTY_DISABLE_CONSOLE) == null || !System.getProperty(Krobot.PROPERTY_DISABLE_CONSOLE).equals("true")))
         {
-            console = new ConsoleCommandProcessor(this);
             console.start();
         }
 
@@ -510,7 +513,7 @@ public class KrobotRuntime
         return commandManager;
     }
 
-    public ConsoleCommandProcessor getConsole()
+    public KrobotConsole getConsole()
     {
         return console;
     }

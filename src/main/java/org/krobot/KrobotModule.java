@@ -37,6 +37,7 @@ import org.krobot.command.KrobotCommand;
 import org.krobot.config.ConfigAccessor;
 import org.krobot.config.ConfigRules;
 import org.krobot.config.ConfigFolder;
+import org.krobot.console.ConsoleCommand;
 import org.krobot.module.Filter;
 import org.krobot.module.FilterAccessor;
 import org.krobot.module.FilterRules;
@@ -72,6 +73,8 @@ public abstract class KrobotModule
 
     private List<Module> guiceModules;
 
+    private List<ConsoleCommand> consoleCommands;
+
     public KrobotModule()
     {
         this.imports = new ArrayList<>();
@@ -84,6 +87,8 @@ public abstract class KrobotModule
         this.argTypes = new HashMap<>();
 
         this.guiceModules = new ArrayList<>();
+
+        this.consoleCommands = new ArrayList<>();
     }
 
     public abstract void preInit();
@@ -168,7 +173,13 @@ public abstract class KrobotModule
         commandFilters.addAll(Arrays.asList(filters));
     }
 
-    protected void listener(Object... listeners)
+    @SafeVarargs /* To suppress an ugly warning */
+    protected final /* @SafeVarargs requires final */ void listeners(Class<? extends Object>... listeners) // "? extends Object" needed for SafeVarargs
+    {
+        listeners(Stream.of(listeners).map(injector::getInstance).toArray(Object[]::new));
+    }
+
+    protected void listeners(Object... listeners)
     {
         eventListeners.addAll(Arrays.asList(listeners));
     }
@@ -181,6 +192,17 @@ public abstract class KrobotModule
     protected void addGuiceModules(Module... modules)
     {
         this.guiceModules.addAll(Arrays.asList(modules));
+    }
+
+    @SafeVarargs /* To suppress an ugly warning */
+    protected final /* @SafeVarargs requires final */ void consoleCommands(Class<? extends ConsoleCommand>... commands)
+    {
+        consoleCommands(Stream.of(commands).map(injector::getInstance).toArray(ConsoleCommand[]::new));
+    }
+
+    protected void consoleCommands(ConsoleCommand... commands)
+    {
+        consoleCommands.addAll(Arrays.asList(commands));
     }
 
     protected void prefix(String prefix)
@@ -236,6 +258,11 @@ public abstract class KrobotModule
     public Map<String, ArgumentFactory> getArgTypes()
     {
         return argTypes;
+    }
+
+    public List<ConsoleCommand> getConsoleCommands()
+    {
+        return consoleCommands;
     }
 
     public List<Module> getGuiceModules()

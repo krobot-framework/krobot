@@ -3,6 +3,8 @@ package org.krobot.console;
 import java.io.IOException;
 import java.util.List;
 import org.jline.reader.Candidate;
+import org.jline.reader.Completer;
+import org.jline.reader.Highlighter;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.ParsedLine;
@@ -14,18 +16,20 @@ import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.krobot.runtime.KrobotRuntime;
 
-public class ConsoleCommandProcessor extends Thread
+public class ConsoleProcessor extends Thread
 {
-    private KrobotRuntime runtime;
-
     private Terminal terminal;
     private LineReader reader;
 
     private boolean typing = false;
 
-    public ConsoleCommandProcessor(KrobotRuntime runtime)
+    private Highlighter highlighter;
+    private Completer completer;
+
+    public ConsoleProcessor(Highlighter highlighter, Completer completer)
     {
-        this.runtime = runtime;
+        this.highlighter = highlighter;
+        this.completer = completer;
     }
 
     @Override
@@ -44,11 +48,9 @@ public class ConsoleCommandProcessor extends Thread
         reader = LineReaderBuilder.builder()
                     .appName("Krobot")
                     .terminal(terminal)
-                    .highlighter(this::highlight)
-                    .completer(this::complete)
-                    //.history(new ConsoleHistory())
+                    .highlighter(highlighter)
+                    .completer(completer)
                     .build();
-
 
         while (!this.isInterrupted())
         {
@@ -59,52 +61,10 @@ public class ConsoleCommandProcessor extends Thread
             }
             catch (UserInterruptException e)
             {
-                runtime.stop();
+                KrobotRuntime.stop();
                 System.exit(0);
             }
         }
-    }
-
-    protected AttributedString highlight(LineReader reader, String buffer)
-    {
-        AttributedStringBuilder builder = new AttributedStringBuilder();
-
-        if (!buffer.isEmpty())
-        {
-            if (!typing)
-            {
-                typing = true;
-                System.out.println("\r                                                                                                                         ");
-            }
-
-            // Deleted because else the cursor is too buggy
-            // builder.append("> ");
-        }
-        else
-        {
-            if (typing)
-            {
-                typing = false;
-            }
-        }
-
-        for (String word : buffer.split(" "))
-        {
-            if (word.equals("help"))
-            {
-                builder.style(AttributedStyle.BOLD.foreground(AttributedStyle.BLUE));
-                builder.append(word);
-                builder.style(AttributedStyle.BOLD_OFF);
-            }
-            else
-            {
-                builder.append(word);
-            }
-
-            builder.append(" ");
-        }
-
-        return builder.toAttributedString();
     }
 
     protected void complete(LineReader reader, ParsedLine line, List<Candidate> candidates)

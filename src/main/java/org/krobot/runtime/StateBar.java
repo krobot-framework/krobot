@@ -56,7 +56,7 @@ public class StateBar extends Thread
 
     public void update()
     {
-        if (runtime.getConsole().isTyping())
+        if (runtime.getConsole().isProcessing())
         {
             return;
         }

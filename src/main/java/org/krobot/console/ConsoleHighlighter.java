@@ -1,5 +1,8 @@
 package org.krobot.console;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.jline.reader.Highlighter;
 import org.jline.reader.LineReader;
@@ -40,7 +43,7 @@ public class ConsoleHighlighter implements Highlighter
             console.setProcessing(false);
         }
 
-        String[] split = CommandManager.splitWithQuotes(buffer, true);
+        String[] split = splitWithQuotes(buffer);
 
         if (split.length == 0)
         {
@@ -73,13 +76,13 @@ public class ConsoleHighlighter implements Highlighter
         {
             String arg = split[i];
 
-            if (arg.startsWith("\"") && arg.endsWith("\""))
+            if (arg.startsWith("\"") && (arg.endsWith("\"") || i == split.length - 1))
             {
                 builder.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN));
             }
             else if (arg.startsWith("@"))
             {
-                builder.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.GREEN).underline());
+                builder.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW).bold());
             }
             else if (StringUtils.isNumeric(arg))
             {
@@ -87,11 +90,47 @@ public class ConsoleHighlighter implements Highlighter
             }
 
             builder.append(arg);
-            builder.append(" ");
-
             builder.style(AttributedStyle.DEFAULT);
+            builder.append(" ");
         }
 
         return builder.toAttributedString();
+    }
+
+    public static String[] splitWithQuotes(String string)
+    {
+        List<String> result = new ArrayList<>();
+        String[] split = string.split(" ");
+
+        for (int i = 0; i < split.length; i++)
+        {
+            StringBuilder current = new StringBuilder(split[i]);
+
+            if (current.toString().startsWith("\""))
+            {
+                i++;
+
+                while (i < split.length && !current.toString().endsWith("\""))
+                {
+                    current.append(" ").append(split[i]);
+                    i++;
+                }
+
+                i--;
+            }
+
+            String done = current.toString();
+
+            if (!done.endsWith("\""))
+            {
+                result.addAll(Arrays.asList(done.split(" ")));
+            }
+            else
+            {
+                result.add(done);
+            }
+        }
+
+        return result.toArray(new String[result.size()]);
     }
 }

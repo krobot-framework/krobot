@@ -85,7 +85,7 @@ public class CommandManager
             content = content.substring(prefix.length());
         }
 
-        String[] split = splitWithQuotes(content, false);
+        String[] split = splitWithQuotes(content);
 
         if (split.length == 0)
         {
@@ -272,25 +272,20 @@ public class CommandManager
      * Will return ["I", "am", "a", "discord bot"].
      *
      * @param line The line to split
-     * @param keepQuotes If it should keep the quotes in the result
      *
      * @return The line split
      */
-    public static String[] splitWithQuotes(String line, boolean keepQuotes)
+    public static String[] splitWithQuotes(String line)
     {
         ArrayList<String> matchList = new ArrayList<>();
-        Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+        Pattern regex = Pattern.compile("[^\\s\"]+|\"([^\"]*)\"");
         Matcher matcher = regex.matcher(line);
 
         while (matcher.find())
         {
             if (matcher.group(1) != null)
             {
-                matchList.add((keepQuotes ? "\"" : "") + matcher.group(1) + (keepQuotes ? "\"" : ""));
-            }
-            else if (matcher.group(2) != null)
-            {
-                matchList.add(matcher.group(2));
+                matchList.add(matcher.group(1));
             }
             else
             {

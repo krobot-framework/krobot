@@ -1,7 +1,9 @@
 package org.krobot.console;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fusesource.jansi.Ansi;
 import org.jline.reader.Candidate;
@@ -16,6 +18,8 @@ import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
+import org.krobot.command.ArgumentMap;
+import org.krobot.command.BadArgumentTypeException;
 import org.krobot.command.CommandArgument;
 import org.krobot.runtime.KrobotRuntime;
 import org.krobot.util.MessageUtils;
@@ -101,16 +105,31 @@ public class ConsoleProcessor extends Thread
             return;
         }
 
-        for (int i = 0; i < args.length; i++)
+        Map<String, Object> mappedArgs = new HashMap<>();
+        for (int i = 0; i < command.getArguments().length; i++)
         {
-            String arg = args[i];
+            CommandArgument arg = command.getArguments()[i];
 
-            if (i > command.getArguments().length - 1)
+            if (i > args.length - 1)
             {
-
+                System.out.println(Ansi.ansi().render("@|red Missing " + (i - (args.length - 1)) + " arguments. Syntax :|@ @|bold,red '" + command.getCommand().getPath() + "'|@").toString());
+                return;
             }
 
-            CommandArgument argument = command.getArguments()[i];
+            String argument = args[i];
+            try
+            {
+                mappedArgs.put(arg.getKey(), arg.getFactory().process(argument));
+            }
+            catch (BadArgumentTypeException e)
+            {
+                System.out.println(Ansi.ansi().render("@|red Cannot convert '|@@|bold,red " + e.getValue() + "|@@|red ' to a '|@@|bold,red " + e.getType() + "|@@|red '. Syntax :|@ @|bold,red '" + command.getCommand().getPath() + "'|@").toString());
+                return;
+            }
         }
+
+        command.getCommand().execute(new ArgumentMap(mappedArgs));
+
+        System.out.println();
     }
 }

@@ -362,7 +362,8 @@ public class KrobotRuntime
 
         this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThread);
 
-        log.infoAuto("@|green Now running|@ @|bold,green {} v{} by {}|@ @|green [{}] (started in|@ @|bold,green {}ms|@@|green )|@\n", bot.name(), bot.version(), bot.author(), botClass.getName(), System.currentTimeMillis() - startTime);
+        log.infoAuto("@|green Now running|@ @|bold,green {} v{} by {}|@ @|green [{}] (started in|@ @|bold,green {}ms|@@|green )|@", bot.name(), bot.version(), bot.author(), botClass.getName(), System.currentTimeMillis() - startTime);
+        log.infoAuto("@|green Press any key to enter a command, do '|@@|bold,green exit|@@|green ' to close|@\n");
 
         String disable = System.getProperty(Krobot.PROPERTY_DISABLE_STATE_BAR);
         if (disable == null || !disable.equals("true"))

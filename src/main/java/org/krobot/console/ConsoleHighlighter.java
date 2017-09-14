@@ -1,15 +1,11 @@
 package org.krobot.console;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.jline.reader.Highlighter;
 import org.jline.reader.LineReader;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
-import org.krobot.command.CommandManager;
 import org.krobot.util.MessageUtils;
 
 public class ConsoleHighlighter implements Highlighter
@@ -73,25 +69,38 @@ public class ConsoleHighlighter implements Highlighter
         builder.style(AttributedStyle.DEFAULT);
         builder.append(" ");
 
+        boolean inQuotes = false;
+
         for (int i = 1; i < split.length; i++)
         {
             String arg = split[i];
 
-            if (arg.startsWith("\"") && (arg.endsWith("\"") || i == split.length - 1))
+            if (arg.startsWith("\""))
             {
                 builder.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN));
+                inQuotes = true;
             }
-            else if (arg.startsWith("@"))
+            else if (arg.startsWith("@") && !inQuotes)
             {
                 builder.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW).bold());
             }
-            else if (StringUtils.isNumeric(arg))
+            else if (StringUtils.isNumeric(arg) && !inQuotes)
             {
                 builder.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.GREEN).italic());
             }
 
+            if (arg.endsWith("\""))
+            {
+                inQuotes = false;
+            }
+
             builder.append(arg);
-            builder.style(AttributedStyle.DEFAULT);
+
+            if (!inQuotes)
+            {
+                builder.style(AttributedStyle.DEFAULT);
+            }
+
             builder.append(" ");
         }
 

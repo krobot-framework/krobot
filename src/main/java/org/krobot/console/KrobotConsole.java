@@ -54,4 +54,9 @@ public class KrobotConsole
     {
         this.processing = processing;
     }
+
+    public KrobotRuntime getRuntime()
+    {
+        return runtime;
+    }
 }

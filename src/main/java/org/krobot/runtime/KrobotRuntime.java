@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import javax.security.auth.login.LoginException;
@@ -50,6 +52,7 @@ import org.krobot.command.KrobotCommand;
 import org.krobot.MessageContext;
 import org.krobot.command.CommandManager;
 import org.krobot.command.PathCompiler;
+import org.krobot.console.ExitCommand;
 import org.krobot.console.KrobotConsole;
 import org.krobot.module.Include;
 import org.krobot.module.LoadModule;
@@ -305,6 +308,8 @@ public class KrobotRuntime
         log.info("Registered {} commands", commandManager.getCommands().size());
 
         console = new KrobotConsole(this);
+        console.register(new ExitCommand());
+
         modules.forEach(m -> m.getModule().getConsoleCommands().forEach(c -> console.register(c)));
 
         log.info("Registered {} console commands", console.getCommands().size());
@@ -348,16 +353,17 @@ public class KrobotRuntime
 
         log.infoBold("----> Done in " + timerGet() + "ms\n");
 
-        if (System.console() == null && System.getProperty(Krobot.PROPERTY_DISABLE_STATE_BAR) == null)
+        if (System.console() == null)
         {
-            log.info(Color.YELLOW, "No console detected, you are probably running from an IDE");
-            log.info(Color.YELLOW, "In these case, state bar can be really buggy");
-            log.info(Color.YELLOW, "If it is, disable it by adding -Dkrobot.disableStateBar=true in the run VM args\n");
-        }
+            if (System.getProperty(Krobot.PROPERTY_DISABLE_STATE_BAR) == null)
+            {
+                log.info(Color.YELLOW, "No console detected, you are probably running from an IDE");
+                log.info(Color.YELLOW, "In these case, state bar can be really buggy");
+                log.info(Color.YELLOW, "If it is, disable it by adding -Dkrobot.disableStateBar=true in the run VM args\n");
+            }
 
-        if (System.console() != null && (System.getProperty(Krobot.PROPERTY_DISABLE_CONSOLE) == null || !System.getProperty(Krobot.PROPERTY_DISABLE_CONSOLE).equals("true")))
-        {
-            console.start();
+            // Disabling ugly JLine message
+            Logger.getLogger("org.jline").setLevel(Level.OFF);
         }
 
         this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThread);
@@ -370,6 +376,12 @@ public class KrobotRuntime
         {
             stateBar = new StateBar(this);
             stateBar.start();
+        }
+
+        disable = System.getProperty(Krobot.PROPERTY_DISABLE_CONSOLE);
+        if (disable == null || !disable.equals("true"))
+        {
+            console.start();
         }
 
         uptime = System.currentTimeMillis();
@@ -428,6 +440,8 @@ public class KrobotRuntime
 
     private void end()
     {
+        log.infoAuto("@|bold ----> Shutting down...|@");
+
         if (stateBar != null)
         {
             stateBar.interrupt();
@@ -512,6 +526,11 @@ public class KrobotRuntime
     public CommandManager getCommandManager()
     {
         return commandManager;
+    }
+
+    public StateBar getStateBar()
+    {
+        return stateBar;
     }
 
     public KrobotConsole getConsole()

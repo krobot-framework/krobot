@@ -55,18 +55,20 @@ public class ConsoleProcessor extends Thread
             return;
         }
 
+        boolean unicorn = console.getRuntime().getStateBar() != null;
+
         reader = LineReaderBuilder.builder()
                     .appName("Krobot")
                     .terminal(terminal)
-                    .highlighter(highlighter)
-                    .completer(completer)
+                    .highlighter(unicorn ? highlighter : null)
+                    .completer(unicorn ? completer : null)
                     .build();
 
         while (!this.isInterrupted())
         {
             try
             {
-                parse(reader.readLine());
+                parse(reader.readLine(unicorn ? null : "> "));
             }
             catch (UserInterruptException e)
             {
@@ -88,6 +90,11 @@ public class ConsoleProcessor extends Thread
         String label = split[0];
         String[] args = split.length > 1 ? ArrayUtils.subarray(split, 1, split.length) : ArrayUtils.EMPTY_STRING_ARRAY;
 
+        if (label.trim().isEmpty())
+        {
+            return;
+        }
+
         ComputedConsoleCommand command = null;
 
         for (ComputedConsoleCommand c : console.getCommands())
@@ -101,7 +108,7 @@ public class ConsoleProcessor extends Thread
 
         if (command == null)
         {
-            System.out.println(Ansi.ansi().render("@|red Unknown command|@ @|bold,red '" + label + "'|@").toString());
+            System.out.println(Ansi.ansi().render("@|red Unknown command|@ @|bold,red '" + label + "'|@\n").toString());
             return;
         }
 
@@ -112,7 +119,7 @@ public class ConsoleProcessor extends Thread
 
             if (i > args.length - 1)
             {
-                System.out.println(Ansi.ansi().render("@|red Missing " + (i - (args.length - 1)) + " arguments. Syntax :|@ @|bold,red '" + command.getCommand().getPath() + "'|@").toString());
+                System.out.println(Ansi.ansi().render("@|red Missing " + (i - (args.length - 1)) + " arguments. Syntax :|@ @|bold,red '" + command.getCommand().getPath() + "'|@\n"));
                 return;
             }
 
@@ -123,7 +130,7 @@ public class ConsoleProcessor extends Thread
             }
             catch (BadArgumentTypeException e)
             {
-                System.out.println(Ansi.ansi().render("@|red Cannot convert '|@@|bold,red " + e.getValue() + "|@@|red ' to a '|@@|bold,red " + e.getType() + "|@@|red '. Syntax :|@ @|bold,red '" + command.getCommand().getPath() + "'|@").toString());
+                System.out.println(Ansi.ansi().render("@|red Cannot convert '|@@|bold,red " + e.getValue() + "|@@|red ' to a '|@@|bold,red " + e.getType() + "|@@|red '. Syntax :|@ @|bold,red '" + command.getCommand().getPath() + "'|@\n"));
                 return;
             }
         }

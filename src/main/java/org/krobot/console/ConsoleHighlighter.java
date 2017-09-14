@@ -10,6 +10,7 @@ import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.krobot.command.CommandManager;
+import org.krobot.util.MessageUtils;
 
 public class ConsoleHighlighter implements Highlighter
 {
@@ -43,7 +44,7 @@ public class ConsoleHighlighter implements Highlighter
             console.setProcessing(false);
         }
 
-        String[] split = splitWithQuotes(buffer);
+        String[] split = MessageUtils.splitWithQuotes(buffer, true);
 
         if (split.length == 0)
         {
@@ -95,42 +96,5 @@ public class ConsoleHighlighter implements Highlighter
         }
 
         return builder.toAttributedString();
-    }
-
-    public static String[] splitWithQuotes(String string)
-    {
-        List<String> result = new ArrayList<>();
-        String[] split = string.split(" ");
-
-        for (int i = 0; i < split.length; i++)
-        {
-            StringBuilder current = new StringBuilder(split[i]);
-
-            if (current.toString().startsWith("\""))
-            {
-                i++;
-
-                while (i < split.length && !current.toString().endsWith("\""))
-                {
-                    current.append(" ").append(split[i]);
-                    i++;
-                }
-
-                i--;
-            }
-
-            String done = current.toString();
-
-            if (!done.endsWith("\""))
-            {
-                result.addAll(Arrays.asList(done.split(" ")));
-            }
-            else
-            {
-                result.add(done);
-            }
-        }
-
-        return result.toArray(new String[result.size()]);
     }
 }

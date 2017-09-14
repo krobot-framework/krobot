@@ -19,7 +19,7 @@ public class KrobotConsole
         this.runtime = runtime;
 
         this.commands = new ArrayList<>();
-        this.processor = new ConsoleProcessor(new ConsoleHighlighter(this), new ConsoleCompleter(this));
+        this.processor = new ConsoleProcessor(this, new ConsoleHighlighter(this), new ConsoleCompleter(this));
     }
 
     public void start()

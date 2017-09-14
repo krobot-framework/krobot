@@ -19,6 +19,7 @@
 package org.krobot.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -124,6 +125,43 @@ public final class MessageUtils
         messages.add(current.toString());
 
         return messages.toArray(new String[messages.size()]);
+    }
+
+    public static String[] splitWithQuotes(String string, boolean keepQuotes)
+    {
+        List<String> result = new ArrayList<>();
+        String[] split = string.split(" ");
+
+        for (int i = 0; i < split.length; i++)
+        {
+            StringBuilder current = new StringBuilder(split[i]);
+
+            if (current.toString().startsWith("\""))
+            {
+                i++;
+
+                while (i < split.length && !current.toString().endsWith("\""))
+                {
+                    current.append(" ").append(split[i]);
+                    i++;
+                }
+
+                i--;
+            }
+
+            String done = current.toString();
+
+            if (!done.endsWith("\""))
+            {
+                result.addAll(Arrays.asList(done.split(" ")));
+            }
+            else
+            {
+                result.add(keepQuotes ? done : done.replace("\"", ""));
+            }
+        }
+
+        return result.toArray(new String[result.size()]);
     }
 
     /**

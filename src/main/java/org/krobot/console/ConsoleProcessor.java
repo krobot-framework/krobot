@@ -15,6 +15,7 @@ import org.jline.reader.ParsedLine;
 import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.terminal.impl.DumbTerminal;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
@@ -55,7 +56,7 @@ public class ConsoleProcessor extends Thread
             return;
         }
 
-        boolean unicorn = console.getRuntime().getStateBar() != null;
+        boolean unicorn = !(terminal instanceof DumbTerminal);
 
         reader = LineReaderBuilder.builder()
                     .appName("Krobot")

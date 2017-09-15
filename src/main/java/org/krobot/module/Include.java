@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
 import org.krobot.KrobotModule;
 import org.krobot.command.CommandFilter;
 import org.krobot.command.CommandHandler;
+import org.krobot.console.ConsoleCommand;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
@@ -33,4 +34,5 @@ public @interface Include
     Class<? extends KrobotModule>[] imports() default {};
     Class<? extends CommandFilter>[] filters() default {};
     Class<? extends CommandHandler>[] commands() default {};
+    Class<? extends ConsoleCommand>[] consoleCommands() default {};
 }

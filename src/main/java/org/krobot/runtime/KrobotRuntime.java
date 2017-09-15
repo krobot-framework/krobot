@@ -312,6 +312,10 @@ public class KrobotRuntime
 
         modules.forEach(m -> m.getModule().getConsoleCommands().forEach(c -> console.register(c)));
 
+        modules.stream().map(ComputedModule::getModule).filter(m -> m.getClass().isAnnotationPresent(Include.class)).forEach(m -> {
+            Stream.of(m.getClass().getAnnotation(Include.class).consoleCommands()).forEach(console::register);
+        });
+
         log.info("Registered {} console commands", console.getCommands().size());
 
         log.infoBold("----> Done in " + timerGet() + "ms\n");

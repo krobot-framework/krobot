@@ -28,8 +28,11 @@ public class ConsoleHighlighter implements Highlighter
             {
                 console.setProcessing(true);
 
-                // Ok this is dirty, but it is the only way i found to hide the State Bar :p
-                System.out.println("\r                                                                                                                         ");
+                if (console.getRuntime().getStateBar() != null)
+                {
+                    // Ok this is dirty, but it is the only way i found to hide the State Bar :p
+                    System.out.println("\r                                                                                                                         ");
+                }
             }
 
             // Deleted because else the cursor is too buggy

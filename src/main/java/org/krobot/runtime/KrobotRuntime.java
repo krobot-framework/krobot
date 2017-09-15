@@ -53,6 +53,7 @@ import org.krobot.MessageContext;
 import org.krobot.command.CommandManager;
 import org.krobot.command.PathCompiler;
 import org.krobot.console.ExitCommand;
+import org.krobot.console.HelpCommand;
 import org.krobot.console.KrobotConsole;
 import org.krobot.module.Include;
 import org.krobot.module.LoadModule;
@@ -309,6 +310,7 @@ public class KrobotRuntime
 
         console = new KrobotConsole(this);
         console.register(new ExitCommand());
+        console.register(new HelpCommand(console));
 
         modules.forEach(m -> m.getModule().getConsoleCommands().forEach(c -> console.register(c)));
 

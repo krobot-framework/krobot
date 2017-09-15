@@ -47,4 +47,9 @@ public class ArgumentMap
 
         return (T) val;
     }
+
+    public int count()
+    {
+        return args.size();
+    }
 }

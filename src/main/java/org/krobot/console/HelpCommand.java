@@ -28,7 +28,7 @@ public class HelpCommand extends ConsoleCommand
     @Override
     public void execute(ArgumentMap args)
     {
-        Ansi result = Ansi.ansi();
+        Ansi result = Ansi.ansi().fgYellow().bold().a("\nList of commands :\n").reset();
 
         console.getCommands().forEach(command -> {
             result.a("    ").bold().fgBlue().a(command.getLabel()).reset().a(" ");

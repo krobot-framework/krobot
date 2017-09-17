@@ -22,7 +22,7 @@ import org.krobot.runtime.KrobotRuntime;
 
 public final class Krobot
 {
-    public static final String VERSION = "3.0.0 ALPHA-02";
+    public static final String VERSION = "3.0.0 ALPHA-03";
 
     public static final String PROPERTY_TOKEN = "krobot.key";
     public static final String PROPERTY_TOKEN_FILE = "krobot.keyFile";

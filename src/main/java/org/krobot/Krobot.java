@@ -31,6 +31,7 @@ public final class Krobot
     public static final String PROPERTY_DISABLE_START_MESSAGE = "krobot.disableStartMessage";
     public static final String PROPERTY_DISABLE_STATE_BAR = "krobot.disableStateBar";
     public static final String PROPERTY_DISABLE_CONSOLE = "krobot.disableConsole";
+    public static final String PROPERTY_DISABLE_COLORS = "krobot.disableColors";
 
     public static KrobotRunner create()
     {

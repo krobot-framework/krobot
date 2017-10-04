@@ -40,6 +40,7 @@ import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.core.hooks.SubscribeEvent;
 import org.apache.commons.lang3.ArrayUtils;
+import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.krobot.Bot;
 import org.krobot.Krobot;
@@ -66,6 +67,8 @@ import static org.fusesource.jansi.Ansi.Color.*;
 
 public class KrobotRuntime
 {
+    // TODO: Rolling logger
+
     public static final int DEFAULT_MAX_THREAD = 25;
 
     private static final ColoredLogger log = ColoredLogger.getLogger("Krobot");
@@ -119,7 +122,22 @@ public class KrobotRuntime
             System.exit(1);
         }
 
-        AnsiConsole.systemInstall();
+        String prop = System.getProperty(Krobot.PROPERTY_DISABLE_COLORS);
+
+        if (System.console() == null && (prop == null || !prop.equalsIgnoreCase("false")))
+        {
+            System.err.println("\n/!\\ No console detected => Disabled colors /!\\\n");
+            prop = "true";
+        }
+
+        if (prop == null || !prop.equalsIgnoreCase("true"))
+        {
+            AnsiConsole.systemInstall();
+        }
+        else
+        {
+            Ansi.setEnabled(false);
+        }
 
         String disableProperty = System.getProperty(Krobot.PROPERTY_DISABLE_START_MESSAGE);
 
@@ -146,7 +164,7 @@ public class KrobotRuntime
         log.info("Running Krobot 3.0.0");
         log.info("Copyright (c) 2017 The Krobot Contributors\n");
 
-        log.infoBold("----> 1/3 Pre-initialization");
+        log.infoBold("----> 1/4 Pre-initialization");
         timerStart();
 
         log.info("Computing modules...");
@@ -187,7 +205,7 @@ public class KrobotRuntime
 
         log.infoBold("----> Done in " + timerGet() + "ms\n");
 
-        log.infoBold("----> 2/3 Initialization");
+        log.infoBold("----> 2/4 Initialization");
         timerStart();
 
         log.info("Processing dependency injection...");
@@ -242,7 +260,7 @@ public class KrobotRuntime
 
         log.info("Processing commands...");
 
-        commandManager = new CommandManager(this);
+        commandManager = injector.getInstance(CommandManager.class);
 
         modules.forEach(module -> module.getModule().getCommandFilters().forEach(filter ->
         {
@@ -322,7 +340,7 @@ public class KrobotRuntime
 
         log.infoBold("----> Done in " + timerGet() + "ms\n");
 
-        log.infoBold("----> 3/3 Starting JDA");
+        log.infoBold("----> 3/4 Starting JDA");
         timerStart();
 
         try
@@ -355,17 +373,27 @@ public class KrobotRuntime
             System.exit(1);
         }
 
-        modules.forEach(m -> jda.addEventListener(m.getModule().getEventListeners()));
+        modules.forEach(m -> m.getModule().getEventListeners().forEach(jda::addEventListener));
 
         log.infoBold("----> Done in " + timerGet() + "ms\n");
+
+        log.infoBold("----> 4/4 Post-Initialization");
+        timerStart();
+
+        modules.stream().map(ComputedModule::getModule).forEach(module ->
+        {
+            log.info("({}) Post-Initialization...", module.getClass().getName());
+
+            module.postInit();
+        });
 
         if (System.console() == null)
         {
             if (System.getProperty(Krobot.PROPERTY_DISABLE_STATE_BAR) == null)
             {
-                log.info(Color.YELLOW, "No console detected, you are probably running from an IDE");
-                log.info(Color.YELLOW, "In these case, state bar can be really buggy");
-                log.info(Color.YELLOW, "If it is, disable it by adding -Dkrobot.disableStateBar=true in the run VM args\n");
+                log.warn(Color.YELLOW, "No console detected, you are probably running from an IDE");
+                log.warn(Color.YELLOW, "In these case, state bar can be really buggy");
+                log.warn(Color.YELLOW, "If they are, disable them by adding -Dkrobot.disableStateBar=true in the run VM args\n");
             }
 
             // Disabling ugly JLine message
@@ -373,6 +401,8 @@ public class KrobotRuntime
         }
 
         this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThread);
+
+        log.infoBold("----> Done in " + timerGet() + "ms\n");
 
         log.infoAuto("@|green Now running|@ @|bold,green {} v{} by {}|@ @|green [{}] (started in|@ @|bold,green {}ms|@@|green )|@", bot.name(), bot.version(), bot.author(), botClass.getName(), System.currentTimeMillis() - startTime);
         log.infoAuto("@|green Press any key to enter a command, do '|@@|bold,green exit|@@|green ' to close|@\n");

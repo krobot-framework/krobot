@@ -55,12 +55,6 @@ public class KrobotGuiceModule extends AbstractModule
     }
 
     @Provides
-    public CommandManager getCommandManager()
-    {
-        return getKrobotRuntime().getCommandManager();
-    }
-
-    @Provides
     public KrobotRuntime getKrobotRuntime()
     {
         return runtime;

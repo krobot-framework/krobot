@@ -39,6 +39,7 @@ public class KrobotRunner
 
     public KrobotRunner setToken(String token)
     {
+        // TODO: Accept token on init
         System.setProperty(PROPERTY_TOKEN, token);
         return this;
     }
@@ -76,6 +77,12 @@ public class KrobotRunner
     public KrobotRunner disableConsole()
     {
         System.setProperty(PROPERTY_DISABLE_CONSOLE, "true");
+        return this;
+    }
+
+    public KrobotRunner disableColors()
+    {
+        System.setProperty(PROPERTY_DISABLE_COLORS, "true");
         return this;
     }
 

@@ -27,6 +27,7 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -51,6 +52,7 @@ public class CommandManager
     private List<KrobotCommand> commands;
     private List<CommandFilter> filters;
 
+    @Inject
     public CommandManager(KrobotRuntime runtime)
     {
         this.runtime = runtime;

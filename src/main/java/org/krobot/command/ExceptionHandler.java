@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import javax.inject.Singleton;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.krobot.Krobot;
@@ -36,6 +37,7 @@ import org.krobot.util.Dialog;
 import org.krobot.util.Markdown;
 import org.krobot.util.MessageUtils;
 
+@Singleton
 public class ExceptionHandler
 {
     private static final ColoredLogger log = ColoredLogger.getLogger("ExceptionHandler");

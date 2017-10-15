@@ -380,7 +380,17 @@ public class KrobotRuntime
             System.exit(1);
         }
 
-        modules.forEach(m -> m.getModule().getEventListeners().forEach(jda::addEventListener));
+        modules.forEach(m -> {
+            m.getModule().getEventListeners().forEach(jda::addEventListener);
+
+            Class<? extends KrobotModule> moduleClass = m.getModule().getClass();
+
+            if (moduleClass.isAnnotationPresent(Include.class))
+            {
+                Object[] listeners = Stream.of(moduleClass.getAnnotation(Include.class).listeners()).map(m.getModule().injector()::getInstance).toArray();
+                jda.addEventListener(listeners);
+            }
+        });
 
         log.infoBold("----> Done in " + timerGet() + "ms\n");
 

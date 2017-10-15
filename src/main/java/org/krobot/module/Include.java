@@ -34,5 +34,6 @@ public @interface Include
     Class<? extends KrobotModule>[] imports() default {};
     Class<? extends CommandFilter>[] filters() default {};
     Class<? extends CommandHandler>[] commands() default {};
+    Class<?>[] listeners() default {};
     Class<? extends ConsoleCommand>[] consoleCommands() default {};
 }

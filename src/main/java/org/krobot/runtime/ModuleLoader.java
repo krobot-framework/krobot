@@ -60,23 +60,25 @@ public class ModuleLoader
             }
         }
 
-        if (module == null)
+        if (module != null)
         {
-            KrobotModule instance = null;
-
-            try
-            {
-                instance = moduleClass.newInstance();
-            }
-            catch (InstantiationException | IllegalAccessException e)
-            {
-                log.errorAuto("@|red Error while creating instance of module|@ @|red,bold " + moduleClass.getName() + "|@|@red ; remember that@| |@red,bold modules must have an empty constructor|@", e);
-                System.exit(1);
-            }
-
-            module = new ComputedModule(instance);
-            modules.add(module);
+            return module;
         }
+
+        KrobotModule instance = null;
+
+        try
+        {
+            instance = moduleClass.newInstance();
+        }
+        catch (InstantiationException | IllegalAccessException e)
+        {
+            log.errorAuto("@|red Error while creating instance of module|@ @|red,bold " + moduleClass.getName() + "|@|@red ; remember that@| |@red,bold modules must have an empty constructor|@", e);
+            System.exit(1);
+        }
+
+        module = new ComputedModule(instance);
+        modules.add(module);
 
         importFromAnnotation(module);
         preInit(module);

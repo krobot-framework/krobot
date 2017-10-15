@@ -33,6 +33,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.requests.RestAction;
 import org.apache.commons.lang3.ArrayUtils;
 import org.krobot.MessageContext;
 import org.krobot.permission.BotNotAllowedException;
@@ -120,7 +121,7 @@ public class CommandManager
 
         if (args.length > 0)
         {
-            Optional<KrobotCommand> sub = Stream.of(command.getSubCommands()).filter(s -> s.getLabel().equalsIgnoreCase(args[0]) || ArrayUtils.contains(s.getAliases(), args[0])).findFirst();
+            Optional<KrobotCommand> sub = command.getSubCommands().stream().filter(s -> s.getLabel().equalsIgnoreCase(args[0]) || ArrayUtils.contains(s.getAliases(), args[0])).findFirst();
 
             if (sub.isPresent())
             {
@@ -135,11 +136,6 @@ public class CommandManager
 
                 return;
             }
-        }
-
-        if (!command.getHandler().getClass().isAnnotationPresent(NoTyping.class))
-        {
-            context.getChannel().sendTyping();
         }
 
         try
@@ -186,9 +182,14 @@ public class CommandManager
         {
             CommandArgument arg = command.getArguments()[i];
 
-            if (i > args.length - 1 && arg.isRequired())
+            if (i > args.length - 1)
             {
-                throw new WrongArgumentNumberException(command, args.length);
+                if (arg.isRequired())
+                {
+                    throw new WrongArgumentNumberException(command, args.length);
+                }
+
+                break;
             }
 
             if (arg.isList())
@@ -227,6 +228,11 @@ public class CommandManager
 
         if (!call.isCancelled())
         {
+            if (!command.getHandler().getClass().isAnnotationPresent(NoTyping.class))
+            {
+                context.getChannel().sendTyping().queue();
+            }
+
             Object result;
 
             try
@@ -253,6 +259,10 @@ public class CommandManager
                 else if (result instanceof MessageEmbed)
                 {
                     context.send((MessageEmbed) result);
+                }
+                else if (result instanceof RestAction)
+                {
+                    ((RestAction) result).queue();
                 }
                 else if (!(result instanceof Future))
                 {

@@ -19,6 +19,7 @@
 package org.krobot.runtime;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
@@ -74,13 +75,25 @@ public class FilterRunner
 
     public boolean isDisabled(MessageContext context, KrobotModule module)
     {
-        return Stream.of(modules)
-                     .filter(m -> m.getModule() == module)
-                     .findFirst()
-                     .map(m -> m.getFilters().stream()
-                                .filter(f -> f.getFilter().filter(context))
-                                .anyMatch(FilterRules::isDisabled))
-                     .orElse(false);
+        for (ComputedModule computedModule : modules)
+        {
+            if (computedModule.getModule() == module)
+            {
+                for (FilterRules rules : computedModule.getFilters())
+                {
+                    boolean result = rules.getFilter().filter(context);
+
+                    if (result && rules.isDisabled())
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        return false;
     }
 
     public Stream<ComputedModule> getEnabledModules(MessageContext context)

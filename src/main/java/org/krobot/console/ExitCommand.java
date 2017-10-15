@@ -14,7 +14,7 @@ public class ExitCommand extends ConsoleCommand
     @Override
     public String getDescription()
     {
-        return "Quit the program";
+        return "Shut down the bot";
     }
 
     @Override

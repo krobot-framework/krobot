@@ -24,11 +24,13 @@ import com.google.inject.Module;
 import java.lang.reflect.Field;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.security.auth.login.LoginException;
@@ -45,7 +47,9 @@ import org.fusesource.jansi.AnsiConsole;
 import org.krobot.Bot;
 import org.krobot.Krobot;
 import org.krobot.KrobotModule;
+import org.krobot.command.ArgumentMap;
 import org.krobot.command.Command;
+import org.krobot.command.CommandCall;
 import org.krobot.command.CommandFilter;
 import org.krobot.command.ExceptionHandler;
 import org.krobot.command.CommandHandler;
@@ -246,16 +250,19 @@ public class KrobotRuntime
         prefix = rootModule.getModule().getPrefix();
 
         log.info("Processing filters...");
+
+        modules.forEach(module -> module.getFilters().addAll(module.getModule().getFilters()));
+
         filterRunner = new FilterRunner(this, modules.toArray(new ComputedModule[modules.size()]));
 
         modules.forEach(module -> module.getModule().getCommands().forEach(command ->
         {
-            command.setFilters(ArrayUtils.add(command.getFilters(), (call, context, args) -> {
+            command.getFilters().add((call, context, args) -> {
                 if (filterRunner.isDisabled(context, module.getModule()))
                 {
                     call.setCancelled(true);
                 }
-            }));
+            });
         }));
 
         log.info("Processing commands...");
@@ -289,11 +296,11 @@ public class KrobotRuntime
 
                         if (parent != null)
                         {
-                            parent.setSubCommands(ArrayUtils.add(parent.getSubCommands(), command));
+                            parent.getSubCommands().add(command);
                             continue;
                         }
 
-                        commandManager.getCommands().add(command);
+                        addCommand(module.getModule(), command);
                     }
                 }
             }
@@ -305,13 +312,13 @@ public class KrobotRuntime
 
             if (parent != null)
             {
-                parent.setSubCommands(ArrayUtils.addAll(parent.getSubCommands(), commands.toArray(new KrobotCommand[0])));
-                commandManager.getCommands().add(parent);
+                parent.getSubCommands().addAll(Arrays.asList(commands.toArray(new KrobotCommand[0])));
+                addCommand(m.getModule(), parent);
 
                 return;
             }
 
-            commandManager.getCommands().addAll(commands);
+            commands.forEach(c -> addCommand(m.getModule(), c));
         });
 
         List<String> labels = new ArrayList<>();
@@ -423,6 +430,18 @@ public class KrobotRuntime
         uptime = System.currentTimeMillis();
     }
 
+    protected void addCommand(KrobotModule source, KrobotCommand command)
+    {
+        command.getFilters().add((call, context, args) -> {
+            if (filterRunner.isDisabled(context, source))
+            {
+                call.setCancelled(true);
+            }
+        });
+
+        commandManager.getCommands().add(command);
+    }
+
     protected KrobotCommand registerCommandClass(KrobotModule module, Class<? extends CommandHandler> commandClass)
     {
         if (!commandClass.isAnnotationPresent(Command.class))
@@ -448,8 +467,8 @@ public class KrobotRuntime
 
         Injector injector = module.injector();
 
-        CommandFilter[] filters = Stream.of(command.filters()).map(injector::getInstance).toArray(CommandFilter[]::new);
-        KrobotCommand[] subs = Stream.of(command.subs()).map(c -> registerCommandClass(module, c)).toArray(KrobotCommand[]::new);
+        List<CommandFilter> filters = Stream.of(command.filters()).map(injector::getInstance).collect(Collectors.toList());
+        List<KrobotCommand> subs = Stream.of(command.subs()).map(c -> registerCommandClass(module, c)).collect(Collectors.toList());
 
         return new KrobotCommand(compiler.label(), compiler.args(), command.desc(), command.aliases(), filters, injector.getInstance(commandClass), subs);
     }

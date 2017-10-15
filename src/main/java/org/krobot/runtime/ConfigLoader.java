@@ -134,7 +134,7 @@ public class ConfigLoader
         log.info("Loaded config '{}' ({}) {}",
                  name,
                  file,
-                 (rules.getDef() == null || (rules.getDef() != null && def == null) ? "as empty config" : (def != null ? "from default file '" + def + "'" : "from file '" + file + "'")));
+                 (rules.getDef() == null || (rules.getDef() != null && !file.exists() && def == null) ? "as empty config" : (def != null ? "from default file '" + def + "'" : "from file '" + file + "'")));
     }
 
     public void load(Pair<ConfigBridge, KrobotModule> pair)
@@ -142,7 +142,7 @@ public class ConfigLoader
         ConfigBridge bridge = pair.getLeft();
 
         RuntimeModule target = KrobotRuntime.get().getRuntimeModule(pair.getRight().getClass());
-        module.getConfig().register(bridge.getConfig(), new BridgeConfig(target.getConfig(), bridge.getDest()));
+        module.getConfig().register(bridge.getDest(), new BridgeConfig(target.getConfig(), bridge.getConfig()));
 
         log.info("Defined bridge from {}#{} <---- to ----> {}#{}",
                  module.getComputed().getModule().getClass().getName(),

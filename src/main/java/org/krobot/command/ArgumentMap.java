@@ -31,6 +31,11 @@ public class ArgumentMap
         this.args = args;
     }
 
+    public boolean has(String key)
+    {
+        return args.containsKey(key);
+    }
+
     public <T> T get(String key, Class<T> type)
     {
         return (T) get(key);
@@ -39,6 +44,11 @@ public class ArgumentMap
     public <T> T get(String key)
     {
         Object val = args.get(key);
+
+        if (val == null)
+        {
+            return null;
+        }
 
         if (val.getClass().isArray() && ClassUtils.isPrimitiveWrapper(val.getClass().getComponentType()))
         {

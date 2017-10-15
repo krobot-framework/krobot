@@ -108,16 +108,16 @@ public class HelpCommand implements CommandHandler
             string.append("> ").append(Markdown.italic(command.getDescription()));
         }
 
-        if (command.getSubCommands() != null && command.getSubCommands().length != 0)
+        if (command.getSubCommands() != null && command.getSubCommands().size() != 0)
         {
-            for (int i = 0; i < command.getSubCommands().length; i++)
+            for (int i = 0; i < command.getSubCommands().size(); i++)
             {
                 if (!(command.getDescription() == null && i == 0))
                 {
                     string.append("\n");
                 }
 
-                string.append(toString((i == command.getSubCommands().length - 1 ? "└" : "├") + "── " + prefix + Markdown.bold(label) + " ", command.getSubCommands()[i]));
+                string.append(toString((i == command.getSubCommands().size() - 1 ? "└" : "├") + "── " + prefix + Markdown.bold(label) + " ", command.getSubCommands().get(i)));
             }
         }
 

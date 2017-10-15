@@ -18,6 +18,7 @@
  */
 package org.krobot.command;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.krobot.KrobotModule;
@@ -55,7 +56,7 @@ public class CommandAccessor
 
     public CommandAccessor filter(CommandFilter... filter)
     {
-        command.setFilters(ArrayUtils.addAll(command.getFilters(), filter));
+        command.getFilters().addAll(Arrays.asList(filter));
         return this;
     }
 
@@ -70,9 +71,7 @@ public class CommandAccessor
         compiler.compile();
 
         KrobotCommand sub = new KrobotCommand(compiler.label(), compiler.args(), handler);
-
-        KrobotCommand[] merged = ArrayUtils.add(command.getSubCommands(), sub);
-        this.command.setSubCommands(merged);
+        this.command.getSubCommands().add(sub);
 
         return new SubCommandAccessor(module, this, sub);
     }

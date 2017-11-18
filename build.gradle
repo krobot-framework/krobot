@@ -1,5 +1,5 @@
 group 'org.krobot'
-version '3.0.0-ALPHA-05'
+version '3.0.0-ALPHA-06'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'

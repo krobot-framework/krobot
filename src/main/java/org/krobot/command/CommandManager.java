@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
@@ -69,7 +70,7 @@ public class CommandManager
 
         String botMention = "<@!" + runtime.jda().getSelfUser().getId() + "> ";
 
-        if (content.startsWith(botMention) && !content.equals(botMention))
+        if (content.startsWith(botMention) && !content.equals(botMention) && !runtime.getRootModule().getModule().getClass().isAnnotationPresent(DisableMention.class))
         {
             prefix = botMention;
         }
@@ -118,6 +119,11 @@ public class CommandManager
 
         KrobotCommand command = optional.get();
         String[] args = ArrayUtils.subarray(split, 1, split.length);
+
+        if (command.getHandler().getClass().isAnnotationPresent(DisableMention.class) && Objects.equals(prefix, botMention))
+        {
+            return;
+        }
 
         if (args.length > 0)
         {

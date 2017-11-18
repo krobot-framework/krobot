@@ -68,6 +68,14 @@ public class HelpCommand implements CommandHandler
 
         for (KrobotCommand command : runtime.getCommandManager().getCommands())
         {
+            CommandCall call = new CommandCall(command);
+            command.getFilters().forEach(f -> f.filter(call, context, null));
+
+            if (call.isCancelled())
+            {
+                continue;
+            }
+
             String cmdStr = prefix + toString("", command);
 
             if(curMessage.length() + cmdStr.length() + 4 > MessageUtils.MAX_MESSAGE_CHARS)

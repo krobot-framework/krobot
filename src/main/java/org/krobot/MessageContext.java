@@ -24,6 +24,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -49,16 +50,17 @@ public class MessageContext
     private JDA jda;
     private User user;
     private Message message;
-    private TextChannel channel;
+    private MessageChannel channel;
 
     /**
      * The command Context
      *
+     * @param jda Current JDA instance
      * @param user The user that called the command
      * @param message The command message
      * @param channel The channel where the command was called
      */
-    public MessageContext(JDA jda, User user, Message message, TextChannel channel)
+    public MessageContext(JDA jda, User user, Message message, MessageChannel channel)
     {
         this.jda = jda;
         this.user = user;
@@ -77,7 +79,13 @@ public class MessageContext
      */
     public void require(Permission permission) throws BotNotAllowedException
     {
-        if (!this.getGuild().getMember(jda.getSelfUser()).hasPermission(permission))
+        Guild guild = getGuild();
+        if (guild == null)
+        {
+            return;
+        }
+
+        if (!guild.getMember(jda.getSelfUser()).hasPermission(permission))
         {
             throw new BotNotAllowedException(permission);
         }
@@ -94,6 +102,12 @@ public class MessageContext
      */
     public void requireCaller(Permission permission) throws UserNotAllowedException
     {
+        Member member = getMember();
+        if (member == null)
+        {
+            return;
+        }
+
         if (!this.getMember().hasPermission(permission))
         {
             throw new UserNotAllowedException(permission);
@@ -166,12 +180,22 @@ public class MessageContext
 
     public boolean hasPermission(Permission... permissions)
     {
-        return getMember().hasPermission(getChannel(), permissions);
+        if (this.channel instanceof TextChannel)
+        {
+            return getMember().hasPermission((TextChannel) this.channel, permissions);
+        }
+
+        return true;
     }
 
     public boolean botHasPermission(Permission... permissions)
     {
-        return getBotMember().hasPermission(getChannel(), permissions);
+        if (this.channel instanceof TextChannel)
+        {
+            return getBotMember().hasPermission((TextChannel) this.channel, permissions);
+        }
+
+        return true;
     }
 
     /**
@@ -187,12 +211,24 @@ public class MessageContext
      */
     public Guild getGuild()
     {
-        return this.getChannel().getGuild();
+        if (this.channel instanceof TextChannel)
+        {
+            return ((TextChannel) this.getChannel()).getGuild();
+        }
+
+        return null;
     }
 
     public Member getBotMember()
     {
-        return this.getGuild().getMember(jda.getSelfUser());
+
+        Guild guild = getGuild();
+        if (guild == null)
+        {
+            return null;
+        }
+
+        return guild.getMember(jda.getSelfUser());
     }
 
     /**
@@ -200,7 +236,13 @@ public class MessageContext
      */
     public Member getMember()
     {
-        return this.getGuild().getMember(this.getUser());
+        Guild guild = getGuild();
+        if (guild == null)
+        {
+            return null;
+        }
+
+        return guild.getMember(this.getUser());
     }
 
     /**
@@ -222,7 +264,7 @@ public class MessageContext
     /**
      * @return The channel where the command was called
      */
-    public TextChannel getChannel()
+    public MessageChannel getChannel()
     {
         return channel;
     }

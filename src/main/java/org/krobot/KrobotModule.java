@@ -131,7 +131,15 @@ public abstract class KrobotModule
 
     protected FilterAccessor guild(Function<Guild, Boolean> guildFilter)
     {
-        return when(context -> guildFilter.apply(context.getGuild()));
+        return when(context -> {
+            Guild guild = context.getGuild();
+            if (guild == null)
+            {
+                return false;
+            }
+
+            return guildFilter.apply(guild);
+        });
     }
 
     protected FilterAccessor guild(String guildName)

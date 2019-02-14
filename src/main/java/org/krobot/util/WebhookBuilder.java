@@ -131,7 +131,7 @@ public class WebhookBuilder
             }
         }
 
-        WebhookAction builder = channel.getGuild().getController().createWebhook(channel, name);
+        WebhookAction builder = channel.createWebhook( name);
 
         if (icon != null)
         {

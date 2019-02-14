@@ -38,8 +38,8 @@ public class Interact
 {
     public static final long DEFAULT_TIMEOUT = 15_000L;
 
-    public static final String YES = "✅";
-    public static final String NO = "❎";
+    public static final String YES = "\u2705";
+    public static final String NO = "\u274e";
 
     private Message message;
     private List<InteractAction> actions;

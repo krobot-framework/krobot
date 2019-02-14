@@ -38,6 +38,7 @@ import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.core.hooks.SubscribeEvent;
@@ -356,7 +357,8 @@ public class KrobotRuntime
                 .setEventManager(new AnnotatedEventManager())
                 .addEventListener(this)
                 .setToken(token)
-                .buildBlocking();
+                .build()
+                .awaitReady();
         }
         catch (LoginException e)
         {
@@ -373,11 +375,6 @@ public class KrobotRuntime
         }
         catch (InterruptedException ignored)
         {
-        }
-        catch (RateLimitedException e)
-        {
-            log.error("Got rate limited when logging in ! Please try again later, exiting...");
-            System.exit(1);
         }
 
         modules.forEach(m -> {
@@ -486,12 +483,23 @@ public class KrobotRuntime
     @SubscribeEvent
     public void onMessage(MessageReceivedEvent event)
     {
+        final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getTextChannel());
+        handle(context);
+    }
+
+    @SubscribeEvent
+    public void onPrivateMessage(PrivateMessageReceivedEvent event)
+    {
+        final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getChannel());
+        handle(context);
+    }
+
+    protected void handle(MessageContext context)
+    {
         if (threadPool == null)
         {
             return;
         }
-
-        final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getTextChannel()); // El famoso (kappa)
 
         threadPool.submit(() -> {
             long time = System.currentTimeMillis();

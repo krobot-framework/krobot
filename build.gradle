@@ -1,5 +1,5 @@
 group 'org.krobot'
-version '3.0.0-ALPHA-06'
+version '3.0.0-ALPHA-09'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -20,15 +20,17 @@ repositories {
 }
 
 dependencies {
-    compile 'org.apache.commons:commons-lang3:3.6'
-    compile 'net.dv8tion:JDA:3.3.0_264'
-    compile 'com.google.inject:guice:4.1.0'
-    compile 'org.apache.logging.log4j:log4j-api:2.8.2'
-    compile 'org.apache.logging.log4j:log4j-core:2.8.2'
-    compile 'org.jetbrains:annotations:15.0'
-    compile 'com.google.code.gson:gson:2.8.1'
-    compile 'org.fusesource.jansi:jansi:1.16'
-    compile 'org.jline:jline:3.3.0'
+    implementation 'org.apache.commons:commons-lang3:3.8.1'
+    implementation 'net.dv8tion:JDA:3.8.3_460'
+    implementation 'com.google.inject:guice:4.2.2'
+    implementation 'org.apache.logging.log4j:log4j-api:2.11.2'
+    implementation 'org.apache.logging.log4j:log4j-core:2.11.2'
+    implementation 'org.jetbrains:annotations:17.0.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'org.fusesource.jansi:jansi:1.17.1'
+    implementation 'org.jline:jline:3.10.0'
+    implementation 'org.json:json:20180813'
+    implementation 'org.apache.commons:commons-collections4:4.3'
 }
 
 jar {

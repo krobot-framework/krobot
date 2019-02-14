@@ -65,7 +65,7 @@ public class CommandManager
 
     public void handle(MessageContext context)
     {
-        String content = context.getMessage().getRawContent().trim();
+        String content = context.getMessage().getContentRaw().trim();
         String prefix = runtime.getFilterRunner().getPrefix(context);
 
         String botMention = "<@!" + runtime.jda().getSelfUser().getId() + "> ";
@@ -251,7 +251,7 @@ public class CommandManager
                 return;
             }
 
-            if (context.botHasPermission(Permission.MESSAGE_MANAGE))
+            if (context.botHasPermission(Permission.MESSAGE_MANAGE) && context.getGuild() != null /* Check we are not in dm */ )
             {
                 context.getMessage().delete().reason("Command triggered").queue();
             }

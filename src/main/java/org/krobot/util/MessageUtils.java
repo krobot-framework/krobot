@@ -235,7 +235,7 @@ public final class MessageUtils
 
             for (Message message : messages)
             {
-                if (message.getContent().toLowerCase().contains(query.toLowerCase().trim()))
+                if (message.getContentDisplay().toLowerCase().contains(query.toLowerCase().trim()))
                 {
                     result = message;
                     break;

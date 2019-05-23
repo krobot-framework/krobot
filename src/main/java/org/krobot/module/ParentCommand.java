@@ -16,31 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.krobot.permission;
+package org.krobot.module;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import net.dv8tion.jda.core.Permission;
-import org.krobot.command.CommandHandler;
-
-/**
- * The User Requires Annotation<br><br>
- *
- * Put this annotation on a {@link CommandHandler}
- * to check for a caller permission during the command call.
- *
- * @author Litarvan
- * @version 2.3.0
- * @since 2.3.0
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface UserRequires
+public class ParentCommand
 {
-    /**
-     * @return The required permissions of the command caller
-     */
-    Permission[] value();
+    private String parentLabel;
+    private String defaultSub;
+
+    public ParentCommand(String parentLabel, String defaultSub)
+    {
+        this.parentLabel = parentLabel;
+        this.defaultSub = defaultSub;
+    }
+
+    public String getParentLabel()
+    {
+        return parentLabel;
+    }
+
+    public String getDefaultSub()
+    {
+        return defaultSub;
+    }
 }

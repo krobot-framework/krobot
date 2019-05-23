@@ -18,39 +18,32 @@
  */
 package org.krobot.command;
 
-import org.krobot.ExceptionHandler;
-
-/**
- * The User Not Found Exception<br><br>
- *
- *
- * An exception thrown when the user called a command and
- * provided a {@link ArgumentType#USER} argument but of
- * a user that cannot be resolved.<br><br>
- *
- * Supposed to be caught by the {@link ExceptionHandler}.
- *
- * @author Litarvan
- * @version 2.0.0
- * @since 2.0.0
- */
-public class UserNotFoundException extends Exception
+public class BadArgumentTypeException extends Exception
 {
-    private String user;
+    private String value;
+    private String type;
 
-    /**
-     * @param user The user that the command caller given
-     */
-    public UserNotFoundException(String user)
+    public BadArgumentTypeException(String value, String type)
     {
-        super("Can't find user '" + user + "'");
+        this.value = value;
+        this.type = type;
     }
 
-    /**
-     * @return The user that the command caller given
-     */
-    public String getUser()
+    public BadArgumentTypeException(String s, String value, String type)
     {
-        return user;
+        super(s);
+
+        this.value = value;
+        this.type = type;
+    }
+
+    public String getValue()
+    {
+        return value;
+    }
+
+    public String getType()
+    {
+        return type;
     }
 }

@@ -18,8 +18,6 @@
  */
 package org.krobot.config;
 
-import java.io.File;
-import java.net.URISyntaxException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,11 +38,27 @@ public interface Config
      * Get a value of the config
      *
      * @param key The key of the value
+     *
+     * @return The found value or null
+     */
+    @Nullable
+    default Object get(String key)
+    {
+        return get(key, null);
+    }
+
+    /**
+     * Get a value of the config
+     *
+     * @param key The key of the value
      * @param def The default value if not found
      *
      * @return The found value or the default one if not found
      */
-    String get(String key, String def);
+    default String get(String key, String def)
+    {
+        return get(key, def, String.class);
+    }
 
     /**
      * Get a value of the config as an object
@@ -57,10 +71,7 @@ public interface Config
      *
      * @return The found value or the default one if not found
      */
-    default <T> T get(String key, T def, Class<T> type)
-    {
-        throw new UnsupportedOperationException("This config does not support object serializing");
-    }
+    <T> T get(String key, T def, Class<T> type);
 
     /**
      * Set a value of the config
@@ -68,30 +79,34 @@ public interface Config
      * @param key The key of the value to set
      * @param value The value to set
      */
-    void set(String key, String value);
+    void set(String key, Object value);
 
     /**
-     * Set a value of the config
+     * Finds a value with the given path.<br><br>
      *
-     * @param key The key of the value to set
-     * @param value The value to set
-     */
-    default void set(String key, Object value)
-    {
-        throw new UnsupportedOperationException("This config does not support object serializing");
-    }
-
-    /**
-     * Get a value of the config
+     * <b>If the config does not support the features (by example it
+     * does not support objects) it just calls {@link #get(String, String)}</b><br><br>
      *
-     * @param key The key of the value
+     * <b>Example :</b>
      *
-     * @return The found value or null
+     * <pre>
+     * {
+     *     "object": {
+     *         "key": "value"
+     *     }
+     * }
+     * </pre>
+     *
+     * config.at("object.key") returns "value"
+     *
+     * @param path The path of the value to get (example config.object.key)
+     *
+     * @return The value at the given path or null if not found
      */
     @Nullable
-    default Object get(String key)
+    default String at(String path)
     {
-        return get(key, null);
+        return at(path, (String) null);
     }
 
     /**
@@ -177,38 +192,7 @@ public interface Config
      *
      * @return The value at the given path or the default if not found
      */
-    default <T> T at(String path, T def, Class<T> type)
-    {
-        return get(path, def, type);
-    }
-
-    /**
-     * Finds a value with the given path.<br><br>
-     *
-     * <b>If the config does not support the features (by example it
-     * does not support objects) it just calls {@link #get(String, String)}</b><br><br>
-     *
-     * <b>Example :</b>
-     *
-     * <pre>
-     * {
-     *     "object": {
-     *         "key": "value"
-     *     }
-     * }
-     * </pre>
-     *
-     * config.at("object.key") returns "value"
-     *
-     * @param path The path of the value to get (example config.object.key)
-     *
-     * @return The value at the given path or null if not found
-     */
-    @Nullable
-    default String at(String path)
-    {
-        return at(path, (String) null);
-    }
+    <T> T at(String path, T def, Class<T> type);
 
     /**
      * Append an object to an array of the config
@@ -227,34 +211,5 @@ public interface Config
         set(field, array);
 
         return array;
-    }
-
-    /**
-     * @return If the config supports containing objects
-     */
-    boolean areObjectsSupported();
-
-    /**
-     * @return If the config supports saving
-     */
-    boolean isSavingSupported();
-
-    /**
-     * Create a file object from a classpath resource
-     *
-     * @param path The path of the resource
-     *
-     * @return The file
-     */
-    static File resource(String path)
-    {
-        try
-        {
-            return new File(Config.class.getResource("/" + (path.startsWith("/") ? path.substring(1) : path)).toURI());
-        }
-        catch (URISyntaxException e)
-        {
-            throw new RuntimeException("Malformed URI from file (shouldn't happen)", e);
-        }
     }
 }

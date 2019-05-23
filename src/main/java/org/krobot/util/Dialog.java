@@ -33,11 +33,11 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
  * <b>Examples :</b>
  *
  * <pre>
- *     channel.sendMessage(Dialog.info("Some info", "Here is an information")).queue();
+ *     channel.send(Dialog.info("Some info", "Here is an information")).queue();
  * </pre>
  *
  * <pre>
- *     channel.sendMessage(Dialog.dialog(Color.GREEN, "Status", "Everything is good !")).queue();
+ *     channel.send(Dialog.dialog(Color.GREEN, "Status", "Everything is good !")).queue();
  * </pre>
  *
  * @author Litarvan

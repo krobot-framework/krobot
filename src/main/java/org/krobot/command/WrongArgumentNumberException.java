@@ -16,31 +16,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.krobot.permission;
+package org.krobot.command;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import net.dv8tion.jda.core.Permission;
-import org.krobot.command.CommandHandler;
-
-/**
- * The User Requires Annotation<br><br>
- *
- * Put this annotation on a {@link CommandHandler}
- * to check for a caller permission during the command call.
- *
- * @author Litarvan
- * @version 2.3.0
- * @since 2.3.0
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface UserRequires
+public class WrongArgumentNumberException extends Exception
 {
-    /**
-     * @return The required permissions of the command caller
-     */
-    Permission[] value();
+    private KrobotCommand command;
+    private int given;
+
+    public WrongArgumentNumberException(KrobotCommand command, int given)
+    {
+        super("Wrong number of argument for command '" + command.getLabel() + "', " + given + " were given but " + command.getArguments().length + " are required");
+
+        this.command = command;
+        this.given = given;
+    }
+
+    public KrobotCommand getCommand()
+    {
+        return command;
+    }
+
+    public int getGiven()
+    {
+        return given;
+    }
 }

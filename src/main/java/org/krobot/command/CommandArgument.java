@@ -18,109 +18,51 @@
  */
 package org.krobot.command;
 
-/**
- * A Command Argument<br><br>
- *
- *
- * Represents a definition of an argument that can be given
- * to a command.
- *
- * @author Litarvan
- * @version 2.0.0
- * @since 2.0.0
- */
 public class CommandArgument
 {
+    private boolean required;
     private String key;
-    private boolean optional;
+    private String type;
+    private ArgumentFactory factory;
     private boolean list;
-    private String[] choices;
-    private ArgumentType type;
 
-    /**
-     * An argument
-     *
-     * @param key The key of the argument (to retrieve it then)
-     * @param optional If it is optional or required
-     * @param list If it is a list
-     * @param type The type of the argument
-     */
-    public CommandArgument(String key, boolean optional, boolean list, ArgumentType type)
+    public CommandArgument(boolean required, String key, String type, ArgumentFactory factory, boolean list)
     {
+        this.required = required;
         this.key = key;
-        this.optional = optional;
-        this.list = list;
         this.type = type;
+        this.factory = factory;
+        this.list = list;
     }
 
-    /**
-     * An fixed "choices" argument
-     *
-     * @param key The key of the argument (to retrieve it then)
-     * @param optional If it is optional or required
-     * @param choices The choices that the user can type
-     */
-    public CommandArgument(String key, boolean optional, String[] choices)
+    public boolean isRequired()
     {
-        this.key = key;
-        this.optional = optional;
-        this.list = false;
-        this.choices = choices;
-        this.type = ArgumentType.STRING;
+        return required;
     }
 
-    /**
-     * @return The key of the argument (to retrieve it then)
-     */
     public String getKey()
     {
         return key;
     }
 
-    /**
-     * @return If it is optional or required
-     */
-    public boolean isOptional()
+    public String getType()
     {
-        return optional;
+        return type;
     }
 
-    /**
-     * @return If it is a list
-     */
+    public ArgumentFactory getFactory()
+    {
+        return factory;
+    }
+
     public boolean isList()
     {
         return list;
     }
 
-    /**
-     * @return (In case of a fixed choices argument) The choices
-     * that the user can type
-     */
-    public String[] getChoices()
-    {
-        return choices;
-    }
-
-    /**
-     * @return The type of the argument
-     */
-    public ArgumentType getType()
-    {
-        return type;
-    }
-
     @Override
     public String toString()
     {
-        String start = (optional ? "[" : "<");
-        String end = (optional ? "]" : ">");
-
-        if (choices != null)
-        {
-            return start + String.join("|", choices) + end;
-        }
-
-        return start + this.key + ":" + this.type.name().toLowerCase() + (list ? "..." : "") + end;
+        return (isRequired() ? "<" : "[") + getKey() + ":" + getType() + (isRequired() ? ">" : "]");
     }
 }

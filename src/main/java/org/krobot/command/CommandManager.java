@@ -18,231 +18,262 @@
  */
 package org.krobot.command;
 
-import org.krobot.ExceptionHandler;
-import org.krobot.Krobot;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.SubscribeEvent;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.requests.RestAction;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.krobot.MessageContext;
+import org.krobot.permission.BotNotAllowedException;
+import org.krobot.permission.BotRequires;
+import org.krobot.permission.UserNotAllowedException;
+import org.krobot.permission.UserRequires;
+import org.krobot.runtime.KrobotRuntime;
+import org.krobot.util.UserUtils;
 
-/**
- * The CommandManager<br><br>
- *
- *
- * It's the starting point of a bot, and the main part of Krobot.<br>
- * It has a command registry, and handle the command call to its
- * registered command.<br>
- * It uses the builders to make commands.<br><br>
- *
- * To use it, use the {@link #make} methods.<br><br>
- *
- * <b>Examples :</b>
- *
- * <pre>
- *     manager.make("/mycommand", MyHandler.class).middlewares(MyMiddleware.class).register();
- *     manager.make("/version", (context, args) -&gt; {
- *         context.getChannel().sendMessage("v1.0.0").queue();
- *     }).register();
- * </pre>
- *
- * <pre>
- *     manager.group().prefix("!").middleware((command, args, context) -&gt; {
- *         context.getChannel().sendMessage("A command was called").queue();
- *     }).apply(() -&gt; {
- *         manager.make("mycommand", MyHandler.class).register();
- *         manager.make("myothercommand", MyOtherHandler.class).register();
- *     });
- * </pre>
- *
- * Don't forget to call the register function at the end of the builder.
- *
- * @author Litarvan
- * @version 2.3.0
- * @since 2.0.0
- */
 @Singleton
 public class CommandManager
 {
-    private static final Logger LOGGER = LogManager.getLogger("CommandManager");
+    private static final Map<String, ArgumentFactory> argumentFactories = new HashMap<>();
 
-    private JDA jda;
-    private ExceptionHandler exHandler;
-    private List<Command> commands;
-    private List<CommandGroup> stack;
-    private boolean typing = true;
+    private KrobotRuntime runtime;
+
+    private List<KrobotCommand> commands;
+    private List<CommandFilter> filters;
 
     @Inject
-    public CommandManager(JDA jda, ExceptionHandler exHandler)
+    public CommandManager(KrobotRuntime runtime)
     {
-        this.jda = jda;
-        this.exHandler = exHandler;
+        this.runtime = runtime;
+
         this.commands = new ArrayList<>();
-        this.stack = new ArrayList<>();
-
-        this.jda.addEventListener(this);
+        this.filters = new ArrayList<>();
     }
 
-    /**
-     * Create a group builder.<br><br>
-     *
-     * A command group is some properties that will be applied
-     * to some commands at the same time.<br><br>
-     *
-     * <b>Example :</b>
-     *
-     * <pre>
-     *     manager.group().prefix("!").middlewares(MyMiddleware.class).apply(() -&gt; {
-     *         manager.make("mycommand", MyHandler.class).register();
-     *         manager.make("myothercommand", MyOtherHandler.class).register();
-     *     });
-     * </pre>
-     *
-     * In this case, the label of mycommand and myothercommand will be
-     * !mycommand and !myothercommand, and they will both have the MyMiddleware
-     * middleware triggered before their call.
-     *
-     * @return A new group builder linked to this
-     */
-    public GroupBuilder group()
+    public void handle(MessageContext context)
     {
-        return new GroupBuilder(this);
-    }
+        String content = context.getMessage().getContentRaw().trim();
+        String prefix = runtime.getFilterRunner().getPrefix(context);
 
-    /**
-     * Generate a CommandBuilder linked to this, with pre-defined
-     * path and command handler.
-     *
-     * @param path The path of the command (see {@link CommandBuilder#path(String)}
-     *             for the syntax
-     * @param commandCl The command handler (will be created by the injector)
-     *
-     * @return A new CommandBuilder
-     */
-    public CommandBuilder make(String path, Class<? extends CommandHandler> commandCl)
-    {
-        return make(path, Krobot.injector().getInstance(commandCl));
-    }
+        String botMention = "<@!" + runtime.jda().getSelfUser().getId() + "> ";
 
-    /**
-     * Generate a CommandBuilder linked to this, with pre-defined
-     * path and command handler.
-     *
-     * @param path The path of the command (see {@link CommandBuilder#path(String)}
-     *             for the syntax
-     * @param handler The command handler
-     *
-     * @return A new CommandBuilder
-     */
-    public CommandBuilder make(String path, CommandHandler handler)
-    {
-        CommandBuilder builder = make(handler);
-        StringBuilder prefix = new StringBuilder();
-
-        for (CommandGroup group : stack)
+        if (content.startsWith(botMention) && !content.equals(botMention) && !runtime.getRootModule().getModule().getClass().isAnnotationPresent(DisableMention.class))
         {
-            if (group.getPrefix() != null)
-            {
-                prefix.append(group.getPrefix());
-            }
-
-            if (group.getParent() != null)
-            {
-                builder.parent(group.getParent());
-            }
-
-            builder.middlewares(group.getMiddlewares().toArray(new Middleware[group.getMiddlewares().size()]));
+            prefix = botMention;
         }
 
-        return builder.path(prefix.toString() + path);
-    }
-
-    /**
-     * Generate a CommandBuilder linked to this, with a pre-defined
-     * command handler.
-     *
-     * @param handler The command handler
-     *
-     * @return A new CommandBuilder
-     */
-    public CommandBuilder make(CommandHandler handler)
-    {
-        return new CommandBuilder(this, jda, exHandler).handler(handler);
-    }
-
-    /**
-     * Register a command
-     *
-     * @param command The command to register
-     */
-    public void register(Command command)
-    {
-        LOGGER.info("Registered command -> " + command.toString("", true));
-        this.commands.add(command);
-    }
-
-    /**
-     * Push a command group to the stack.<br>
-     * The next command registered will have the group properties
-     * applied.
-     *
-     * @param group The group to push
-     */
-    public void push(CommandGroup group)
-    {
-        stack.add(group);
-    }
-
-    /**
-     * Pop the last group of the stack
-     */
-    public void pop()
-    {
-        stack.remove(stack.size() - 1);
-    }
-
-    @SubscribeEvent
-    protected void onMessage(MessageReceivedEvent event)
-    {
-        // TODO: Krobot 2.5.0, handle mentions with space / quotes / etc...
-
-        String[] line = splitWithQuotes(event.getMessage().getContent());
-
-        if (line.length == 0)
+        if (prefix != null && (!content.startsWith(prefix) || content.equals(prefix)))
         {
             return;
         }
 
-        for (Command command : commands)
+        if (content.startsWith(botMention))
         {
-            if (command.getLabel().equalsIgnoreCase(line[0]))
+            content = content.substring(botMention.length());
+        }
+        else if (prefix != null && content.startsWith(prefix))
+        {
+            content = content.substring(prefix.length());
+        }
+
+        String[] split = splitWithQuotes(content);
+
+        if (split.length == 0)
+        {
+            return;
+        }
+
+        String label = split[0];
+
+        Optional<KrobotCommand> optional = commands.stream().filter(c -> {
+            if (c.getAliases() != null)
             {
-                if (typing)
+                Optional<String> alias = Stream.of(c.getAliases()).filter(a -> a.equalsIgnoreCase(label)).findFirst();
+
+                if (alias.isPresent())
                 {
-                    event.getChannel().sendTyping().queue();
+                    return true;
                 }
+            }
 
-                CommandContext context = new CommandContext(event.getAuthor(), event.getMessage(), event.getTextChannel());
-                List<String> args = Arrays.asList(ArrayUtils.subarray(line, 1, line.length));
+            return c.getLabel().equalsIgnoreCase(label);
+        }).findFirst();
 
+        if (!optional.isPresent())
+        {
+            return;
+        }
+
+        KrobotCommand command = optional.get();
+        String[] args = ArrayUtils.subarray(split, 1, split.length);
+
+        if (command.getHandler().getClass().isAnnotationPresent(DisableMention.class) && Objects.equals(prefix, botMention))
+        {
+            return;
+        }
+
+        if (args.length > 0)
+        {
+            Optional<KrobotCommand> sub = command.getSubCommands().stream().filter(s -> s.getLabel().equalsIgnoreCase(args[0]) || ArrayUtils.contains(s.getAliases(), args[0])).findFirst();
+
+            if (sub.isPresent())
+            {
                 try
                 {
-                    command.call(context, args);
+                    execute(context, sub.get(), ArrayUtils.subarray(args, 1, args.length));
                 }
-                catch (Throwable t)
+                catch (Exception e)
                 {
-                    exHandler.handle(t, command, args, context);
+                    runtime.getExceptionHandler().handle(context, command, args, e);
                 }
 
                 return;
+            }
+        }
+
+        try
+        {
+            execute(context, command, args);
+        }
+        catch (Exception e)
+        {
+            runtime.getExceptionHandler().handle(context, command, args, e);
+        }
+    }
+
+    public void execute(MessageContext context, KrobotCommand command, String[] args) throws Exception
+    {
+        CommandHandler handler = command.getHandler();
+
+        if (handler.getClass().isAnnotationPresent(BotRequires.class))
+        {
+            for (Permission perm : handler.getClass().getAnnotation(BotRequires.class).value())
+            {
+                if (!context.botHasPermission(perm))
+                {
+                    throw new BotNotAllowedException(perm);
+                }
+            }
+        }
+
+        if (handler.getClass().isAnnotationPresent(UserRequires.class))
+        {
+            for (Permission perm : handler.getClass().getAnnotation(UserRequires.class).value())
+            {
+                if (!context.hasPermission(perm))
+                {
+                    throw new UserNotAllowedException(perm);
+                }
+            }
+        }
+
+        Map<String, Object> supplied = new HashMap<>();
+
+        int i;
+
+        for (i = 0; i < command.getArguments().length; i++)
+        {
+            CommandArgument arg = command.getArguments()[i];
+
+            if (i > args.length - 1)
+            {
+                if (arg.isRequired())
+                {
+                    throw new WrongArgumentNumberException(command, args.length);
+                }
+
+                break;
+            }
+
+            if (arg.isList())
+            {
+                List list = new ArrayList();
+
+                for (; i < args.length; i++)
+                {
+                    list.add(arg.getFactory().process(args[i]));
+                }
+
+                supplied.put(arg.getKey(), list.toArray(arg.getFactory().createArray()));
+            }
+            else
+            {
+                supplied.put(arg.getKey(), arg.getFactory().process(args[i]));
+            }
+        }
+
+        if (i < args.length - 1)
+        {
+            throw new WrongArgumentNumberException(command, args.length);
+        }
+
+        ArgumentMap argsMap = new ArgumentMap(supplied);
+
+        CommandCall call = new CommandCall(command);
+
+        if (command.getFilters() != null)
+        {
+            for (CommandFilter filter : command.getFilters())
+            {
+                filter.filter(call, context, argsMap);
+            }
+        }
+
+        if (!call.isCancelled())
+        {
+            if (!command.getHandler().getClass().isAnnotationPresent(NoTyping.class))
+            {
+                context.getChannel().sendTyping().queue();
+            }
+
+            Object result;
+
+            try
+            {
+                result = command.getHandler().handle(context, argsMap);
+            }
+            catch (Throwable t)
+            {
+                runtime.getExceptionHandler().handle(context, command, args, t);
+                return;
+            }
+
+            if (context.botHasPermission(Permission.MESSAGE_MANAGE) && context.getGuild() != null /* Check we are not in dm */ )
+            {
+                context.getMessage().delete().reason("Command triggered").queue();
+            }
+
+            if (result != null)
+            {
+                if (result instanceof EmbedBuilder)
+                {
+                    context.send((EmbedBuilder) result);
+                }
+                else if (result instanceof MessageEmbed)
+                {
+                    context.send((MessageEmbed) result);
+                }
+                else if (result instanceof RestAction)
+                {
+                    ((RestAction) result).queue();
+                }
+                else if (!(result instanceof Future))
+                {
+                    context.send(result.toString());
+                }
             }
         }
     }
@@ -265,7 +296,7 @@ public class CommandManager
     public static String[] splitWithQuotes(String line)
     {
         ArrayList<String> matchList = new ArrayList<>();
-        Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+        Pattern regex = Pattern.compile("[^\\s\"]+|\"([^\"]*)\"");
         Matcher matcher = regex.matcher(line);
 
         while (matcher.find())
@@ -273,10 +304,6 @@ public class CommandManager
             if (matcher.group(1) != null)
             {
                 matchList.add(matcher.group(1));
-            }
-            else if (matcher.group(2) != null)
-            {
-                matchList.add(matcher.group(2));
             }
             else
             {
@@ -287,35 +314,111 @@ public class CommandManager
         return matchList.toArray(new String[matchList.size()]);
     }
 
-    /**
-     * If set to true, when a command is being executed,
-     * "(Bot name) is typing..." will be displayed.<br><br>
-     *
-     * Default is true.
-     *
-     * @param typing To enable it or not
-     */
-    public void setTypingDuringExec(boolean typing)
-    {
-        this.typing = typing;
-    }
-
-    /**
-     * @return If true, when a command is being executed,
-     * "(Bot name) is typing..." will be displayed.<br><br>
-     *
-     * Default is true.
-     */
-    public boolean isTypingDuringExec()
-    {
-        return typing;
-    }
-
-    /**
-     * @return The registered commands
-     */
-    public List<Command> getCommands()
+    public List<KrobotCommand> getCommands()
     {
         return commands;
+    }
+
+    public List<CommandFilter> getFilters()
+    {
+        return filters;
+    }
+
+    public static void registerArgumentFactory(String name, ArgumentFactory factory)
+    {
+        argumentFactories.put(name, factory);
+    }
+
+    public static ArgumentFactory getArgumentFactory(String key)
+    {
+        return argumentFactories.get(key);
+    }
+
+    static
+    {
+        registerArgumentFactory("string", new ArgumentFactory<String>()
+        {
+            @Override
+            public String process(String a) throws BadArgumentTypeException
+            {
+                return a;
+            }
+
+            @Override
+            public String[] createArray()
+            {
+                return new String[0];
+            }
+        });
+
+        registerArgumentFactory("number", new ArgumentFactory<Integer>()
+        {
+            @Override
+            public Integer process(String argument) throws BadArgumentTypeException
+            {
+                try
+                {
+                    return Integer.parseInt(argument);
+                }
+                catch (NumberFormatException e)
+                {
+                    throw new BadArgumentTypeException(argument, "number");
+                }
+            }
+
+            @Override
+            public Integer[] createArray()
+            {
+                return new Integer[0];
+            }
+        });
+
+        registerArgumentFactory("float", new ArgumentFactory<Float>()
+        {
+            @Override
+            public Float process(String argument) throws BadArgumentTypeException
+            {
+                try
+                {
+                    return Float.parseFloat(argument);
+                }
+                catch (NumberFormatException e)
+                {
+                    throw new BadArgumentTypeException(argument, "float");
+                }
+            }
+
+            @Override
+            public Float[] createArray()
+            {
+                return new Float[0];
+            }
+        });
+
+        registerArgumentFactory("user", new ArgumentFactory<User>()
+        {
+            @Override
+            public User process(String argument) throws BadArgumentTypeException
+            {
+                User result = UserUtils.resolve(argument);
+
+                if (result == null)
+                {
+                    throw new BadArgumentTypeException("Can't find user '" + argument + "'", argument, "user");
+                }
+
+                return result;
+            }
+
+            @Override
+            public User[] createArray()
+            {
+                return new User[0];
+            }
+        });
+
+        // Aliases
+        registerArgumentFactory("integer", getArgumentFactory("number"));
+        registerArgumentFactory("int", getArgumentFactory("number"));
     }
 }

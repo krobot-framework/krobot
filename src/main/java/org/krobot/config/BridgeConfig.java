@@ -16,35 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.krobot.command;
+package org.krobot.config;
 
-import net.dv8tion.jda.core.entities.User;
-
-/**
- * The Argument Types<br><br>
- *
- *
- * The different types of argument.
- *
- * @author Litarvan
- * @version 2.0.0
- * @since 2.0.0
- */
-public enum ArgumentType
+public class BridgeConfig implements Config
 {
-    /**
-     * A User argument, will be parsed to a {@link User} object. It
-     * can be a username, id, or mention.
-     */
-    USER,
+    private ConfigProvider target;
+    private String path;
 
-    /**
-     * A simple string argument
-     */
-    STRING,
+    public BridgeConfig(ConfigProvider target, String path)
+    {
+        this.target = target;
+        this.path = path;
+    }
 
-    /**
-     * A number (int) argument
-     */
-    NUMBER;
+    @Override
+    public <T> T get(String key, T def, Class<T> type)
+    {
+        return at(key, def, type);
+    }
+
+    @Override
+    public void set(String key, Object value)
+    {
+        target.set(path + "." + key, value);
+    }
+
+    @Override
+    public <T> T at(String path, T def, Class<T> type)
+    {
+        return target.at(this.path + "." + path, def, type);
+    }
 }

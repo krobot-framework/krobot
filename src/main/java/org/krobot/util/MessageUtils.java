@@ -19,11 +19,13 @@
 package org.krobot.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -125,6 +127,43 @@ public final class MessageUtils
         return messages.toArray(new String[messages.size()]);
     }
 
+    public static String[] splitWithQuotes(String string, boolean keepQuotes)
+    {
+        List<String> result = new ArrayList<>();
+        String[] split = string.split(" ");
+
+        for (int i = 0; i < split.length; i++)
+        {
+            StringBuilder current = new StringBuilder(split[i]);
+
+            if (current.toString().startsWith("\""))
+            {
+                i++;
+
+                while (i < split.length && !current.toString().endsWith("\""))
+                {
+                    current.append(" ").append(split[i]);
+                    i++;
+                }
+
+                i--;
+            }
+
+            String done = current.toString();
+
+            if (!done.endsWith("\""))
+            {
+                result.addAll(Arrays.asList(done.split(" ")));
+            }
+            else
+            {
+                result.add(keepQuotes ? done : done.replace("\"", ""));
+            }
+        }
+
+        return result.toArray(new String[result.size()]);
+    }
+
     /**
      * Get the most similar message of a list to a base<br><br>
      *
@@ -180,5 +219,32 @@ public final class MessageUtils
     public static void deleteAfter(Message message, int duration)
     {
         deletePool.schedule(() -> message.delete().queue(), duration, TimeUnit.MILLISECONDS);
+    }
+
+    public static Message search(TextChannel channel, String query, int max)
+    {
+        List<Message> messages = channel.getHistory().retrievePast(100).complete();
+        messages.remove(0);
+
+        Message result = null;
+        int searched = 0;
+
+        while (result == null && searched < max)
+        {
+            messages = channel.getHistory().retrievePast(100).complete();
+
+            for (Message message : messages)
+            {
+                if (message.getContentDisplay().toLowerCase().contains(query.toLowerCase().trim()))
+                {
+                    result = message;
+                    break;
+                }
+            }
+
+            searched += messages.size();
+        }
+
+        return result;
     }
 }

@@ -1,14 +1,31 @@
+/*
+ * Copyright 2017 The Krobot Contributors
+ *
+ * This file is part of Krobot.
+ *
+ * Krobot is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Krobot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.krobot.command;
 
-import org.jetbrains.annotations.NotNull;
-import org.krobot.util.Dialog;
+import org.krobot.MessageContext;
+import org.krobot.runtime.KrobotRuntime;
 import org.krobot.util.Markdown;
 import org.krobot.util.MessageUtils;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The Help Command<br><br>
@@ -23,23 +40,43 @@ import java.util.Map;
  * @version 2.2.0
  * @since 2.0.0
  */
+@Command(value = "help", desc = "Displays the list of commands with their descriptions")
 public class HelpCommand implements CommandHandler
 {
+    private KrobotRuntime runtime;
+
     @Inject
-    private CommandManager commandManager;
+    public HelpCommand(KrobotRuntime runtime)
+    {
+        this.runtime = runtime;
+    }
 
     @Override
-    public void handle(@NotNull CommandContext context, @NotNull Map<String, SuppliedArgument> args)
+    public Object handle(MessageContext context, ArgumentMap args)
     {
         StringBuilder curMessage = new StringBuilder();
 
         List<StringBuilder> messages = new ArrayList<>();
         messages.add(curMessage);
 
+        String prefix = runtime.getFilterRunner().getPrefix(context);
 
-        for (Command command : commandManager.getCommands())
+        if (prefix == null)
         {
-            String cmdStr = toString("", command);
+            prefix = "";
+        }
+
+        for (KrobotCommand command : runtime.getCommandManager().getCommands())
+        {
+            CommandCall call = new CommandCall(command);
+            command.getFilters().forEach(f -> f.filter(call, context, null));
+
+            if (call.isCancelled())
+            {
+                continue;
+            }
+
+            String cmdStr = prefix + toString("", command);
 
             if(curMessage.length() + cmdStr.length() + 4 > MessageUtils.MAX_MESSAGE_CHARS)
             {
@@ -50,15 +87,17 @@ public class HelpCommand implements CommandHandler
             curMessage.append(cmdStr).append("\n\n");
         }
 
-        context.sendMessage(Dialog.info(Markdown.underline("List of commands :"), messages.get(0).toString()));
+        context.info(Markdown.underline("List of commands :"), messages.get(0).toString());
 
         for(int i = 1; i < messages.size(); i++)
         {
-            context.sendMessage(Dialog.info(null, messages.get(i).toString()));
+            context.info(null, messages.get(i).toString());
         }
+
+        return null;
     }
 
-    private String toString(String prefix, Command command)
+    private String toString(String prefix, KrobotCommand command)
     {
         StringBuilder string = new StringBuilder();
 
@@ -67,7 +106,7 @@ public class HelpCommand implements CommandHandler
 
         string.append(prefix.replace("└", "├")).append(Markdown.bold(label)).append(str.substring(label.length())).append("\n");
 
-        if (command.getDescription() != null)
+        if (command.getDescription() != null && !command.getDescription().trim().isEmpty())
         {
             if (!prefix.isEmpty())
             {
@@ -77,16 +116,16 @@ public class HelpCommand implements CommandHandler
             string.append("> ").append(Markdown.italic(command.getDescription()));
         }
 
-        if (command.getSubs() != null && !command.getSubs().isEmpty())
+        if (command.getSubCommands() != null && command.getSubCommands().size() != 0)
         {
-            for (int i = 0; i < command.getSubs().size(); i++)
+            for (int i = 0; i < command.getSubCommands().size(); i++)
             {
                 if (!(command.getDescription() == null && i == 0))
                 {
                     string.append("\n");
                 }
 
-                string.append(toString((i == command.getSubs().size() - 1 ? "└" : "├") + "── " + prefix + Markdown.bold(label) + " ", command.getSubs().get(i)));
+                string.append(toString((i == command.getSubCommands().size() - 1 ? "└" : "├") + "── " + prefix + Markdown.bold(label) + " ", command.getSubCommands().get(i)));
             }
         }
 

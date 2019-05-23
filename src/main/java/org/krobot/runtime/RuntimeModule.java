@@ -16,31 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.krobot.permission;
+package org.krobot.runtime;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import net.dv8tion.jda.core.Permission;
-import org.krobot.command.CommandHandler;
+import org.krobot.config.ConfigProvider;
+import org.krobot.runtime.ModuleLoader.ComputedModule;
 
-/**
- * The User Requires Annotation<br><br>
- *
- * Put this annotation on a {@link CommandHandler}
- * to check for a caller permission during the command call.
- *
- * @author Litarvan
- * @version 2.3.0
- * @since 2.3.0
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface UserRequires
+public class RuntimeModule
 {
-    /**
-     * @return The required permissions of the command caller
-     */
-    Permission[] value();
+    private ComputedModule module;
+    private ConfigProvider config;
+
+    public RuntimeModule(ComputedModule module)
+    {
+        this.module = module;
+        this.config = new ConfigProvider();
+    }
+
+    public ComputedModule getComputed()
+    {
+        return module;
+    }
+
+    public ConfigProvider getConfig()
+    {
+        return config;
+    }
 }

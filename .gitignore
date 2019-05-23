@@ -6,3 +6,6 @@ build/
 *.ipr
 src/test
 logs/
+out/
+*.json
+.token

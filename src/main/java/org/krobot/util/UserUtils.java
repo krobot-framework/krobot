@@ -20,7 +20,7 @@ package org.krobot.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.krobot.Krobot;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import net.dv8tion.jda.core.JDA;
@@ -29,6 +29,8 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.User;
 import org.jetbrains.annotations.NotNull;
+import org.krobot.Krobot;
+import org.krobot.runtime.KrobotRuntime;
 
 /**
  * User Utils<br><br>
@@ -42,13 +44,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class UserUtils
 {
-    private static JDA jda = Krobot.jda();
-
     /**
      * Resolve a user from a String.<br>
      * If it can be a nickname, use {@link #resolve(Guild, String)}<br><br>
      *
-     * Example : "@Litarvan", "Litarvan", or "87279950075293696"<br>
+     * Example : "@Litarvan", "Litarvan", "&lt;@!87279950075293696&gt;" or "87279950075293696"<br>
      * returns the JDA User object of Litarvan.
      *
      * @param user A string (mention/username/id) of the user
@@ -60,16 +60,27 @@ public final class UserUtils
     public static User resolve(@NotNull String user)
     {
         user = user.trim();
-        List<User> users = jda.getUsersByName(user, true);
+        List<User> users = jda().getUsersByName(user, true);
+
+        if (users.size() == 0 && user.startsWith("<@") && user.endsWith(">"))
+        {
+            try
+            {
+                return jda().getUserById(Long.parseLong(user.substring(2, user.length() - 1)));
+            }
+            catch (NumberFormatException ignored)
+            {
+            }
+        }
 
         if (users.size() == 0 && user.startsWith("@"))
         {
-            users = jda.getUsersByName(user.substring(1), true);
+            users = jda().getUsersByName(user.substring(1), true);
         }
 
         if (users.size() == 0 && StringUtils.isNumeric(user))
         {
-            return jda.getUserById(user);
+            return jda().getUserById(user);
         }
 
         return users.size() > 0 ? users.get(0) : null;
@@ -80,7 +91,7 @@ public final class UserUtils
      * The guild is used to check if it is a nickname and not the
      * user real name.<br><br>
      *
-     * Example : "@Litarvan", "Litarvan", or "87279950075293696"<br>
+     * Example : "@Litarvan", "Litarvan", "&lt;@!87279950075293696&gt;" or "87279950075293696"<br>
      * returns the JDA User object of Litarvan.
      *
      * @param guild The guild where the user is
@@ -117,19 +128,14 @@ public final class UserUtils
      *
      * @deprecated Deprecated in JDA, use now {@link User#openPrivateChannel()} directly.
      */
+    @Deprecated
     public static PrivateChannel privateChannel(@NotNull User user)
     {
-        if (!user.hasPrivateChannel())
-        {
-            try
-            {
-                return user.openPrivateChannel().submit().get();
-            }
-            catch (InterruptedException | ExecutionException ignored)
-            {
-            }
-        }
+        return user.openPrivateChannel().complete();
+    }
 
-        return user.getPrivateChannel();
+    private static JDA jda()
+    {
+        return KrobotRuntime.get().jda();
     }
 }

@@ -16,41 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.krobot.command;
+package org.krobot;
 
-import org.krobot.ExceptionHandler;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * The Bad Syntax Exception<br><br>
- *
- *
- * An exception called when the syntax of the command
- * isn't respected.<br><br>
- *
- * Supposed to be caught by the {@link ExceptionHandler}<br>
- *
- * @author Litarvan
- * @version 2.1.0
- * @since 2.0.0
- */
-public class BadSyntaxException extends Exception
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Bot
 {
-    /**
-     * The Bad Syntax Exception<br>
-     * Default message is <i>"Bad command syntax"</i>
-     */
-    public BadSyntaxException()
-    {
-        super("Bad command syntax");
-    }
-
-    /**
-     * The Bad Syntax Exception
-     *
-     * @param s The exception message
-     */
-    public BadSyntaxException(String s)
-    {
-        super(s);
-    }
+    String name();
+    String version();
+    String author();
 }

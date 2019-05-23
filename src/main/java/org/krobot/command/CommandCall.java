@@ -16,27 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.krobot;
+package org.krobot.command;
 
-import com.google.inject.Module;
-
-/**
- * A Krobot Discord bot<br><br>
- *
- *
- * A Discord bot that uses Krobot, just contains an initialization
- * method.<br><br>
- *
- * To start it, use {@link Krobot#start(String, Class, Module...)}
- *
- * @author Litarvan
- * @version 2.0.0
- * @since 2.0.0
- */
-public interface IBot
+public class CommandCall
 {
-    /**
-     * Initializes the bot, called just after setting up JDA
-     */
-    void init();
+    private KrobotCommand command;
+    private boolean cancelled;
+
+    public CommandCall(KrobotCommand command)
+    {
+        this.command = command;
+    }
+
+    public KrobotCommand getCommand()
+    {
+        return command;
+    }
+
+    public void setCancelled(boolean cancelled)
+    {
+        this.cancelled = cancelled;
+    }
+
+    public boolean isCancelled()
+    {
+        return cancelled;
+    }
 }

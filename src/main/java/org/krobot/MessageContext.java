@@ -16,21 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Krobot.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.krobot.command;
+package org.krobot;
 
-import java.util.concurrent.Future;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
-import org.krobot.Krobot;
+import net.dv8tion.jda.core.requests.RequestFuture;
 import org.krobot.permission.BotNotAllowedException;
 import org.krobot.permission.UserNotAllowedException;
+import org.krobot.util.Dialog;
 
 /**
  * The Command Context<br><br>
@@ -44,21 +45,24 @@ import org.krobot.permission.UserNotAllowedException;
  * @version 2.1.1
  * @since 2.0.0
  */
-public class CommandContext
+public class MessageContext
 {
+    private JDA jda;
     private User user;
     private Message message;
-    private TextChannel channel;
+    private MessageChannel channel;
 
     /**
      * The command Context
      *
+     * @param jda Current JDA instance
      * @param user The user that called the command
      * @param message The command message
      * @param channel The channel where the command was called
      */
-    public CommandContext(User user, Message message, TextChannel channel)
+    public MessageContext(JDA jda, User user, Message message, MessageChannel channel)
     {
+        this.jda = jda;
         this.user = user;
         this.message = message;
         this.channel = channel;
@@ -75,7 +79,13 @@ public class CommandContext
      */
     public void require(Permission permission) throws BotNotAllowedException
     {
-        if (!this.getGuild().getMember(Krobot.jda().getSelfUser()).hasPermission(permission))
+        Guild guild = getGuild();
+        if (guild == null)
+        {
+            return;
+        }
+
+        if (!guild.getMember(jda.getSelfUser()).hasPermission(permission))
         {
             throw new BotNotAllowedException(permission);
         }
@@ -92,6 +102,12 @@ public class CommandContext
      */
     public void requireCaller(Permission permission) throws UserNotAllowedException
     {
+        Member member = getMember();
+        if (member == null)
+        {
+            return;
+        }
+
         if (!this.getMember().hasPermission(permission))
         {
             throw new UserNotAllowedException(permission);
@@ -105,7 +121,7 @@ public class CommandContext
      *
      * @return A Future representing the task result
      */
-    public Future<Message> sendMessage(String content)
+    public RequestFuture<Message> send(String content)
     {
         return channel.sendMessage(content).submit();
     }
@@ -118,7 +134,7 @@ public class CommandContext
      *
      * @return A Future representing the task result
      */
-    public Future<Message> sendMessage(String content, Object... args)
+    public RequestFuture<Message> send(String content, Object... args)
     {
         return channel.sendMessage(String.format(content, args)).submit();
     }
@@ -130,7 +146,7 @@ public class CommandContext
      *
      * @return A Future representing the task result
      */
-    public Future<Message> sendMessage(MessageEmbed content)
+    public RequestFuture<Message> send(MessageEmbed content)
     {
         return channel.sendMessage(content).submit();
     }
@@ -142,9 +158,44 @@ public class CommandContext
      *
      * @return A Future representing  task result
      */
-    public Future<Message> sendMessage(EmbedBuilder content)
+    public RequestFuture<Message> send(EmbedBuilder content)
     {
-        return sendMessage(content.build());
+        return send(content.build());
+    }
+
+    public RequestFuture<Message> info(String title, String message)
+    {
+        return send(Dialog.info(title, message));
+    }
+
+    public RequestFuture<Message> warn(String title, String message)
+    {
+        return send(Dialog.warn(title, message));
+    }
+
+    public RequestFuture<Message> error(String title, String message)
+    {
+        return send(Dialog.error(title, message));
+    }
+
+    public boolean hasPermission(Permission... permissions)
+    {
+        if (this.channel instanceof TextChannel)
+        {
+            return getMember().hasPermission((TextChannel) this.channel, permissions);
+        }
+
+        return true;
+    }
+
+    public boolean botHasPermission(Permission... permissions)
+    {
+        if (this.channel instanceof TextChannel)
+        {
+            return getBotMember().hasPermission((TextChannel) this.channel, permissions);
+        }
+
+        return true;
     }
 
     /**
@@ -160,7 +211,24 @@ public class CommandContext
      */
     public Guild getGuild()
     {
-        return this.getChannel().getGuild();
+        if (this.channel instanceof TextChannel)
+        {
+            return ((TextChannel) this.getChannel()).getGuild();
+        }
+
+        return null;
+    }
+
+    public Member getBotMember()
+    {
+
+        Guild guild = getGuild();
+        if (guild == null)
+        {
+            return null;
+        }
+
+        return guild.getMember(jda.getSelfUser());
     }
 
     /**
@@ -168,7 +236,13 @@ public class CommandContext
      */
     public Member getMember()
     {
-        return this.getGuild().getMember(this.getUser());
+        Guild guild = getGuild();
+        if (guild == null)
+        {
+            return null;
+        }
+
+        return guild.getMember(this.getUser());
     }
 
     /**
@@ -190,7 +264,7 @@ public class CommandContext
     /**
      * @return The channel where the command was called
      */
-    public TextChannel getChannel()
+    public MessageChannel getChannel()
     {
         return channel;
     }

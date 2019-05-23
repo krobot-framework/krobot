@@ -18,30 +18,10 @@
  */
 package org.krobot.command;
 
-import java.util.Map;
-import org.jetbrains.annotations.NotNull;
+import org.krobot.MessageContext;
 
-/**
- * The Command Handler<br><br>
- *
- *
- * Called by the {@link CommandManager} to handle the call
- * of a command.
- *
- * @author Litarvan
- * @version 2.1.0
- * @since 2.0.0
- */
 @FunctionalInterface
 public interface CommandHandler
 {
-    /**
-     * Handle a command calling
-     *
-     * @param context The context of the command call
-     * @param args The supplied arguments
-     *
-     * @throws Exception If the command threw one
-     */
-    void handle(@NotNull CommandContext context, @NotNull Map<String, SuppliedArgument> args) throws Exception;
+    Object handle(MessageContext context, ArgumentMap args) throws Exception;
 }

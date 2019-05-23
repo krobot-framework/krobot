@@ -27,7 +27,7 @@ package org.krobot.util;
  * <b>Example :</b>
  *
  * <pre>
- *     channel.sendMessage("I am a " + Markdown.bold("bot")).queue();
+ *     channel.send("I am a " + Markdown.bold("bot")).queue();
  * </pre>
  *
  * @author Litarvan

@@ -18,146 +18,124 @@
  */
 package org.krobot.config;
 
+import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
-/**
- * The File Config<br><br>
- *
- *
- * A config that can be loaded/saved from/to a file.
- *
- * @author Litarvan
- * @version 2.0.0
- * @since 2.0.0
- */
-public abstract class FileConfig implements Config
+public class FileConfig implements Config
 {
-    /**
-     * If it should save automatically when defining a value
-     */
-    protected boolean autoSave = true;
+    protected static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    /**
-     * The config file
-     */
-    protected File file;
+    private File file;
+    private JsonObject config;
 
-    /**
-     * Empty config, no file set, can't save until set.
-     */
-    public FileConfig()
+    public FileConfig(File file) throws IOException
     {
+        this.file = file;
+        this.config = new JsonParser().parse(Files.toString(file, Charset.defaultCharset())).getAsJsonObject();
     }
 
-    /**
-     * Config from a file, if it exists, config will be loaded from it.
-     *
-     * @param file The file of the config
-     */
-    public FileConfig(File file)
+    @Override
+    public <T> T get(String key, T def, Class<T> type)
     {
-        this.in(file);
+        T value = gson.fromJson(config.get(key), type);
+        return value == null ? def : value;
+    }
 
-        if (file != null && file.exists())
+    @Override
+    public void set(String key, Object value)
+    {
+        if (key.contains("."))
         {
-            this.load();
+            try
+            {
+                String[] split = key.split("\\.");
+                JsonObject object = config;
+
+                for (int i = 0; i < split.length - 1; i++)
+                {
+                    String str = split[i];
+
+                    if (!object.has(str))
+                    {
+                        object.add(str, new JsonObject());
+                    }
+
+                    object = object.getAsJsonObject(str);
+                }
+
+                object.add(split[split.length - 1], gson.toJsonTree(value));
+            }
+            catch (JsonParseException ignored)
+            {
+            }
+        }
+        else
+        {
+            config.add(key, gson.toJsonTree(value));
+        }
+
+        save();
+    }
+
+    @Override
+    public <T> T at(String path, T def, Class<T> type)
+    {
+        try
+        {
+            String[] split = path.split("\\.");
+            JsonElement el = config;
+
+            for (int i = 0; i < split.length - 1; i++)
+            {
+                el = el.getAsJsonObject().get(split[i]);
+
+                if (el == null)
+                {
+                    return null;
+                }
+
+                if (!el.isJsonObject())
+                {
+                    throw new IllegalArgumentException("Field '" + split[i] + "' isn't an object");
+                }
+            }
+
+            return gson.fromJson(el.getAsJsonObject().get(split[split.length - 1]), type);
+        }
+        catch (JsonParseException e)
+        {
+            return def;
         }
     }
 
-    /**
-     * @return The file of the config
-     */
+    private void save()
+    {
+        if (!file.exists())
+        {
+            file.getParentFile().mkdirs();
+        }
+
+        try
+        {
+            Files.write(gson.toJson(config), file, Charset.defaultCharset());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Can't save the config", e);
+        }
+    }
+
     public File getFile()
     {
         return file;
     }
-
-    /**
-     * Define the file of the config
-     *
-     * @param file The config file
-     *
-     * @return This
-     */
-    public FileConfig in(File file)
-    {
-        this.file = file;
-        return this;
-    }
-
-    /**
-     * Provide a default configuration from a file path<br>
-     * <b>If the file is in the classpath it will tries to find it before</b>
-     *
-     * @param path The default configuration path
-     *e
-     * @return This
-     */
-    public FileConfig defaultIn(String path)
-    {
-        File file = Config.resource(path);
-
-        if (!file.exists())
-        {
-            file = new File(path);
-        }
-
-        return defaultIn(file);
-    }
-
-    /**
-     * Provide a default configuration from a file
-     *
-     * @param file The default configuration
-     *
-     * @return This
-     */
-    public abstract FileConfig defaultIn(File file);
-
-    /**
-     * Enable or disable automatic saving when setting a value
-     *
-     * @param autoSave Enable/disable the auto save
-     *
-     * @return This
-     */
-    public FileConfig autoSave(boolean autoSave)
-    {
-        this.autoSave = autoSave;
-        return this;
-    }
-
-    /**
-     * @return If it automatically saves when setting a value
-     */
-    public boolean isAutoSaveEnabled()
-    {
-        return autoSave;
-    }
-
-    /**
-     * @return If saving is supported
-     */
-    @Override
-    public boolean isSavingSupported()
-    {
-        return true;
-    }
-
-    /**
-     * Load the config from the file.<br>
-     * Will probably throw an exception if no file is set.
-     *
-     * @return This
-     */
-    public abstract FileConfig load();
-
-    /**
-     * Save the config from the file.<br>
-     * Will probably throw an exception if no file is set or
-     * saving is not supported.
-     *
-     * @return This
-     */
-    public abstract FileConfig save();
 }

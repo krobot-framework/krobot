@@ -18,21 +18,25 @@
  */
 package org.krobot.runtime;
 
-import com.google.common.io.Files;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.fusesource.jansi.Ansi.Color;
 import org.krobot.KrobotModule;
+import org.krobot.config.BridgeConfig;
 import org.krobot.config.ConfigRules;
 import org.krobot.config.ConfigRules.DefaultPath;
-import org.krobot.config.BridgeConfig;
 import org.krobot.config.FileConfig;
 import org.krobot.module.ImportRules.ConfigBridge;
 import org.krobot.util.ColoredLogger;
+
+import com.google.common.io.Files;
 
 public class ConfigLoader
 {
@@ -75,7 +79,7 @@ public class ConfigLoader
         }
 
         File file = new File(path);
-        File def = null;
+        InputStream def = null;
 
         String name = rules.getName();
 
@@ -112,7 +116,8 @@ public class ConfigLoader
                 {
                     try
                     {
-                        Files.copy(def, file);
+                    	Files.write(toByteArray(def), file);
+                        ///Files.copy(def, file);
                     }
                     catch (IOException e)
                     {
@@ -164,29 +169,30 @@ public class ConfigLoader
         }
     }
 
-    private File getDefaultFile(DefaultPath def)
+    private InputStream getDefaultFile(DefaultPath def)
     {
         switch (def.getLocation())
         {
             case FILESYSTEM:
-                return new File(def.getPath());
+			try {
+				return new FileInputStream(def.getPath());
+			} catch (FileNotFoundException ignored) {}
             case CLASSPATH:
-                try
-                {
-                    URL res = module.getClass().getResource(def.getPath());
-
-                    if (res == null)
-                    {
-                        return null;
-                    }
-
-                    return new File(res.toURI());
-                }
-                catch (URISyntaxException ignored)
-                {
-                }
+            	return module.getClass().getResourceAsStream(def.getPath());
         }
 
         return null;
     }
+    
+	private byte[] toByteArray(InputStream in) throws IOException {
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+		byte[] buffer = new byte[1024];
+		int len;
+		while ((len = in.read(buffer)) != -1)
+			os.write(buffer, 0, len);
+
+		return os.toByteArray();
+	}
 }

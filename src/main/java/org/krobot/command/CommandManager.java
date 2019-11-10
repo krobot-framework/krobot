@@ -234,7 +234,7 @@ public class CommandManager
 
         if (!call.isCancelled())
         {
-            if (!command.getHandler().getClass().isAnnotationPresent(NoTyping.class))
+            if (!command.getHandler().getClass().isAnnotationPresent(NoTyping.class) && context.getChannel() != null)
             {
                 context.getChannel().sendTyping().queue();
             }

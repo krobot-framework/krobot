@@ -37,6 +37,7 @@ import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.SelfUser;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
@@ -286,6 +287,15 @@ public class KrobotRuntime
 
             if (cl.isAnnotationPresent(Include.class))
             {
+                Stream.of(cl.getAnnotation(Include.class).filters()).map(injector::getInstance).forEach(commandManager.getFilters()::add);
+            }
+        });
+        
+        modules.forEach(module -> {
+            Class<? extends KrobotModule> cl = module.getModule().getClass();
+
+            if (cl.isAnnotationPresent(Include.class))
+            {
                 Class<? extends CommandHandler>[] classes = cl.getAnnotation(Include.class).commands();
 
                 for (Class<? extends CommandHandler> commandClass : classes)
@@ -483,7 +493,10 @@ public class KrobotRuntime
 
     @SubscribeEvent
     public void onMessage(MessageReceivedEvent event)
-    {
+    {    	
+    	if (event.getTextChannel() == null) //Private Channel
+    		return;
+    	
         final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getTextChannel());
         handle(context);
     }
@@ -492,8 +505,8 @@ public class KrobotRuntime
     public void onPrivateMessage(PrivateMessageReceivedEvent event)
     {
     	if (event.getAuthor() instanceof SelfUser) return;
-    	
-        final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getAuthor().openPrivateChannel().complete());
+
+    	final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getAuthor().openPrivateChannel().complete());
         handle(context);
     }
 

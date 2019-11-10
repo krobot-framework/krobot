@@ -37,6 +37,7 @@ import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.SelfUser;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
@@ -490,7 +491,9 @@ public class KrobotRuntime
     @SubscribeEvent
     public void onPrivateMessage(PrivateMessageReceivedEvent event)
     {
-        final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getChannel());
+    	if (event.getAuthor() instanceof SelfUser) return;
+    	
+        final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getAuthor().openPrivateChannel().complete());
         handle(context);
     }
 

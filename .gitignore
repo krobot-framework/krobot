@@ -9,3 +9,5 @@ logs/
 out/
 *.json
 .token
+/.classpath
+/.project

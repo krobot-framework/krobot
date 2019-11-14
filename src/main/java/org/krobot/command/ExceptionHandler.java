@@ -50,7 +50,10 @@ public class ExceptionHandler
 
         if (handler.isPresent())
         {
-            handler.get().handle(context, t);
+        	if (command.getErrorMP())
+        		handler.get().handle(new MessageContext(context.getJDA(), context.getUser(), context.getMessage(), context.getUser().openPrivateChannel().complete()), t);
+        	else
+        		handler.get().handle(context, t);
             return;
         }
 

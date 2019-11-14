@@ -488,7 +488,7 @@ public class KrobotRuntime
         List<CommandFilter> filters = Stream.of(command.filters()).map(injector::getInstance).collect(Collectors.toList());
         List<KrobotCommand> subs = Stream.of(command.subs()).map(c -> registerCommandClass(module, c)).collect(Collectors.toList());
 
-        return new KrobotCommand(compiler.label(), compiler.args(), command.desc(), command.aliases(), filters, injector.getInstance(commandClass), subs);
+        return new KrobotCommand(compiler.label(), compiler.args(), command.desc(), command.aliases(), command.errorMP(), filters, injector.getInstance(commandClass), subs);
     }
 
     @SubscribeEvent

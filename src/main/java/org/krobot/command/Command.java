@@ -32,4 +32,9 @@ public @interface Command
     String[] aliases() default {};
     Class<? extends CommandFilter>[] filters() default {};
     Class<? extends CommandHandler>[] subs() default {};
+    
+    /**
+     * sending errors commands as private message.
+     */
+    boolean errorMP() default false; 
 }

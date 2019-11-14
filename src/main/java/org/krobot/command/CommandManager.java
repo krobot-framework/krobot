@@ -226,6 +226,7 @@ public class CommandManager
 
         if (command.getFilters() != null)
         {
+        	System.out.println("filter ?");
             for (CommandFilter filter : command.getFilters())
             {
                 filter.filter(call, context, argsMap);

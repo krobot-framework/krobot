@@ -207,6 +207,14 @@ public class MessageContext
     }
 
     /**
+     * @return The current JDA instance
+     */
+    public JDA getJDA()
+    {
+    	return jda;
+    }
+    
+    /**
      * @return The guild where the command was called
      */
     public Guild getGuild()

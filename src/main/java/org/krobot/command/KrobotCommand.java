@@ -27,7 +27,8 @@ public class KrobotCommand
     private String[] aliases;
     private CommandArgument[] arguments;
     private String description;
-    private boolean errorMP;
+    private boolean errorMP; //error in private message
+    private boolean handleMP; //private message only
     private List<CommandFilter> filters;
     private List<KrobotCommand> subs;
     private CommandHandler handler;
@@ -40,16 +41,17 @@ public class KrobotCommand
 
     public KrobotCommand(String label, CommandArgument[] arguments, CommandHandler handler, List<KrobotCommand> subs)
     {
-        this(label, arguments, "", new String[] {}, false, new ArrayList<>(), handler, new ArrayList<>());
+        this(label, arguments, "", new String[] {}, false, false, new ArrayList<>(), handler, new ArrayList<>());
     }
 
-    public KrobotCommand(String label, CommandArgument[] arguments, String description, String[] aliases, boolean errorMP, List<CommandFilter> filters, CommandHandler handler, List<KrobotCommand> subs)
+    public KrobotCommand(String label, CommandArgument[] arguments, String description, String[] aliases, boolean errorMP, boolean handleMP, List<CommandFilter> filters, CommandHandler handler, List<KrobotCommand> subs)
     {
         this.label = label;
         this.aliases = aliases;
         this.arguments = arguments;
         this.description = description;
         this.errorMP = errorMP;
+        this.handleMP = handleMP;
         this.filters = filters;
         this.subs = subs;
         this.handler = handler;
@@ -94,15 +96,25 @@ public class KrobotCommand
     {
         this.description = description;
     }
-    
+
     public boolean getErrorMP()
     {
     	return errorMP;
     }
-    
+
     public void setErrorMP(boolean errorMP)
     {
     	this.errorMP = errorMP;
+    }
+
+    public boolean getHandleMP()
+    {
+    	return handleMP;
+    }
+
+    public void setHandleMP(boolean handleMP)
+    {
+    	this.handleMP = handleMP;
     }
 
     public List<CommandFilter> getFilters()

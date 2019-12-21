@@ -18,9 +18,9 @@
  */
 package org.krobot.runtime;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.BLUE;
+
 import java.lang.reflect.Field;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -34,31 +34,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.security.auth.login.LoginException;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.PrivateChannel;
-import net.dv8tion.jda.core.entities.SelfUser;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
-import net.dv8tion.jda.core.exceptions.RateLimitedException;
-import net.dv8tion.jda.core.hooks.AnnotatedEventManager;
-import net.dv8tion.jda.core.hooks.SubscribeEvent;
-import org.apache.commons.lang3.ArrayUtils;
+
 import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.Ansi.Color;
 import org.fusesource.jansi.AnsiConsole;
 import org.krobot.Bot;
 import org.krobot.Krobot;
 import org.krobot.KrobotModule;
-import org.krobot.command.ArgumentMap;
-import org.krobot.command.Command;
-import org.krobot.command.CommandCall;
-import org.krobot.command.CommandFilter;
-import org.krobot.command.ExceptionHandler;
-import org.krobot.command.CommandHandler;
-import org.krobot.command.KrobotCommand;
 import org.krobot.MessageContext;
+import org.krobot.command.Command;
+import org.krobot.command.CommandFilter;
+import org.krobot.command.CommandHandler;
 import org.krobot.command.CommandManager;
+import org.krobot.command.ExceptionHandler;
+import org.krobot.command.KrobotCommand;
 import org.krobot.command.PathCompiler;
 import org.krobot.console.ExitCommand;
 import org.krobot.console.HelpCommand;
@@ -68,9 +57,18 @@ import org.krobot.module.LoadModule;
 import org.krobot.runtime.ModuleLoader.ComputedModule;
 import org.krobot.util.ColoredLogger;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 
-import static org.fusesource.jansi.Ansi.*;
-import static org.fusesource.jansi.Ansi.Color.*;
+import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.SelfUser;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.core.hooks.AnnotatedEventManager;
+import net.dv8tion.jda.core.hooks.SubscribeEvent;
 
 public class KrobotRuntime
 {
@@ -488,7 +486,7 @@ public class KrobotRuntime
         List<CommandFilter> filters = Stream.of(command.filters()).map(injector::getInstance).collect(Collectors.toList());
         List<KrobotCommand> subs = Stream.of(command.subs()).map(c -> registerCommandClass(module, c)).collect(Collectors.toList());
 
-        return new KrobotCommand(compiler.label(), compiler.args(), command.desc(), command.aliases(), command.errorMP(), filters, injector.getInstance(commandClass), subs);
+        return new KrobotCommand(compiler.label(), compiler.args(), command.desc(), command.aliases(), command.errorMP(), command.handleMP(), filters, injector.getInstance(commandClass), subs);
     }
 
     @SubscribeEvent

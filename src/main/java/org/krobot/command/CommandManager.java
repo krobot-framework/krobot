@@ -28,13 +28,10 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.requests.RestAction;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.krobot.MessageContext;
 import org.krobot.permission.BotNotAllowedException;
@@ -43,6 +40,12 @@ import org.krobot.permission.UserNotAllowedException;
 import org.krobot.permission.UserRequires;
 import org.krobot.runtime.KrobotRuntime;
 import org.krobot.util.UserUtils;
+
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.requests.RestAction;
 
 @Singleton
 public class CommandManager
@@ -226,7 +229,6 @@ public class CommandManager
 
         if (command.getFilters() != null)
         {
-        	System.out.println("filter ?");
             for (CommandFilter filter : command.getFilters())
             {
                 filter.filter(call, context, argsMap);
@@ -240,10 +242,14 @@ public class CommandManager
                 context.getChannel().sendTyping().queue();
             }
 
+            final MessageContext originalContext = context;
             Object result;
 
             try
             {
+                if (command.getHandleMP())
+                	context = new MessageContext(context.getJDA(), context.getUser(), context.getMessage(), context.getUser().openPrivateChannel().complete());
+
                 result = command.getHandler().handle(context, argsMap);
             }
             catch (Throwable t)
@@ -252,9 +258,9 @@ public class CommandManager
                 return;
             }
 
-            if (context.botHasPermission(Permission.MESSAGE_MANAGE) && context.getGuild() != null /* Check we are not in dm */ )
+            if (originalContext.botHasPermission(Permission.MESSAGE_MANAGE) && originalContext.getGuild() != null /* Check we are not in dm */ )
             {
-                context.getMessage().delete().reason("Command triggered").queue();
+            	originalContext.getMessage().delete().reason("Command triggered").queue();
             }
 
             if (result != null)

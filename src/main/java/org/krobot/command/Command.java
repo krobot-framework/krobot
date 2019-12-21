@@ -37,4 +37,8 @@ public @interface Command
      * sending errors commands as private message.
      */
     boolean errorMP() default false; 
+    /**
+     * handle command in private message only.
+     */
+    boolean handleMP() default false;
 }

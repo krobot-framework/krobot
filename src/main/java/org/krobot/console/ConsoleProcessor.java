@@ -69,7 +69,12 @@ public class ConsoleProcessor extends Thread
         {
             try
             {
-                parse(reader.readLine(console.getRuntime().getStateBar() == null ? "> " : null));
+                String line = reader.readLine(console.getRuntime().getStateBar() == null ? "> " : null);
+                if (line == null) {
+                    return;
+                }
+
+                parse(line);
             }
             catch (UserInterruptException e)
             {

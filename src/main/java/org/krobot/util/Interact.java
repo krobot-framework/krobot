@@ -20,17 +20,18 @@ package org.krobot.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageReaction.ReactionEmote;
-import net.dv8tion.jda.core.events.message.MessageDeleteEvent;
-import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.SubscribeEvent;
-import net.dv8tion.jda.core.requests.RequestFuture;
-import net.dv8tion.jda.core.requests.RestAction;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.SubscribeEvent;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.krobot.Krobot;
 import org.krobot.MessageContext;
 
@@ -42,9 +43,10 @@ public class Interact
     public static final String NO = "\u274e";
 
     private Message message;
+    private User author;
     private List<InteractAction> actions;
 
-    protected Interact(Message message, long timeout)
+    protected Interact(Message message, User author, long timeout)
     {
         this.message = message;
         this.actions = new ArrayList<>();
@@ -97,6 +99,11 @@ public class Interact
             return;
         }
 
+        if (author != null && event.getUserIdLong() != author.getIdLong())
+        {
+            return;
+        }
+
         ReactionEmote reaction = event.getReactionEmote();
         MessageContext context = new MessageContext(event.getJDA(), event.getUser(), this.message, event.getTextChannel());
 
@@ -144,12 +151,12 @@ public class Interact
         return from(message.complete(), timeout);
     }
 
-    public static Interact from(RequestFuture<Message> message)
+    public static Interact from(CompletableFuture<Message> message)
     {
         return from(message, DEFAULT_TIMEOUT);
     }
 
-    public static Interact from(RequestFuture<Message> message, long timeout)
+    public static Interact from(CompletableFuture<Message> message, long timeout)
     {
         try
         {
@@ -168,7 +175,12 @@ public class Interact
 
     public static Interact from(Message message, long timeout)
     {
-        return new Interact(message, timeout);
+        return from(message, null, timeout);
+    }
+
+    public static Interact from(Message message, User author, long timeout)
+    {
+        return new Interact(message, author, timeout);
     }
 
     public static class InteractAction

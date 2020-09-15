@@ -18,20 +18,21 @@
  */
 package org.krobot;
 
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.requests.RequestFuture;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import org.krobot.permission.BotNotAllowedException;
 import org.krobot.permission.UserNotAllowedException;
 import org.krobot.util.Dialog;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The Command Context<br><br>
@@ -121,7 +122,7 @@ public class MessageContext
      *
      * @return A Future representing the task result
      */
-    public RequestFuture<Message> send(String content)
+    public CompletableFuture<Message> send(String content)
     {
         return channel.sendMessage(content).submit();
     }
@@ -134,7 +135,7 @@ public class MessageContext
      *
      * @return A Future representing the task result
      */
-    public RequestFuture<Message> send(String content, Object... args)
+    public CompletableFuture<Message> send(String content, Object... args)
     {
         return channel.sendMessage(String.format(content, args)).submit();
     }
@@ -146,7 +147,7 @@ public class MessageContext
      *
      * @return A Future representing the task result
      */
-    public RequestFuture<Message> send(MessageEmbed content)
+    public CompletableFuture<Message> send(MessageEmbed content)
     {
         return channel.sendMessage(content).submit();
     }
@@ -158,22 +159,22 @@ public class MessageContext
      *
      * @return A Future representing  task result
      */
-    public RequestFuture<Message> send(EmbedBuilder content)
+    public CompletableFuture<Message> send(EmbedBuilder content)
     {
         return send(content.build());
     }
 
-    public RequestFuture<Message> info(String title, String message)
+    public CompletableFuture<Message> info(String title, String message)
     {
         return send(Dialog.info(title, message));
     }
 
-    public RequestFuture<Message> warn(String title, String message)
+    public CompletableFuture<Message> warn(String title, String message)
     {
         return send(Dialog.warn(title, message));
     }
 
-    public RequestFuture<Message> error(String title, String message)
+    public CompletableFuture<Message> error(String title, String message)
     {
         return send(Dialog.error(title, message));
     }

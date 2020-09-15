@@ -73,8 +73,8 @@ public class StateBar extends Thread
         result += "@|bold Uptime : |@@|bold,blue " + DurationFormatUtils.formatDuration(runtime.getUptime(), "dd'd' HH'h' mm'm' ss's'") + "|@ @|bold | |@";
 
         // Ping
-        long ping = runtime.jda().getPing();
-        result += "@|bold Ping : |@@|bold," + colored(ping, 175, 450) + " " + runtime.jda().getPing() + "|@@|bold ms | |@";
+        long ping = runtime.jda().getGatewayPing();
+        result += "@|bold Ping : |@@|bold," + colored(ping, 175, 450) + " " + ping + "|@@|bold ms | |@";
 
         // Threads
         int active = runtime.getThreadPool().getActiveCount();

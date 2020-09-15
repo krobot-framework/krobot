@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.inject.Singleton;
-import net.dv8tion.jda.core.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.krobot.Krobot;
 import org.krobot.MessageContext;

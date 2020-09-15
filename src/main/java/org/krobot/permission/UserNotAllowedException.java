@@ -18,7 +18,7 @@
  */
 package org.krobot.permission;
 
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.Permission;
 import org.krobot.command.KrobotCommand;
 
 /**

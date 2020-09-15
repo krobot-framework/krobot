@@ -22,17 +22,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Icon;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.Webhook;
-import net.dv8tion.jda.core.requests.Request;
-import net.dv8tion.jda.core.requests.Requester;
-import net.dv8tion.jda.core.requests.Response;
-import net.dv8tion.jda.core.requests.RestAction;
-import net.dv8tion.jda.core.requests.Route;
-import net.dv8tion.jda.core.requests.restaction.WebhookAction;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Icon;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.Webhook;
+import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.WebhookAction;
+import net.dv8tion.jda.internal.requests.Requester;
+import net.dv8tion.jda.internal.requests.RestActionImpl;
+import net.dv8tion.jda.internal.requests.Route;
 import okhttp3.RequestBody;
 
 public class WebhookBuilder
@@ -87,22 +86,7 @@ public class WebhookBuilder
     public RestAction<Void> execute()
     {
         RequestBody body = RequestBody.create(Requester.MEDIA_TYPE_JSON, gson.toJson(this));
-
-        return new RestAction<Void>(webhook.getJDA(), Route.Webhooks.EXECUTE_WEBHOOK.compile(webhook.getId(), webhook.getToken()), body)
-        {
-            @Override
-            protected void handleResponse(Response response, Request<Void> request)
-            {
-                if (response.isOk())
-                {
-                    request.onSuccess(null);
-                }
-                else
-                {
-                    request.onFailure(response);
-                }
-            }
-        };
+        return new RestActionImpl<Void>(webhook.getJDA(), Route.Webhooks.EXECUTE_WEBHOOK.compile(webhook.getId(), webhook.getToken()), body);
     }
 
     public WebhookBuilder addEmbed(MessageEmbed embed)
@@ -123,7 +107,7 @@ public class WebhookBuilder
 
     public static WebhookBuilder from(String name, TextChannel channel, Icon icon)
     {
-        for (Webhook hook : channel.getWebhooks().complete())
+        for (Webhook hook : channel.retrieveWebhooks().complete())
         {
             if (hook.getName().equals(name))
             {
@@ -135,7 +119,7 @@ public class WebhookBuilder
 
         if (icon != null)
         {
-            builder.setAvatar(icon);
+            builder.setAvatar(icon).queue();
         }
 
         return from(builder.complete());

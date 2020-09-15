@@ -8,6 +8,8 @@ import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.krobot.util.MessageUtils;
 
+import java.util.regex.Pattern;
+
 public class ConsoleHighlighter implements Highlighter
 {
     private KrobotConsole console;
@@ -108,5 +110,15 @@ public class ConsoleHighlighter implements Highlighter
         }
 
         return builder.toAttributedString();
+    }
+
+    @Override
+    public void setErrorPattern(Pattern errorPattern)
+    {
+    }
+
+    @Override
+    public void setErrorIndex(int errorIndex)
+    {
     }
 }

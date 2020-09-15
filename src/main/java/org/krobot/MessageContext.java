@@ -21,18 +21,14 @@ package org.krobot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import org.krobot.permission.BotNotAllowedException;
 import org.krobot.permission.UserNotAllowedException;
 import org.krobot.util.Dialog;
+import org.krobot.util.MessageUtils;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The Command Context<br><br>
@@ -86,7 +82,7 @@ public class MessageContext
             return;
         }
 
-        if (!guild.getMember(jda.getSelfUser()).hasPermission(permission))
+        if (!guild.retrieveMember(jda.getSelfUser()).complete().hasPermission(permission))
         {
             throw new BotNotAllowedException(permission);
         }
@@ -181,9 +177,20 @@ public class MessageContext
 
     public boolean hasPermission(Permission... permissions)
     {
-        if (this.channel instanceof TextChannel)
+        if (this.channel instanceof GuildChannel)
         {
-            return getMember().hasPermission((TextChannel) this.channel, permissions);
+            Member member = getMember();
+            if (member == null) {
+                try {
+                    MessageUtils.deleteAfter(error("Membre inconnu", "Impossible de récupérer le membre de l'auteur de la commande").get(), 2500);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                return false;
+            }
+
+            return member.hasPermission((GuildChannel) this.channel, permissions);
         }
 
         return true;
@@ -191,9 +198,9 @@ public class MessageContext
 
     public boolean botHasPermission(Permission... permissions)
     {
-        if (this.channel instanceof TextChannel)
+        if (this.channel instanceof GuildChannel)
         {
-            return getBotMember().hasPermission((TextChannel) this.channel, permissions);
+            return getBotMember().hasPermission((GuildChannel) this.channel, permissions);
         }
 
         return true;
@@ -220,9 +227,9 @@ public class MessageContext
      */
     public Guild getGuild()
     {
-        if (this.channel instanceof TextChannel)
+        if (this.channel instanceof GuildChannel)
         {
-            return ((TextChannel) this.getChannel()).getGuild();
+            return ((GuildChannel) this.getChannel()).getGuild();
         }
 
         return null;
@@ -251,7 +258,7 @@ public class MessageContext
             return null;
         }
 
-        return guild.getMember(this.getUser());
+        return guild.retrieveMember(this.getUser()).complete();
     }
 
     /**
@@ -276,5 +283,13 @@ public class MessageContext
     public MessageChannel getChannel()
     {
         return channel;
+    }
+
+    /**
+     * @return If the context is from a private message channel
+     */
+    public boolean isFromPrivateMessage()
+    {
+        return channel instanceof PrivateChannel;
     }
 }

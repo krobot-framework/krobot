@@ -122,5 +122,6 @@ public class ExceptionHandler
 
         on(BotNotAllowedException.class, (context, t) -> context.send(Dialog.error("Missing required permission", t.getMessage())));
         on(UserNotAllowedException.class, (context, t) -> context.send(Dialog.error("You're missing a required permission", t.getMessage())));
+        on(PrivateChannelNotSupportedException.class, (context, t) -> context.send(Dialog.error("Unsupported channel", t.getMessage())));
     }
 }

@@ -46,9 +46,12 @@ public class Interact
     private User author;
     private List<InteractAction> actions;
 
+    private boolean thenDelete = false;
+
     protected Interact(Message message, User author, long timeout)
     {
         this.message = message;
+        this.author = author;
         this.actions = new ArrayList<>();
 
         Krobot.getRuntime().jda().addEventListener(this);
@@ -69,10 +72,16 @@ public class Interact
                     return;
                 }
 
-                this.message.clearReactions().queue();
+                this.message.delete().queue();
                 remove(Krobot.getRuntime().jda());
             }).start();
         }
+    }
+
+    public Interact thenDelete()
+    {
+        this.thenDelete = true;
+        return this;
     }
 
     public Interact on(String emote, Consumer<MessageContext> runnable)
@@ -113,6 +122,12 @@ public class Interact
                 || !reaction.isEmote() && action.stringEmote != null && reaction.getName().equals(action.stringEmote))
             {
                 action.runnable.accept(context);
+
+                if (thenDelete)
+                {
+                    this.message.delete().queue();
+                    this.remove(event.getJDA());
+                }
             }
         }
     }
@@ -168,9 +183,26 @@ public class Interact
         }
     }
 
+    public static Interact from(CompletableFuture<Message> message, User author)
+    {
+        try
+        {
+            return from(message.get(), author);
+        }
+        catch (InterruptedException | ExecutionException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Interact from(Message message)
     {
         return from(message, DEFAULT_TIMEOUT);
+    }
+
+    public static Interact from(Message message, User author)
+    {
+        return from(message, author, DEFAULT_TIMEOUT);
     }
 
     public static Interact from(Message message, long timeout)

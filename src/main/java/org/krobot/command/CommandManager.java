@@ -183,6 +183,11 @@ public class CommandManager
             }
         }
 
+        if (handler.getClass().isAnnotationPresent(GuildOnly.class) && context.isFromPrivateMessage())
+        {
+            throw new PrivateChannelNotSupportedException();
+        }
+
         Map<String, Object> supplied = new HashMap<>();
 
         int i;
@@ -260,7 +265,13 @@ public class CommandManager
 
             if (originalContext.botHasPermission(Permission.MESSAGE_MANAGE) && originalContext.getGuild() != null /* Check we are not in dm */ )
             {
-            	originalContext.getMessage().delete().reason("Command triggered").queue();
+                try
+                {
+                    originalContext.getMessage().delete().reason("Command triggered").complete();
+                }
+                catch (Exception ignored)
+                {
+                }
             }
 
             if (result != null)

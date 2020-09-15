@@ -35,6 +35,8 @@ import java.util.stream.Stream;
 
 import javax.security.auth.login.LoginException;
 
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Color;
 import org.fusesource.jansi.AnsiConsole;
@@ -491,20 +493,15 @@ public class KrobotRuntime
 
     @SubscribeEvent
     public void onMessage(MessageReceivedEvent event)
-    {    	
-    	if (event.getTextChannel() == null) //Private Channel
-    		return;
-    	
-        final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getTextChannel());
-        handle(context);
-    }
-
-    @SubscribeEvent
-    public void onPrivateMessage(PrivateMessageReceivedEvent event)
     {
-    	if (event.getAuthor() instanceof SelfUser) return;
+        if (event.getAuthor() instanceof SelfUser) return;
 
-    	final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), event.getAuthor().openPrivateChannel().complete());
+        MessageChannel channel;
+        if (event.isFromType(ChannelType.TEXT)) channel = event.getChannel();
+        else if (event.isFromType(ChannelType.PRIVATE)) channel = event.getAuthor().openPrivateChannel().complete();
+        else return;
+
+        final MessageContext context = new MessageContext(event.getJDA(), event.getAuthor(), event.getMessage(), channel);
         handle(context);
     }
 
@@ -518,8 +515,15 @@ public class KrobotRuntime
         threadPool.submit(() -> {
             long time = System.currentTimeMillis();
 
-            filterRunner.runFilters(context);
-            commandManager.handle(context);
+            try
+            {
+                filterRunner.runFilters(context);
+                commandManager.handle(context);
+            }
+            catch (Exception e)
+            {
+                log.error("Error while handling message", e);
+            }
 
             setLastExecutionTime(System.currentTimeMillis() - time);
         });

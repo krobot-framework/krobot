@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
+import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -103,7 +104,7 @@ public class Interact
     @SubscribeEvent
     protected void onReaction(MessageReactionAddEvent event)
     {
-        if (!event.getMessageId().equals(this.message.getId()) || actions == null || event.getMember().getUser().getId().equals(event.getJDA().getSelfUser().getId()))
+        if (!event.getMessageId().equals(this.message.getId()) || actions == null || event.getUser() instanceof SelfUser)
         {
             return;
         }
@@ -114,7 +115,7 @@ public class Interact
         }
 
         ReactionEmote reaction = event.getReactionEmote();
-        MessageContext context = new MessageContext(event.getJDA(), event.getUser(), this.message, event.getTextChannel());
+        MessageContext context = new MessageContext(event.getJDA(), event.retrieveUser().complete(), this.message, event.getTextChannel());
 
         for (InteractAction action : this.actions)
         {
